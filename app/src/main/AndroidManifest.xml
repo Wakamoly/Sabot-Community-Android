@@ -46,7 +46,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ForgotPassActivity" />
-        <activity android:name=".Walkthrough" />
+        <!--<activity android:name=".Walkthrough" />-->
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
