@@ -1,0 +1,1764 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bgLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <RelativeLayout
+            android:id="@+id/relLayout1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <include layout="@layout/snippet_top_profilebar" />
+
+        </RelativeLayout>
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/profileRefreshLayout"
+            android:layout_below="@id/relLayout1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/nestedScrollView"
+                android:background="@color/colorPrimary">
+
+                <LinearLayout
+                    android:id="@+id/profileLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:id="@+id/profileCover"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
+                            android:layout_width="match_parent"
+                            android:layout_height="180dp"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/profile_default_cover" />
+
+                        <RelativeLayout
+                            android:id="@+id/setProfileCoverButton"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginTop="155dp"
+                            android:layout_marginEnd="@dimen/spacing_mlarge"
+                            android:background="@drawable/circle_layout"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:visibility="gone"
+                            tools:visibility="visible">
+
+                            <de.hdodenhof.circleimageview.CircleImageView
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:layout_centerInParent="true"
+                                android:src="@drawable/ic_image_2"
+                                app:civ_border_color="@color/profile_action_icon_bg"
+                                app:civ_border_width="1dp" />
+
+                        </RelativeLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_alignParentStart="true"
+                            android:layout_alignParentTop="true"
+                            android:layout_marginTop="48dp"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical"
+                            android:padding="@dimen/spacing_mlarge">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/spacing_large"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <de.hdodenhof.circleimageview.CircleImageView
+                                    android:id="@+id/imageViewProfilePic"
+                                    android:layout_width="164dp"
+                                    android:layout_height="164dp"
+                                    app:civ_border_color="@color/white"
+                                    app:civ_border_width="7dp" />
+
+                                <de.hdodenhof.circleimageview.CircleImageView
+                                    android:id="@+id/verifiedIcon"
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:layout_marginStart="45dp"
+                                    android:layout_marginTop="-35dp"
+                                    android:src="@drawable/ic_verified"
+                                    android:visibility="gone"
+                                    app:civ_border_color="@color/white"
+                                    app:civ_border_width="3dp"
+                                    tools:visibility="visible" />
+
+                                <ImageView
+                                    android:id="@+id/starIcon"
+                                    android:layout_width="42dp"
+                                    android:layout_height="42dp"
+                                    android:layout_marginTop="-25dp"
+                                    android:src="@drawable/ic_star_yellow_24dp"
+                                    android:visibility="gone"
+                                    tools:visibility="visible" />
+
+                                <RelativeLayout
+                                    android:id="@+id/setProfilePhotoButton"
+                                    android:layout_width="48dp"
+                                    android:layout_height="48dp"
+                                    android:layout_marginTop="-65dp"
+                                    android:layout_marginEnd="50dp"
+                                    android:background="@drawable/circle_layout"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:visibility="gone"
+                                    tools:visibility="visible">
+
+                                    <de.hdodenhof.circleimageview.CircleImageView
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_action_camera"
+                                        app:civ_border_color="@color/profile_action_icon_bg"
+                                        app:civ_border_width="1dp" />
+
+                                </RelativeLayout>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/spacing_small"
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:id="@+id/textViewClanTag"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginEnd="3dp"
+                                        android:textColor="@color/pin"
+                                        android:textSize="22sp"
+                                        android:textStyle="bold"
+                                        tools:text="[YEET]" />
+
+                                    <TextView
+                                        android:id="@+id/textViewNickname"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                                        android:textColor="@color/white"
+                                        tools:text="Wakamoly" />
+
+                                    <ImageView
+                                        android:id="@+id/profileOnlineIcon"
+                                        android:layout_width="12dp"
+                                        android:layout_height="12dp"
+                                        android:layout_marginStart="4dp"
+                                        android:src="@drawable/ic_online"
+                                        android:tint="@color/green"
+                                        android:visibility="gone"
+                                        tools:visibility="visible" />
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:id="@+id/profileRatingContainer"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:gravity="center_horizontal"
+                                    android:orientation="horizontal">
+
+                                    <com.iarcuschin.simpleratingbar.SimpleRatingBar
+                                        android:id="@+id/profileRating"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_margin="3dp"
+                                        app:srb_borderColor="@color/colorAccent"
+                                        app:srb_fillColor="@color/green"
+                                        app:srb_isIndicator="true"
+                                        app:srb_numberOfStars="5"
+                                        app:srb_starBorderWidth="3"
+                                        app:srb_starSize="20dp"
+                                        app:srb_starsSeparation="1dp"
+                                        app:srb_stepSize="0.2" />
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="5dp">
+
+                                    <TextView
+                                        android:id="@+id/reviewCount"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="5dp"
+                                        android:layout_marginTop="5dp"
+                                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                        android:textColor="@color/white"
+                                        tools:text="0" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="3dp"
+                                        android:layout_marginTop="5dp"
+                                        android:text="@string/reviews"
+                                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                        android:textColor="@color/white" />
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:id="@+id/userProfileDetails"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:orientation="vertical">
+
+                                    <LinearLayout
+                                        android:id="@+id/followDetails"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="@color/topbar"
+                                        android:orientation="horizontal">
+
+                                        <TextView
+                                            android:id="@+id/followers"
+                                            android:layout_width="100dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginTop="5dp"
+                                            android:layout_weight="1"
+                                            android:gravity="center_horizontal"
+                                            android:text="@string/label_followers"
+                                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                            android:textSize="18sp"
+                                            android:textStyle="normal" />
+
+                                        <TextView
+                                            android:id="@+id/connections"
+                                            android:layout_width="100dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginTop="5dp"
+                                            android:layout_weight="1"
+                                            android:gravity="center_horizontal"
+                                            android:text="@string/connections"
+                                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                            android:textSize="18sp"
+                                            android:textStyle="normal" />
+
+                                        <TextView
+                                            android:id="@+id/following"
+                                            android:layout_width="100dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginTop="5dp"
+                                            android:layout_weight="1"
+                                            android:gravity="center_horizontal"
+                                            android:text="@string/followingTextProfile"
+                                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                            android:textSize="18sp"
+                                            android:textStyle="normal" />
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:id="@+id/followNumDetails"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="@color/topbar"
+                                        android:orientation="horizontal">
+
+                                        <TextView
+                                            android:id="@+id/followersCount"
+                                            android:layout_width="100dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:gravity="center_horizontal"
+                                            android:text="0"
+                                            tools:text="32" />
+
+                                        <TextView
+                                            android:id="@+id/friendsCount"
+                                            android:layout_width="100dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:gravity="center"
+                                            android:text="0"
+                                            tools:text="62" />
+
+                                        <TextView
+                                            android:id="@+id/followingCount"
+                                            android:layout_width="100dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:gravity="center_horizontal"
+                                            android:text="0"
+                                            tools:text="7432" />
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:layout_marginTop="10dp"
+                                        android:orientation="vertical"
+                                        android:paddingStart="35dp"
+                                        android:paddingEnd="35dp">
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center_horizontal"
+                                            android:orientation="horizontal">
+
+                                            <RelativeLayout
+                                                android:id="@+id/userPSNDetails"
+                                                android:layout_width="0dp"
+                                                android:layout_height="wrap_content"
+                                                android:layout_weight="1"
+                                                android:gravity="center"
+                                                android:padding="3dp"
+                                                android:visibility="gone"
+                                                tools:visibility="visible">
+
+                                                <ImageView
+                                                    android:id="@+id/userPSNDraw"
+                                                    android:layout_width="25dp"
+                                                    android:layout_height="25dp"
+                                                    android:layout_centerVertical="true"
+                                                    app:srcCompat="@drawable/icons8_playstation_50" />
+
+                                                <TextView
+                                                    android:id="@+id/userPSN"
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_centerVertical="true"
+                                                    android:layout_marginStart="5dp"
+                                                    android:layout_toEndOf="@id/userPSNDraw"
+                                                    android:textColor="@color/white"
+                                                    tools:text="\@wakamoly" />
+
+                                            </RelativeLayout>
+
+                                            <RelativeLayout
+                                                android:id="@+id/userXboxDetails"
+                                                android:layout_width="0dp"
+                                                android:layout_height="wrap_content"
+                                                android:layout_weight="1"
+                                                android:gravity="center"
+                                                android:padding="3dp"
+                                                android:visibility="gone"
+                                                tools:visibility="visible">
+
+                                                <ImageView
+                                                    android:id="@+id/userXboxDraw"
+                                                    android:layout_width="25dp"
+                                                    android:layout_height="25dp"
+                                                    android:layout_centerVertical="true"
+                                                    app:srcCompat="@drawable/icons8_xbox_50" />
+
+                                                <TextView
+                                                    android:id="@+id/userXbox"
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_centerVertical="true"
+                                                    android:layout_marginStart="5dp"
+                                                    android:layout_toEndOf="@id/userXboxDraw"
+                                                    android:textColor="@color/white"
+                                                    tools:text="\@wakamoly" />
+
+                                            </RelativeLayout>
+
+                                        </LinearLayout>
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center_horizontal"
+                                            android:orientation="horizontal">
+
+                                            <RelativeLayout
+                                                android:id="@+id/userDiscordDetails"
+                                                android:layout_width="0dp"
+                                                android:layout_height="wrap_content"
+                                                android:layout_weight="1"
+                                                android:gravity="center"
+                                                android:padding="3dp"
+                                                android:visibility="gone"
+                                                tools:visibility="visible">
+
+                                                <ImageView
+                                                    android:id="@+id/userDiscordDraw"
+                                                    android:layout_width="25dp"
+                                                    android:layout_height="25dp"
+                                                    android:layout_centerVertical="true"
+                                                    app:srcCompat="@drawable/icons8_discord_50" />
+
+                                                <TextView
+                                                    android:id="@+id/userDiscord"
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_centerVertical="true"
+                                                    android:layout_marginStart="5dp"
+                                                    android:layout_toEndOf="@id/userDiscordDraw"
+                                                    android:textColor="@color/white"
+                                                    tools:text="\@wakamoly" />
+
+                                            </RelativeLayout>
+
+                                            <RelativeLayout
+                                                android:id="@+id/userSteamDetails"
+                                                android:layout_width="0dp"
+                                                android:layout_height="wrap_content"
+                                                android:layout_weight="1"
+                                                android:gravity="center"
+                                                android:padding="3dp"
+                                                android:visibility="gone"
+                                                tools:visibility="visible">
+
+                                                <ImageView
+                                                    android:id="@+id/userSteamDraw"
+                                                    android:layout_width="25dp"
+                                                    android:layout_height="25dp"
+                                                    android:layout_centerVertical="true"
+                                                    app:srcCompat="@drawable/icons8_steam_48" />
+
+                                                <TextView
+                                                    android:id="@+id/userSteam"
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_centerVertical="true"
+                                                    android:layout_marginStart="5dp"
+                                                    android:layout_toEndOf="@id/userSteamDraw"
+                                                    android:textColor="@color/white"
+                                                    tools:text="\@wakamoly" />
+
+                                            </RelativeLayout>
+
+                                        </LinearLayout>
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center_horizontal"
+                                            android:orientation="horizontal">
+
+                                            <RelativeLayout
+                                                android:id="@+id/userYoutubeDetails"
+                                                android:layout_width="0dp"
+                                                android:layout_height="wrap_content"
+                                                android:layout_weight="1"
+                                                android:gravity="center"
+                                                android:padding="3dp"
+                                                android:visibility="gone"
+                                                tools:visibility="visible">
+
+                                                <ImageView
+                                                    android:id="@+id/userYoutubeDraw"
+                                                    android:layout_width="25dp"
+                                                    android:layout_height="25dp"
+                                                    android:layout_centerVertical="true"
+                                                    app:srcCompat="@drawable/icons8_youtube_squared_48" />
+
+                                                <TextView
+                                                    android:id="@+id/userYoutube"
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_centerVertical="true"
+                                                    android:layout_marginStart="5dp"
+                                                    android:layout_toEndOf="@id/userYoutubeDraw"
+                                                    android:text="YouTube"
+                                                    android:textColor="@color/white" />
+
+                                            </RelativeLayout>
+
+                                            <RelativeLayout
+                                                android:id="@+id/userInstagramDetails"
+                                                android:layout_width="0dp"
+                                                android:layout_height="wrap_content"
+                                                android:layout_weight="1"
+                                                android:gravity="center"
+                                                android:padding="3dp"
+                                                android:visibility="gone"
+                                                tools:visibility="visible">
+
+                                                <ImageView
+                                                    android:id="@+id/userInstagramDraw"
+                                                    android:layout_width="25dp"
+                                                    android:layout_height="25dp"
+                                                    android:layout_centerVertical="true"
+                                                    app:srcCompat="@drawable/icons8_instagram_80" />
+
+                                                <TextView
+                                                    android:id="@+id/userInstagram"
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_centerVertical="true"
+                                                    android:layout_marginStart="5dp"
+                                                    android:layout_toEndOf="@id/userInstagramDraw"
+                                                    android:textColor="@color/white"
+                                                    tools:text="\@wakamoly" />
+
+                                            </RelativeLayout>
+
+                                        </LinearLayout>
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center_horizontal"
+                                            android:orientation="horizontal">
+
+                                            <RelativeLayout
+                                                android:id="@+id/userTwitchDetails"
+                                                android:layout_width="0dp"
+                                                android:layout_height="wrap_content"
+                                                android:layout_weight="1"
+                                                android:gravity="center"
+                                                android:padding="3dp"
+                                                android:visibility="gone"
+                                                tools:visibility="visible">
+
+                                                <ImageView
+                                                    android:id="@+id/userTwitchDraw"
+                                                    android:layout_width="25dp"
+                                                    android:layout_height="25dp"
+                                                    android:layout_centerVertical="true"
+                                                    app:srcCompat="@drawable/icons8_twitch_50" />
+
+                                                <TextView
+                                                    android:id="@+id/userTwitch"
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_centerVertical="true"
+                                                    android:layout_marginStart="5dp"
+                                                    android:layout_toEndOf="@id/userTwitchDraw"
+                                                    android:textColor="@color/white"
+                                                    tools:text="\@wakamoly" />
+
+                                            </RelativeLayout>
+
+                                            <RelativeLayout
+                                                android:id="@+id/userMixerDetails"
+                                                android:layout_width="0dp"
+                                                android:layout_height="wrap_content"
+                                                android:layout_weight="1"
+                                                android:gravity="center"
+                                                android:padding="3dp"
+                                                android:visibility="gone"
+                                                tools:visibility="visible">
+
+                                                <ImageView
+                                                    android:id="@+id/userMixerDraw"
+                                                    android:layout_width="25dp"
+                                                    android:layout_height="25dp"
+                                                    android:layout_centerVertical="true"
+                                                    app:srcCompat="@drawable/icons8_microsoft_mixer_50" />
+
+                                                <TextView
+                                                    android:id="@+id/userMixer"
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_centerVertical="true"
+                                                    android:layout_marginStart="5dp"
+                                                    android:layout_toEndOf="@id/userMixerDraw"
+                                                    android:textColor="@color/white"
+                                                    tools:text="\@wakamoly" />
+
+                                            </RelativeLayout>
+
+                                        </LinearLayout>
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center_horizontal"
+                                            android:orientation="horizontal">
+
+                                            <RelativeLayout
+                                                android:id="@+id/userTwitterDetails"
+                                                android:layout_width="0dp"
+                                                android:layout_height="wrap_content"
+                                                android:layout_weight="1"
+                                                android:gravity="center"
+                                                android:padding="3dp"
+                                                android:visibility="gone"
+                                                tools:visibility="visible">
+
+                                                <ImageView
+                                                    android:id="@+id/userTwitterDraw"
+                                                    android:layout_width="25dp"
+                                                    android:layout_height="25dp"
+                                                    android:layout_centerVertical="true"
+                                                    app:srcCompat="@drawable/icons8_twitter_48" />
+
+                                                <TextView
+                                                    android:id="@+id/userTwitter"
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_centerVertical="true"
+                                                    android:layout_marginStart="5dp"
+                                                    android:layout_toEndOf="@id/userTwitterDraw"
+                                                    android:textColor="@color/white"
+                                                    tools:text="\@wakamoly" />
+
+                                            </RelativeLayout>
+
+                                            <RelativeLayout
+                                                android:id="@+id/userSwitchDetails"
+                                                android:layout_width="0dp"
+                                                android:layout_height="wrap_content"
+                                                android:layout_weight="1"
+                                                android:gravity="center"
+                                                android:padding="3dp"
+                                                android:visibility="gone"
+                                                tools:visibility="visible">
+
+                                                <ImageView
+                                                    android:id="@+id/userSwitchDraw"
+                                                    android:layout_width="25dp"
+                                                    android:layout_height="25dp"
+                                                    android:layout_centerVertical="true"
+                                                    app:srcCompat="@drawable/icons8_nintendo_switch_48" />
+
+                                                <TextView
+                                                    android:id="@+id/userSwitch"
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_centerVertical="true"
+                                                    android:layout_marginStart="5dp"
+                                                    android:layout_toEndOf="@id/userSwitchDraw"
+                                                    android:textColor="@color/white"
+                                                    tools:text="\@wakamoly" />
+
+                                            </RelativeLayout>
+
+                                        </LinearLayout>
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center_horizontal"
+                                            android:orientation="horizontal">
+
+                                            <RelativeLayout
+                                                android:id="@+id/userDiscordProfileDetails"
+                                                android:layout_width="0dp"
+                                                android:layout_height="wrap_content"
+                                                android:layout_weight="1"
+                                                android:gravity="center"
+                                                android:padding="3dp"
+                                                android:visibility="gone"
+                                                tools:visibility="visible">
+
+                                                <ImageView
+                                                    android:id="@+id/userDiscordProfileDraw"
+                                                    android:layout_width="25dp"
+                                                    android:layout_height="25dp"
+                                                    android:layout_centerVertical="true"
+                                                    app:srcCompat="@drawable/icons8_discord_50" />
+
+                                                <ImageView
+                                                    android:id="@+id/userDiscordProfilePic"
+                                                    android:layout_width="25dp"
+                                                    android:layout_height="25dp"
+                                                    android:layout_centerVertical="true"
+                                                    android:layout_toEndOf="@id/userDiscordProfileDraw"
+                                                    android:src="@drawable/ic_person_add_dark_24dp" />
+
+                                                <TextView
+                                                    android:id="@+id/userDiscordProfile"
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_centerVertical="true"
+                                                    android:layout_marginStart="5dp"
+                                                    android:layout_toEndOf="@id/userDiscordProfilePic"
+                                                    android:textColor="@color/white"
+                                                    tools:text="\@wakamoly" />
+
+                                            </RelativeLayout>
+
+                                        </LinearLayout>
+
+                                    </LinearLayout>
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:id="@+id/profileStatusContainer"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:visibility="gone"
+                                    tools:visibility="visible">
+
+                                    <ImageView
+                                        android:id="@+id/profileStatusImage"
+                                        android:layout_width="@dimen/spacing_mlarge"
+                                        android:layout_height="@dimen/spacing_mlarge"
+                                        android:layout_margin="@dimen/spacing_middle"
+                                        android:src="@drawable/ic_quote" />
+
+                                    <TextView
+                                        android:id="@+id/textViewDescription"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_margin="@dimen/spacing_medium"
+                                        android:text="@string/detailsTextProfile"
+                                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                        android:textColor="@color/white" />
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:id="@+id/profileWebsiteContainer"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:visibility="gone"
+                                    tools:visibility="visible">
+
+                                    <ImageView
+                                        android:id="@+id/profileWebsiteImage"
+                                        android:layout_width="@dimen/spacing_mlarge"
+                                        android:layout_height="@dimen/spacing_mlarge"
+                                        android:layout_margin="@dimen/spacing_middle"
+                                        android:src="@drawable/ic_website" />
+
+                                    <TextView
+                                        android:id="@+id/profileWebsite"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_margin="@dimen/spacing_medium"
+                                        android:autoLink="web"
+                                        android:text="@string/detailsTextProfile"
+                                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                        android:textColor="@color/white" />
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:id="@+id/actions_container"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@color/colorPrimary"
+                                    android:gravity="center"
+                                    android:orientation="horizontal">
+
+                                    <com.balysv.materialripple.MaterialRippleLayout
+                                        android:id="@+id/addItemButton"
+                                        style="@style/MyRippleStyleDark"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:visibility="visible">
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center_horizontal|top"
+                                            android:orientation="vertical"
+                                            android:paddingTop="@dimen/spacing_large"
+                                            android:paddingBottom="@dimen/spacing_medium">
+
+                                            <RelativeLayout
+                                                android:id="@+id/addItemIconBackground"
+                                                android:layout_width="48dp"
+                                                android:layout_height="48dp"
+                                                android:background="@drawable/circle_layout">
+
+                                                <de.hdodenhof.circleimageview.CircleImageView
+                                                    android:id="@+id/addItemIcon"
+                                                    android:layout_width="36dp"
+                                                    android:layout_height="36dp"
+                                                    android:layout_centerInParent="true"
+                                                    android:src="@drawable/ic_plus_profile"
+                                                    android:tint="@color/profile_action_icon_tint"
+                                                    app:civ_border_color="@color/profile_action_icon_bg"
+                                                    app:civ_border_width="1dp" />
+
+                                            </RelativeLayout>
+
+                                            <TextView
+                                                android:id="@+id/addItemLabel"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:ellipsize="end"
+                                                android:gravity="center"
+                                                android:maxLines="2"
+                                                android:paddingTop="@dimen/spacing_middle"
+                                                android:text="@string/new_post"
+                                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                                android:textColor="@color/white"
+                                                android:textSize="14sp" />
+                                        </LinearLayout>
+                                    </com.balysv.materialripple.MaterialRippleLayout>
+
+
+                                    <com.balysv.materialripple.MaterialRippleLayout
+                                        android:id="@+id/followProfileButton"
+                                        style="@style/MyRippleStyleDark"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:visibility="visible">
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center_horizontal|top"
+                                            android:orientation="vertical"
+                                            android:paddingTop="@dimen/spacing_large"
+                                            android:paddingBottom="@dimen/spacing_medium">
+
+                                            <RelativeLayout
+                                                android:id="@+id/followProfileIconBackground"
+                                                android:layout_width="48dp"
+                                                android:layout_height="48dp"
+                                                android:background="@drawable/circle_layout">
+
+                                                <de.hdodenhof.circleimageview.CircleImageView
+                                                    android:id="@+id/followProfileIcon"
+                                                    android:layout_width="36dp"
+                                                    android:layout_height="36dp"
+                                                    android:layout_centerInParent="true"
+                                                    android:src="@drawable/ic_favorite_dark_24dp"
+                                                    android:tint="@color/profile_action_icon_tint"
+                                                    app:civ_border_color="@color/profile_action_icon_bg"
+                                                    app:civ_border_width="1dp" />
+
+                                            </RelativeLayout>
+
+                                            <TextView
+                                                android:id="@+id/followProfileLabel"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:ellipsize="end"
+                                                android:gravity="center"
+                                                android:maxLines="2"
+                                                android:paddingTop="@dimen/spacing_middle"
+                                                android:text="@string/follow"
+                                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                                android:textColor="@color/white"
+                                                android:textSize="14sp" />
+                                        </LinearLayout>
+                                    </com.balysv.materialripple.MaterialRippleLayout>
+
+                                    <com.balysv.materialripple.MaterialRippleLayout
+                                        android:id="@+id/followedProfileButton"
+                                        style="@style/MyRippleStyleDark"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:visibility="gone">
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center_horizontal|top"
+                                            android:orientation="vertical"
+                                            android:paddingTop="@dimen/spacing_large"
+                                            android:paddingBottom="@dimen/spacing_medium">
+
+                                            <RelativeLayout
+                                                android:id="@+id/followedProfileIconBackground"
+                                                android:layout_width="48dp"
+                                                android:layout_height="48dp"
+                                                android:background="@drawable/circle_layout">
+
+                                                <de.hdodenhof.circleimageview.CircleImageView
+                                                    android:id="@+id/followedProfileIcon"
+                                                    android:layout_width="36dp"
+                                                    android:layout_height="36dp"
+                                                    android:layout_centerInParent="true"
+                                                    android:src="@drawable/ic_favorite_red_24dp"
+                                                    android:tint="@color/profile_action_icon_tint"
+                                                    app:civ_border_color="@color/profile_action_icon_bg"
+                                                    app:civ_border_width="1dp" />
+
+                                            </RelativeLayout>
+
+                                            <TextView
+                                                android:id="@+id/followedProfileLabel"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:ellipsize="end"
+                                                android:gravity="center"
+                                                android:maxLines="2"
+                                                android:paddingTop="@dimen/spacing_middle"
+                                                android:text="@string/action_followed"
+                                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                                android:textColor="@color/white"
+                                                android:textSize="14sp" />
+                                        </LinearLayout>
+                                    </com.balysv.materialripple.MaterialRippleLayout>
+
+
+                                    <com.balysv.materialripple.MaterialRippleLayout
+                                        android:id="@+id/editProfileButton"
+                                        style="@style/MyRippleStyleDark"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:visibility="gone">
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center_horizontal|top"
+                                            android:orientation="vertical"
+                                            android:paddingTop="@dimen/spacing_large"
+                                            android:paddingBottom="@dimen/spacing_medium">
+
+                                            <RelativeLayout
+                                                android:id="@+id/editProfileIconBackground"
+                                                android:layout_width="48dp"
+                                                android:layout_height="48dp"
+                                                android:background="@drawable/circle_layout">
+
+                                                <de.hdodenhof.circleimageview.CircleImageView
+                                                    android:id="@+id/editProfileIcon"
+                                                    android:layout_width="36dp"
+                                                    android:layout_height="36dp"
+                                                    android:layout_centerInParent="true"
+                                                    android:src="@drawable/ic_profile_edit"
+                                                    android:tint="@color/profile_action_icon_tint"
+                                                    app:civ_border_color="@color/profile_action_icon_bg"
+                                                    app:civ_border_width="1dp" />
+
+                                            </RelativeLayout>
+
+                                            <TextView
+                                                android:id="@+id/editProfileLabel"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:ellipsize="end"
+                                                android:gravity="center"
+                                                android:maxLines="2"
+                                                android:paddingTop="@dimen/spacing_middle"
+                                                android:text="@string/edit"
+                                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                                android:textColor="@color/white"
+                                                android:textSize="14sp" />
+                                        </LinearLayout>
+                                    </com.balysv.materialripple.MaterialRippleLayout>
+
+                                    <com.balysv.materialripple.MaterialRippleLayout
+                                        android:id="@+id/addFriendProgress"
+                                        style="@style/MyRippleStyleDark"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:visibility="visible">
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center_horizontal|top"
+                                            android:orientation="vertical"
+                                            android:paddingTop="@dimen/spacing_large"
+                                            android:paddingBottom="@dimen/spacing_medium">
+
+                                            <ProgressBar
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content" />
+
+                                            <TextView
+                                                android:id="@+id/addFriendProgressLabel"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:ellipsize="end"
+                                                android:gravity="center"
+                                                android:maxLines="2"
+                                                android:paddingTop="@dimen/spacing_middle"
+                                                android:text="@string/loading"
+                                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                                android:textColor="@color/white"
+                                                android:textSize="14sp" />
+                                        </LinearLayout>
+                                    </com.balysv.materialripple.MaterialRippleLayout>
+
+                                    <com.balysv.materialripple.MaterialRippleLayout
+                                        android:id="@+id/addFriendButton"
+                                        style="@style/MyRippleStyleDark"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:visibility="gone">
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center_horizontal|top"
+                                            android:orientation="vertical"
+                                            android:paddingTop="@dimen/spacing_large"
+                                            android:paddingBottom="@dimen/spacing_medium">
+
+                                            <RelativeLayout
+                                                android:id="@+id/addFriendIconBackground"
+                                                android:layout_width="48dp"
+                                                android:layout_height="48dp"
+                                                android:background="@drawable/circle_layout">
+
+                                                <de.hdodenhof.circleimageview.CircleImageView
+                                                    android:id="@+id/addFriendIcon"
+                                                    android:layout_width="36dp"
+                                                    android:layout_height="36dp"
+                                                    android:layout_centerInParent="true"
+                                                    android:src="@drawable/ic_person_add_dark_24dp"
+                                                    android:tint="@color/profile_action_icon_tint"
+                                                    app:civ_border_color="@color/profile_action_icon_bg"
+                                                    app:civ_border_width="1dp" />
+
+                                            </RelativeLayout>
+
+                                            <TextView
+                                                android:id="@+id/addFriendLabel"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:ellipsize="end"
+                                                android:gravity="center"
+                                                android:maxLines="2"
+                                                android:paddingTop="@dimen/spacing_middle"
+                                                android:text="@string/add_friend"
+                                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                                android:textColor="@color/white"
+                                                android:textSize="14sp" />
+                                        </LinearLayout>
+                                    </com.balysv.materialripple.MaterialRippleLayout>
+
+                                    <com.balysv.materialripple.MaterialRippleLayout
+                                        android:id="@+id/addedFriendButton"
+                                        style="@style/MyRippleStyleDark"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:visibility="gone">
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center_horizontal|top"
+                                            android:orientation="vertical"
+                                            android:paddingTop="@dimen/spacing_large"
+                                            android:paddingBottom="@dimen/spacing_medium">
+
+                                            <RelativeLayout
+                                                android:id="@+id/addedFriendIconBackground"
+                                                android:layout_width="48dp"
+                                                android:layout_height="48dp"
+                                                android:background="@drawable/circle_layout">
+
+                                                <de.hdodenhof.circleimageview.CircleImageView
+                                                    android:id="@+id/addedFriendIcon"
+                                                    android:layout_width="36dp"
+                                                    android:layout_height="36dp"
+                                                    android:layout_centerInParent="true"
+                                                    android:src="@drawable/ic_friend_green_24dp"
+                                                    android:tint="@color/profile_action_icon_tint"
+                                                    app:civ_border_color="@color/profile_action_icon_bg"
+                                                    app:civ_border_width="1dp" />
+
+                                            </RelativeLayout>
+
+                                            <TextView
+                                                android:id="@+id/addedFriendLabel"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:ellipsize="end"
+                                                android:gravity="center"
+                                                android:maxLines="2"
+                                                android:paddingTop="@dimen/spacing_middle"
+                                                android:text="@string/friend"
+                                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                                android:textColor="@color/white"
+                                                android:textSize="14sp" />
+                                        </LinearLayout>
+                                    </com.balysv.materialripple.MaterialRippleLayout>
+
+                                    <com.balysv.materialripple.MaterialRippleLayout
+                                        android:id="@+id/requestedFriendButton"
+                                        style="@style/MyRippleStyleDark"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:visibility="gone">
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center_horizontal|top"
+                                            android:orientation="vertical"
+                                            android:paddingTop="@dimen/spacing_large"
+                                            android:paddingBottom="@dimen/spacing_medium">
+
+                                            <RelativeLayout
+                                                android:id="@+id/requestedFriendIconBackground"
+                                                android:layout_width="48dp"
+                                                android:layout_height="48dp"
+                                                android:background="@drawable/circle_layout">
+
+                                                <de.hdodenhof.circleimageview.CircleImageView
+                                                    android:id="@+id/requestedFriendIcon"
+                                                    android:layout_width="36dp"
+                                                    android:layout_height="36dp"
+                                                    android:layout_centerInParent="true"
+                                                    android:src="@drawable/ic_person_add_orange_24dp"
+                                                    android:tint="@color/profile_action_icon_tint"
+                                                    app:civ_border_color="@color/profile_action_icon_bg"
+                                                    app:civ_border_width="1dp" />
+
+                                            </RelativeLayout>
+
+                                            <TextView
+                                                android:id="@+id/requestedFriendLabel"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:ellipsize="end"
+                                                android:gravity="center"
+                                                android:maxLines="2"
+                                                android:paddingTop="@dimen/spacing_middle"
+                                                android:text="@string/requested"
+                                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                                android:textColor="@color/white"
+                                                android:textSize="14sp" />
+                                        </LinearLayout>
+                                    </com.balysv.materialripple.MaterialRippleLayout>
+
+                                    <com.balysv.materialripple.MaterialRippleLayout
+                                        android:id="@+id/requestSentFriendButton"
+                                        style="@style/MyRippleStyleDark"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:visibility="gone">
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center_horizontal|top"
+                                            android:orientation="vertical"
+                                            android:paddingTop="@dimen/spacing_large"
+                                            android:paddingBottom="@dimen/spacing_medium">
+
+                                            <RelativeLayout
+                                                android:id="@+id/requestSentFriendIconBackground"
+                                                android:layout_width="48dp"
+                                                android:layout_height="48dp"
+                                                android:background="@drawable/circle_layout">
+
+                                                <de.hdodenhof.circleimageview.CircleImageView
+                                                    android:id="@+id/requestSentFriendIcon"
+                                                    android:layout_width="36dp"
+                                                    android:layout_height="36dp"
+                                                    android:layout_centerInParent="true"
+                                                    android:src="@drawable/ic_person_add_green_24dp"
+                                                    android:tint="@color/profile_action_icon_tint"
+                                                    app:civ_border_color="@color/profile_action_icon_bg"
+                                                    app:civ_border_width="1dp" />
+
+                                            </RelativeLayout>
+
+                                            <TextView
+                                                android:id="@+id/requestSentFriendLabel"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:ellipsize="end"
+                                                android:gravity="center"
+                                                android:maxLines="2"
+                                                android:paddingTop="@dimen/spacing_middle"
+                                                android:text="@string/request_sent"
+                                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                                android:textColor="@color/white"
+                                                android:textSize="14sp" />
+                                        </LinearLayout>
+                                    </com.balysv.materialripple.MaterialRippleLayout>
+
+                                    <com.balysv.materialripple.MaterialRippleLayout
+                                        android:id="@+id/addMessageButton"
+                                        style="@style/MyRippleStyleDark"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:visibility="visible">
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center_horizontal|top"
+                                            android:orientation="vertical"
+                                            android:paddingTop="@dimen/spacing_large"
+                                            android:paddingBottom="@dimen/spacing_medium">
+
+                                            <RelativeLayout
+                                                android:id="@+id/addMessageIconBackground"
+                                                android:layout_width="48dp"
+                                                android:layout_height="48dp"
+                                                android:background="@drawable/circle_layout">
+
+                                                <de.hdodenhof.circleimageview.CircleImageView
+                                                    android:id="@+id/addMessageIcon"
+                                                    android:layout_width="36dp"
+                                                    android:layout_height="36dp"
+                                                    android:layout_centerInParent="true"
+                                                    android:src="@drawable/ic_messages"
+                                                    android:tint="@color/profile_action_icon_tint"
+                                                    app:civ_border_color="@color/profile_action_icon_bg"
+                                                    app:civ_border_width="1dp" />
+
+                                            </RelativeLayout>
+
+                                            <TextView
+                                                android:id="@+id/addMessageLabel"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:ellipsize="end"
+                                                android:gravity="center"
+                                                android:maxLines="2"
+                                                android:paddingTop="@dimen/spacing_middle"
+                                                android:text="@string/send_message"
+                                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                                android:textColor="@color/white"
+                                                android:textSize="14sp" />
+                                        </LinearLayout>
+                                    </com.balysv.materialripple.MaterialRippleLayout>
+
+                                    <com.balysv.materialripple.MaterialRippleLayout
+                                        android:id="@+id/moreButton"
+                                        style="@style/MyRippleStyleDark"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1">
+
+                                        <LinearLayout
+                                            android:id="@+id/moreButtonLayout"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center_horizontal|top"
+                                            android:orientation="vertical"
+                                            android:paddingTop="@dimen/spacing_large"
+                                            android:paddingBottom="@dimen/spacing_medium">
+
+                                            <RelativeLayout
+                                                android:id="@+id/moreIconBackground"
+                                                android:layout_width="48dp"
+                                                android:layout_height="48dp"
+                                                android:background="@drawable/circle_layout">
+
+                                                <de.hdodenhof.circleimageview.CircleImageView
+                                                    android:id="@+id/moreIcon"
+                                                    android:layout_width="36dp"
+                                                    android:layout_height="36dp"
+                                                    android:layout_centerInParent="true"
+                                                    android:src="@drawable/ic_horizontal_popup"
+                                                    android:tint="@color/profile_action_icon_tint"
+                                                    app:civ_border_color="@color/profile_action_icon_bg"
+                                                    app:civ_border_width="1dp" />
+
+                                            </RelativeLayout>
+
+                                            <TextView
+                                                android:id="@+id/moreLabel"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:ellipsize="end"
+                                                android:gravity="center"
+                                                android:maxLines="2"
+                                                android:paddingTop="@dimen/spacing_middle"
+                                                android:text="@string/more"
+                                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                                android:textColor="@color/white"
+                                                android:textSize="14sp" />
+                                        </LinearLayout>
+                                    </com.balysv.materialripple.MaterialRippleLayout>
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+                    </RelativeLayout>
+
+                    <LinearLayout
+                        android:id="@+id/addPostLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="3dp"
+                        android:background="@drawable/grey_button"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        tools:visibility="visible">
+
+                        <EditText
+                            android:id="@+id/statusUpdate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:cursorVisible="true"
+                            android:focusableInTouchMode="true"
+                            android:hint="@string/what_are_you_playing"
+                            android:inputType="textMultiLine|textCapSentences"
+                            android:maxLength="500"
+                            android:maxLines="10"
+                            android:minLines="3"
+                            android:padding="2dp"
+                            android:scrollbars="vertical"
+                            android:text=""
+                            android:textColor="@color/white"
+                            android:textColorHint="@color/grey_medium"
+                            android:textCursorDrawable="@drawable/cursor_color"
+                            android:textSize="14sp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <Spinner
+                                android:id="@+id/postTypeSpinner"
+                                style="dark"
+                                android:layout_width="0dp"
+                                android:layout_height="40dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/spinner"
+                                android:entries="@array/platform_array"
+                                android:prompt="@string/posttype_prompt" />
+
+                            <ImageView
+                                android:id="@+id/imageUploadBtn"
+                                android:layout_width="30dp"
+                                android:layout_height="40dp"
+                                android:background="@color/colorAccent"
+                                android:padding="5dp"
+                                android:src="@drawable/ic_attach_file_grey_24dp" />
+
+                            <Button
+                                android:id="@+id/submitStatusButton"
+                                android:layout_width="200dp"
+                                android:layout_height="40dp"
+                                android:layout_gravity="center"
+                                android:background="@color/buttonGreen"
+                                android:drawableEnd="@drawable/ic_check"
+                                android:paddingEnd="5dp"
+                                android:text="@string/submit" />
+
+                        </LinearLayout>
+
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/profileMessage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="16dp"
+                        android:gravity="center"
+                        android:text="@string/profile_information_only_for_friends"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        android:textColor="@color/gray_text"
+                        android:visibility="gone" />
+
+                    <LinearLayout
+                        android:background="@drawable/grey_transparent_blob"
+                        android:id="@+id/recyclerButtons"
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/profilePostsButton"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:text="@string/postsTextProfile"
+                            style="?android:attr/borderlessButtonStyle"
+                            android:textSize="12sp" />
+
+                        <Button
+                            android:id="@+id/publicsPostsButtons"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:text="@string/publics_posts_text"
+                            style="?android:attr/borderlessButtonStyle"
+                            android:textSize="12sp" />
+
+                        <Button
+                            android:id="@+id/profileClansButtons"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:text="@string/clans"
+                            style="?android:attr/borderlessButtonStyle"
+                            android:textSize="12sp" />
+                        <!--<Button
+                            android:text="@string/profileMedia"
+                            android:id="@+id/profileMedia"
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"/>-->
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/profileInfoContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="visible">
+
+                        <!-- <LinearLayout
+                             android:id="@+id/profileFacebookContainer"
+                             android:layout_width="match_parent"
+                             android:layout_height="match_parent"
+                             android:gravity="center_vertical"
+                             android:orientation="horizontal"
+                             android:padding="5dp">
+
+                             <ImageView
+                                 android:id="@+id/profileFacebookImage"
+                                 android:layout_width="@dimen/spacing_mlarge"
+                                 android:layout_height="@dimen/spacing_mlarge"
+                                 android:layout_margin="@dimen/spacing_middle"
+                                 android:src="@drawable/ic_website" />
+
+                             <TextView
+                                 android:id="@+id/profileFacebookUrl"
+                                 android:layout_width="match_parent"
+                                 android:layout_height="wrap_content"
+                                 android:layout_margin="@dimen/spacing_medium"
+                                 android:text="www.facebook.com/mypage"
+                                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                 android:textColor="@color/white" />
+
+                         </LinearLayout>
+
+                         <LinearLayout
+                             android:id="@+id/profileSiteContainer"
+                             android:layout_width="match_parent"
+                             android:layout_height="match_parent"
+                             android:gravity="center_vertical"
+                             android:orientation="horizontal"
+                             android:padding="5dp">
+
+                             <ImageView
+                                 android:id="@+id/profileSiteImage"
+                                 android:layout_width="@dimen/spacing_mlarge"
+                                 android:layout_height="@dimen/spacing_mlarge"
+                                 android:layout_margin="@dimen/spacing_middle"
+                                 android:src="@drawable/ic_website" />
+
+                             <TextView
+                                 android:id="@+id/profileSiteUrl"
+                                 android:layout_width="match_parent"
+                                 android:layout_height="wrap_content"
+                                 android:layout_margin="@dimen/spacing_medium"
+                                 android:text="www.mywebsite.com"
+                                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                 android:textColor="@color/white" />
+
+                         </LinearLayout>-->
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1px"
+                        android:background="@color/gray_border" />
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/profileNewsSpotlight"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardCornerRadius="0dp"
+                        app:cardElevation="0dp"
+                        app:cardUseCompatPadding="false">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="35dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="center"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:id="@+id/tvPosts"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="1.2 K"
+                                        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                                        android:textColor="@color/white"
+                                        android:textStyle="italic" />
+
+                                    <TextView
+                                        android:id="@+id/profileItemsLabel"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="3dp"
+                                        android:ellipsize="end"
+                                        android:maxLines="1"
+                                        android:text="@string/postsTextProfile"
+                                        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                                        android:textColor="@color/white" />
+
+                                </LinearLayout>
+
+                                <Button
+                                    android:id="@+id/profileNewsMoreBtn"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/edit_profile_button"
+                                    android:text="@string/see_all"
+                                    android:textColor="@color/white"
+                                    android:textStyle="normal" />
+
+                            </LinearLayout>
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/recyclerProfilenews"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scrollbars="vertical">
+
+                            </androidx.recyclerview.widget.RecyclerView>
+
+                            <TextView
+                                android:id="@+id/postsNoPosts"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:layout_marginBottom="3dp"
+                                android:background="@color/colorPrimary"
+                                android:text="@string/no_more_posts_text"
+                                android:textAlignment="center"
+                                android:textStyle="bold|italic"
+                                android:visibility="gone"
+                                tools:visibility="visible" />
+
+                        </LinearLayout>
+
+                    </androidx.cardview.widget.CardView>
+
+                    <!--//<View
+                        android:layout_width="match_parent"
+                        android:layout_height="1px"
+                        android:background="@color/gray_border" />
+
+                    <android.support.v7.widget.CardView
+                        android:id="@+id/publicsSpotlight"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="visible"
+                        app:cardCornerRadius="0dp"
+                        app:cardElevation="0dp"
+                        app:cardUseCompatPadding="false"
+                        tools:visibility="visible">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="35dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="center"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:id="@+id/publicsSpotlightTitle"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:ellipsize="end"
+                                        android:maxLines="1"
+                                        android:text="@string/title_publics"
+                                        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                                        android:textColor="@color/white" />
+
+                                </LinearLayout>
+
+                                <Button
+                                    android:id="@+id/publicsSpotlightMoreBtn"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/details_button"
+                                    android:text="@string/see_all"
+                                    android:textColor="@color/white"
+                                    android:textStyle="normal" />
+
+                            </LinearLayout>
+
+                            <android.support.v7.widget.RecyclerView
+                                android:id="@+id/publicsSpotlightRecyclerView"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                            </android.support.v7.widget.RecyclerView>
+
+                            <TextView
+
+                                android:id="@+id/publicsNoPosts"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:layout_marginBottom="3dp"
+                                android:background="@color/colorPrimary"
+                                android:text="@string/no_more_publics_posts"
+                                android:textAlignment="center"
+                                android:textStyle="bold|italic"
+                                android:visibility="gone"
+                                tools:visibility="visible" />
+
+
+                        </LinearLayout>
+
+                    </android.support.v7.widget.CardView>-->
+
+                </LinearLayout>
+
+            </androidx.core.widget.NestedScrollView>
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <RelativeLayout
+            android:id="@+id/profileErrorScreen"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:longClickable="false"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/ivError1"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ic_error"
+                android:tint="@color/gray" />
+
+            <TextView
+                android:id="@+id/profileErrorScreenMsg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ivError1"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="@string/error"
+                android:textColor="@color/gray"
+                android:textSize="18sp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/profileDisabledScreen"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/profileDisabledScreenContent"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <ImageView
+                    android:id="@+id/ivError2"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:src="@drawable/ic_error"
+                    android:tint="@color/dark_blue" />
+
+                <TextView
+                    android:id="@+id/profileDisabledScreenMsg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center"
+                    android:text="@string/account_disabled"
+                    android:textColor="@color/dark_blue"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/profileLoadingScreen"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:visibility="visible"
+            tools:visibility="gone">
+
+            <ProgressBar
+                android:progressDrawable="@drawable/progressbarcolor"
+                android:id="@+id/profileLoadingScreenProgressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true" />
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <!--<android.support.design.widget.CoordinatorLayout
+        android:id="@+id/bottom_sheet_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <FrameLayout
+            android:id="@+id/bottom_sheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_behavior="@string/bottom_sheet_behavior" />
+
+    </android.support.design.widget.CoordinatorLayout>-->
+
+</RelativeLayout>

@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/publicsTopicLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp">
+
+        <LinearLayout
+            android:id="@+id/whenLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:gravity="end">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="When: " />
+
+            <TextView
+                android:id="@+id/eventDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/holo_orange_dark"
+                android:textStyle="bold"
+                tools:text="2 hours" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/whenLayout"
+            android:layout_alignParentEnd="true"
+            android:gravity="end">
+
+            <TextView
+                android:id="@+id/numPlayersAdded"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/holo_orange_dark"
+                tools:text="0" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="/"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/numPlayersNeeded"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/pin"
+                android:textStyle="bold"
+                tools:text="5" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:text="@string/players" />
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/publicsImageViewContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/publicsImageView"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/online"
+                android:layout_width="@dimen/spacing_large"
+                android:layout_height="@dimen/spacing_large"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="38dp"
+                android:src="@drawable/ic_online"
+                android:visibility="gone"
+                app:civ_border_color="@color/gray_bg"
+                app:civ_border_width="1dp" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/verified"
+                android:layout_width="@dimen/spacing_large"
+                android:layout_height="@dimen/spacing_large"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="38dp"
+                android:src="@drawable/ic_verified"
+                android:visibility="gone"
+                app:civ_border_color="@color/gray_bg"
+                app:civ_border_width="1dp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textViewTitle"
+            android:layout_toEndOf="@+id/publicsImageViewContainer">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textViewContext"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="2dp"
+                android:layout_toEndOf="@id/tvComments"
+                android:gravity="right">
+
+                <TextView
+                    android:id="@+id/textViewProfilenewsDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2019-06-17 00:00:00" />
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/textViewNumComments"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textViewContext"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="3dp"
+                android:textSize="12sp"
+                tools:text="0" />
+
+            <TextView
+                android:id="@+id/tvComments"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textViewContext"
+                android:layout_toEndOf="@+id/textViewNumComments"
+                android:text="@string/comments"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvProfileName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:textColor="@color/light_blue"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                tools:text="Wakamoly" />
+
+            <TextView
+                android:id="@+id/textViewContext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvProfileName"
+                android:layout_marginStart="5dp"
+                android:ellipsize="end"
+                android:maxLength="100"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                tools:text="Once upon a time..." />
+
+            <ImageView
+                android:id="@+id/platformType"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="5dp"
+                android:layout_toEndOf="@id/tvProfileName"
+                android:visibility="gone"
+                app:srcCompat="@drawable/icons8_xbox_50"
+                tools:visibility="visible" />
+
+        </RelativeLayout>
+
+
+        <TextView
+            android:layout_below="@+id/textViewGamename"
+            android:id="@+id/textViewTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@id/publicsImageViewContainer"
+            android:ellipsize="end"
+            android:maxLength="40"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            android:textColor="@color/green"
+            android:textSize="16sp"
+            tools:text="Need 3 players" />
+
+        <TextView
+            android:id="@+id/textViewGamename"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@id/publicsImageViewContainer"
+            android:ellipsize="end"
+            android:maxLength="40"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            android:textColor="@android:color/holo_orange_dark"
+            android:textSize="12sp"
+            android:textStyle="bold|italic"
+            tools:text="Fallout 76" />
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "128659864593",
+    "firebase_url": "https://sabotcommunitynoti.firebaseio.com",
+    "project_id": "sabotcommunitynoti",
+    "storage_bucket": "sabotcommunitynoti.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:128659864593:android:98b0bf9485e2725c8545b0",
+        "android_client_info": {
+          "package_name": "com.lucidsoftworksllc.sabotcommunity"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "128659864593-87992kcf5b384kttehbhm5ug3rv12uka.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lucidsoftworksllc.sabotcommunity",
+            "certificate_hash": "89a18cb292e6f8d0be8ef7c09f766d8379118cdf"
+          }
+        },
+        {
+          "client_id": "128659864593-dcdm1sj5d46nd75njl2pvp2h36l22ghd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqpDC8SPb1edn0bxRWtHJHEraTomSjL1k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "128659864593-dcdm1sj5d46nd75njl2pvp2h36l22ghd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

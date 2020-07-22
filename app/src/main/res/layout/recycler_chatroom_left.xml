@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/publicsTopicList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/fullLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.balysv.materialripple.MaterialRippleLayout
+                android:id="@+id/contentLayout"
+                style="@style/RippleStyleBlack"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <RelativeLayout
+                        android:id="@+id/postContent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RelativeLayout
+                            android:id="@+id/bodyLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_toEndOf="@id/imageViewProfilenewsPic">
+
+                            <TextView
+                                android:id="@+id/textViewProfileName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                android:textColor="@color/green"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                tools:text="Profile Name" />
+
+                            <RelativeLayout
+                                android:id="@+id/postContext"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/textViewProfileName"
+                                android:background="@drawable/dark_blob"
+                                android:padding="4dp">
+
+                                <TextView
+                                    android:id="@+id/textViewBody"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:autoLink="web"
+                                    android:ellipsize="end"
+                                    android:maxLines="10"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                                    android:textColor="#fff"
+                                    android:textSize="14sp"
+                                    tools:text="Post body here" />
+
+                            </RelativeLayout>
+
+                        </RelativeLayout>
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/imageViewProfilenewsPic"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginEnd="2dp"
+                            android:layout_marginBottom="5dp"
+                            tools:src="@drawable/ic_person_black_24dp" />
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/verified"
+                            android:layout_width="9dp"
+                            android:layout_height="9dp"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="23dp"
+                            android:src="@drawable/ic_verified"
+                            android:visibility="gone"
+                            app:civ_border_color="@color/gray_bg"
+                            app:civ_border_width="1dp"
+                            tools:visibility="visible" />
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/online"
+                            android:layout_width="9dp"
+                            android:layout_height="9dp"
+                            android:layout_marginStart="21dp"
+                            android:layout_marginTop="23dp"
+                            android:src="@drawable/ic_online"
+                            android:visibility="gone"
+                            app:civ_border_color="@color/gray_bg"
+                            app:civ_border_width="1dp"
+                            tools:visibility="visible" />
+
+                        <TextView
+                            android:id="@+id/profileCommentsDateTime_top"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/bodyLayout"
+                            android:layout_alignStart="@id/bodyLayout"
+                            android:gravity="end"
+                            android:textAppearance="@style/Base.TextAppearance.AppCompat.Small.Inverse"
+                            android:textColor="@android:color/secondary_text_dark"
+                            android:textSize="12sp"
+                            tools:text="Just Now" />
+
+
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+            </com.balysv.materialripple.MaterialRippleLayout>
+
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>

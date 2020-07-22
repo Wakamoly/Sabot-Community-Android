@@ -1,0 +1,70 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="autoCompleteTextViewStyle">@style/cursorColor</item>
+        <item name="android:editTextStyle">@style/editTextCursor</item>
+        <item name="android:textColorHighlight">@color/grey_40</item>
+    </style>
+
+    <style name="cursorColor" parent="Widget.AppCompat.AutoCompleteTextView">
+        <item name="android:textCursorDrawable">@drawable/cursor_color</item>
+    </style>
+    <style name="editTextCursor" parent="@android:style/Widget.Holo.Light.EditText">
+        <item name="android:background">@android:drawable/editbox_background_normal</item>
+        <item name="android:textCursorDrawable">@drawable/cursor_color</item>
+        <item name="android:height">40sp</item>
+    </style>
+
+    <!-- Checkbox Style -->
+    <style name="checkboxGreen" parent="Base.Theme.AppCompat">
+        <item name="colorAccent">@color/green</item> <!-- for uncheck state -->
+        <item name="android:textColorSecondary">#809EA1A3</item> <!-- for check state -->
+    </style>
+
+    <!-- Android Splash Screen Example -->
+
+    <style name="AlertDialogStyle" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:textSize">10sp</item>
+        <item name="android:labelTextSize">10sp</item>
+        <item name="android:keyTextSize">10sp</item>
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:textColor">#f3f3f3</item>
+        <item name="android:textColorPrimary">#f3f3f3</item>
+    </style>
+
+    <style name="RippleStyleBlack" parent="RippleStyleWhite">
+        <item name="mrl_rippleColor">#809EA1A3</item>
+        <item name="mrl_rippleDuration">200</item>
+        <!--<item name="mrl_rippleDelayClick">true</item>-->
+    </style>
+
+    <style name="MyRippleStyleLight">
+        <item name="mrl_rippleAlpha">0.2</item>
+        <item name="mrl_rippleOverlay">true</item>
+        <item name="mrl_rippleColor">#C0FFFAFF</item>
+        <item name="mrl_rippleDelayClick">true</item>
+        <item name="mrl_rippleHover">true</item>
+        <item name="mrl_rippleDuration">200</item>
+    </style>
+
+    <style name="MyRippleStyleDark" parent="MyRippleStyleLight">
+        <item name="mrl_rippleColor">#809EA1A3</item>
+    </style>
+
+    <style name="RippleStyleWhite">
+        <item name="mrl_rippleOverlay">true</item>
+        <item name="mrl_rippleColor">#80FFFFFF</item>
+        <item name="mrl_rippleHover">true</item>
+        <item name="mrl_rippleAlpha">0.2</item>
+    </style>
+
+    <style name="ProgressBarStyle">
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+</resources>

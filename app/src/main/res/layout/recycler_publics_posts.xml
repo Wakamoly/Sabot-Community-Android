@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
+    android:background="@color/colorPrimary">
+
+    <com.balysv.materialripple.MaterialRippleLayout
+        android:id="@+id/userPublicsPostsListLayout"
+        style="@style/RippleStyleBlack"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/publicsPostsUserInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/publicsPostsProfile_image"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/publicsPostsClantag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="5dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                    android:textColor="@color/pin"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    tools:text="[CLAN]" />
+
+                <TextView
+                    android:id="@+id/publicsPostsNickname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:text="@string/nickname_text"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                    android:textColor="@color/green"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/publicsPostsUsername"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:text="@string/username_text"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textColor="@color/light_blue"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/publicsPostsBodyInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/publicsPostsUserInfo"
+                android:layout_marginEnd="25dp"
+                android:layout_toEndOf="@id/publicsPostsProfile_image">
+
+                <TextView
+                    android:id="@+id/publicsPostBody"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text "
+                    android:textColor="@color/white"
+                    android:textColorHighlight="@color/grey"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/textViewNumPublicsPoints"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/publicsPostBody"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="3dp"
+                    android:text="0"
+                    android:textColor="@android:color/secondary_text_dark"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/TvPublicsPostsPoints"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/publicsPostBody"
+                    android:layout_toEndOf="@+id/textViewNumPublicsPoints"
+                    android:text="points"
+                    android:textColor="@android:color/secondary_text_dark"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/publicsPostsDateTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/publicsPostBody"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    android:layout_toEndOf="@+id/TvPublicsPostsPoints"
+                    android:gravity="end"
+                    android:paddingEnd="3dp"
+                    android:text="a lil bit ago m8"
+                    android:textColor="@android:color/secondary_text_dark"
+                    android:textSize="14sp" />
+            </RelativeLayout>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/publicsPostsProfile_image"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_centerVertical="false"
+                android:padding="4dp" />
+
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/online"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_marginStart="35dp"
+                android:layout_marginTop="33dp"
+                android:src="@drawable/ic_online"
+                android:visibility="gone"
+                app:civ_border_color="@color/gray_bg"
+                app:civ_border_width="1dp"
+                tools:visibility="visible" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/verified"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_marginTop="33dp"
+                android:src="@drawable/ic_verified"
+                android:visibility="gone"
+                app:civ_border_color="@color/gray_bg"
+                app:civ_border_width="1dp"
+                tools:visibility="visible" />
+
+
+        </RelativeLayout>
+
+    </com.balysv.materialripple.MaterialRippleLayout>
+
+    <LinearLayout
+        android:id="@+id/reply_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/userPublicsPostsListLayout"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="28dp"
+        android:background="@drawable/grey_transparent_wide_blob"
+        android:padding="2dp">
+
+        <ImageView
+            android:id="@+id/reply_button"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="6dp"
+            android:background="@drawable/grey_transparent_wide_blob"
+            android:src="@drawable/ic_reply_24dp" />
+
+        <ProgressBar
+            android:id="@+id/reply_button_progress"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="17dp"
+            android:layout_height="17dp"
+            android:layout_weight="1"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/reply_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/num_replies"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:text="0"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:text="Replies"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/reply_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="3dp"
+            android:layout_marginEnd="4dp"
+            android:inputType="textCapSentences"
+            android:singleLine="true"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/replies_progress"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_below="@id/reply_layout"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/replies_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/reply_layout"
+        android:layout_marginStart="20dp"
+        android:visibility="invisible"
+        tools:visibility="visible" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="-30dp"
+        android:layout_toEndOf="@id/userPublicsPostsListLayout"
+        android:orientation="vertical">
+
+        <ProgressBar
+            android:id="@+id/voteProgress"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/publicsPostsUpvoteWhiteBottom"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/ic_keyboard_arrow_up_white_24dp"
+            tools:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/publicsPostsUpvoteGreen"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/ic_keyboard_arrow_up_green_24dp"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/publicsPostsDownvoteWhiteBottom"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/ic_keyboard_arrow_down_white_24dp"
+            tools:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/publicsPostsDownvoteRed"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/ic_keyboard_arrow_down_red_24dp"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </LinearLayout>
+
+</RelativeLayout>

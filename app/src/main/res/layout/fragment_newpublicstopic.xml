@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/relLayout1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <include layout="@layout/snippet_top_newpublicstopic" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/submitDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <ImageView
+                    android:id="@+id/newTopicImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="100dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="10dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/lfgonly"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/howTo"
+                    android:text="@string/how_does_this_work"
+                    android:padding="4dp"
+                    android:textStyle="bold|italic"
+                    android:textColor="@android:color/holo_orange_dark"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:layout_marginTop="10dp"
+                    android:padding="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/platform"
+                        android:textSize="18sp" />
+
+                    <ImageView
+                        android:id="@+id/platformInfo"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="10dp"
+                        android:src="@drawable/icons8_question_mark_64"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"/>
+
+                </LinearLayout>
+
+                <ProgressBar
+                    android:id="@+id/spinnerProgress"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <Spinner
+                    android:id="@+id/platformSpinner"
+                    style="dark"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/spinner"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <EditText
+                    android:id="@+id/etOther"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 ./-_'&quot;"
+                    android:hint="@string/other"
+                    android:inputType="textCapSentences"
+                    android:singleLine="true"
+                    android:textCursorDrawable="@drawable/cursor_color"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <CheckBox
+                    android:layout_marginTop="10dp"
+                    android:theme="@style/checkboxGreen"
+                    android:text="@string/playing_now_text"
+                    android:id="@+id/playingNowCheck"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/whenTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/when"
+                        android:textSize="18sp" />
+
+                    <ImageView
+                        android:id="@+id/whenInfo"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="10dp"
+                        android:src="@drawable/icons8_question_mark_64"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"/>
+
+                </LinearLayout>
+
+                <Spinner
+                    android:id="@+id/whenSpinner"
+                    style="dark"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/spinner"
+                    android:entries="@array/publics_topic_time_array"
+                    android:prompt="@string/when_prompt" />
+
+                <LinearLayout
+                    android:layout_marginTop="10dp"
+                    android:padding="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/players_needed"
+                        android:textSize="18sp" />
+
+                    <ImageView
+                        android:id="@+id/playersInfo"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="10dp"
+                        android:src="@drawable/icons8_question_mark_64"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"/>
+
+                </LinearLayout>
+
+                <Spinner
+                    android:id="@+id/numPlayersSpinner"
+                    style="dark"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/spinner"
+                    android:entries="@array/num_players_array"
+                    android:prompt="@string/when_prompt" />
+
+                <LinearLayout
+                    android:layout_marginTop="10dp"
+                    android:padding="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/subject_text"
+                        android:textSize="18sp" />
+
+                    <ImageView
+                        android:id="@+id/subjectInfo"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="10dp"
+                        android:src="@drawable/icons8_question_mark_64"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"/>
+
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/etSubject"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 ./-_'&quot;,"
+                    android:hint="@string/etsubject2"
+                    android:inputType="textCapSentences"
+                    android:maxLength="30"
+                    android:singleLine="true"
+                    android:textCursorDrawable="@drawable/cursor_color" />
+
+                <LinearLayout
+                    android:layout_marginTop="10dp"
+                    android:padding="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/description_text"
+                        android:textSize="18sp" />
+
+                    <ImageView
+                        android:id="@+id/descInfo"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="10dp"
+                        android:src="@drawable/icons8_question_mark_64"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"/>
+
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/etDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/etdescription"
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:minLines="5"
+                    android:maxLength="750"
+                    android:maxLines="14"
+                    android:scrollbars="vertical"
+                    android:textColor="@color/white"
+                    android:textCursorDrawable="@drawable/cursor_color" />
+
+                <Button
+                    android:id="@+id/btnSubmit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/details_button"
+                    android:text="@string/submit"
+                    android:textColor="@android:color/white" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/newPublicsTopicProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </LinearLayout>
+
+</ScrollView>

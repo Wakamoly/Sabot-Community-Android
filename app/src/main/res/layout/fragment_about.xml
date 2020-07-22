@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/relLayout1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <include layout="@layout/snippet_top_aboutbar" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="There are quite a few libraries Sabot uses to provide our users with this experience. Many of them require us to mention them, and we're more than happy to." />
+
+            <LinearLayout
+                android:padding="4dp"
+                android:orientation="vertical"
+                android:layout_marginTop="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/icons8"
+                    android:textColor="@color/buttonGreen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Icons provided by Icons8"/>
+                <TextView
+                    android:layout_marginTop="5dp"
+                    android:id="@+id/dexter"
+                    android:textColor="@color/buttonGreen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Karumi/Dexter"/>
+
+                <TextView
+                    android:layout_marginTop="5dp"
+                    android:id="@+id/CircleImageView"
+                    android:textColor="@color/buttonGreen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="hdodenhof/CircleImageView"/>
+                <TextView
+                    android:layout_marginTop="5dp"
+                    android:id="@+id/glide"
+                    android:textColor="@color/buttonGreen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="bumptech/glide"/>
+                <TextView
+                    android:layout_marginTop="5dp"
+                    android:id="@+id/material_ripple"
+                    android:textColor="@color/buttonGreen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="balysv/material-ripple"/>
+                <TextView
+                    android:layout_marginTop="5dp"
+                    android:id="@+id/simpleratingbar"
+                    android:textColor="@color/buttonGreen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="FlyingPumba/SimpleRatingBar"/>
+                <TextView
+                    android:layout_marginTop="5dp"
+                    android:id="@+id/slidingdotsplash"
+                    android:textColor="@color/buttonGreen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Chabbal/slidingdotsplash"/>
+                <TextView
+                    android:layout_marginTop="5dp"
+                    android:id="@+id/onesignal"
+                    android:textColor="@color/buttonGreen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="One Signal Push Notifications"/>
+
+                <TextView
+                    android:layout_marginTop="5dp"
+                    android:id="@+id/retrofit"
+                    android:textColor="@color/buttonGreen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="square/retrofit"/>
+                <TextView
+                    android:layout_marginTop="5dp"
+                    android:id="@+id/acra"
+                    android:textColor="@color/buttonGreen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="ACRA/acra"/>
+                <TextView
+                    android:layout_marginTop="5dp"
+                    android:id="@+id/jsoup"
+                    android:textColor="@color/buttonGreen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="jhy/jsoup"/>
+                <TextView
+                    android:layout_marginTop="5dp"
+                    android:id="@+id/lovelydialog"
+                    android:textColor="@color/buttonGreen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="yarolegovich/LovelyDialog"/>
+                <TextView
+                    android:layout_marginTop="5dp"
+                    android:id="@+id/imageCropper"
+                    android:textColor="@color/buttonGreen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="ArthurHub/Android-Image-Cropper"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/privacy"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:gravity="center"
+                    android:text="Privacy Policy"
+                    android:textColor="@color/pin" />
+
+                <TextView
+                    android:id="@+id/terms"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:gravity="center"
+                    android:text="Terms and Conditions"
+                    android:textColor="@color/pin" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</ScrollView>

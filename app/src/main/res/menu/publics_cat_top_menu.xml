@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item
+        android:id="@+id/menuCatReport"
+        android:title="@string/report"
+        />
+
+    <item
+        android:id="@+id/menuCatReview"
+        android:title="@string/submit_review"
+        />
+
+    <item
+        android:id="@+id/menuCatNewPublicsTopic"
+        android:title="@string/new_publics"
+        />
+
+</menu>

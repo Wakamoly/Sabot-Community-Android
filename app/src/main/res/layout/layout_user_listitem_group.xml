@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/topbar">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/userListLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/acceptBtn"
+                android:background="@drawable/details_button"
+                android:text="Add"
+                android:layout_marginEnd="10dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:layout_width="80dp"
+                android:layout_height="40dp"/>
+
+            <RelativeLayout
+                android:id="@+id/profile_image_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="5dp">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_centerVertical="true" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/online"
+                    android:layout_width="@dimen/spacing_large"
+                    android:layout_height="@dimen/spacing_large"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginTop="38dp"
+                    android:src="@drawable/ic_online"
+                    android:visibility="gone"
+                    app:civ_border_color="@color/gray_bg"
+                    app:civ_border_width="1dp" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/verified"
+                    android:layout_width="@dimen/spacing_large"
+                    android:layout_height="@dimen/spacing_large"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="38dp"
+                    android:src="@drawable/ic_verified"
+                    android:visibility="gone"
+                    app:civ_border_color="@color/gray_bg"
+                    app:civ_border_width="1dp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/searchUsersInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/profile_image_container">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/Searchnickname"
+                    android:layout_toEndOf="@id/Searchusername">
+
+                    <ImageView
+                        android:id="@+id/dot"
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:layout_alignWithParentIfMissing="true"
+                        android:layout_marginTop="2dp"
+
+                        android:src="@drawable/sc_chev_white" />
+
+                    <TextView
+                        android:id="@+id/reviewCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/dot"
+                        android:text="0"
+                        android:textColor="@color/overlay_light_90"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:layout_toEndOf="@id/reviewCount"
+                        android:text="@string/reviews"
+                        android:textColor="@color/overlay_light_90"
+                        android:textSize="12sp" />
+
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/Searchusername"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/Searchnickname"
+                    android:layout_marginStart="5dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textColor="@color/light_blue"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    tools:text="@string/hint_username" />
+
+
+                <TextView
+                    android:id="@+id/Searchnickname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                    android:textColor="@color/green"
+                    android:textSize="18sp"
+                    tools:text="@string/nickname_text" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/tvTotalPosts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/searchUsersInfo"
+                android:layout_alignBottom="@id/profile_image_container"
+                android:layout_centerVertical="false"
+                android:layout_toEndOf="@id/profile_image_container">
+
+                <TextView
+                    android:id="@+id/textViewNumPublicsPosts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="3dp"
+                    android:text="0"
+                    android:textColor="@color/overlay_light_90"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/textViewNumPublicsPosts"
+                    android:text="Total Posts"
+                    android:textColor="@color/overlay_light_90"
+                    android:textSize="12sp" />
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>

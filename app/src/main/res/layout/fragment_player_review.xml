@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/player_review_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:descendantFocusability="blocksDescendants">
+
+            <include layout="@layout/snippet_top_playerreviewbar" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/player_review_center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/player_review_bar"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <include layout="@layout/layout_center_player_review" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/player_review_recycler_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/player_review_center"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:descendantFocusability="blocksDescendants">
+
+            <include layout="@layout/layout_recycler_player_reviews" />
+
+        </RelativeLayout>
+
+        <ProgressBar
+            android:id="@+id/player_review_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="100dp"
+            android:indeterminate="true"
+            android:visibility="visible"
+            tools:visibility="visible" />
+
+    </RelativeLayout>
+
+</ScrollView>

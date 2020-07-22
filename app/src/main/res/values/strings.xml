@@ -1,0 +1,343 @@
+<resources>
+    <string name="app_name">Sabot Community</string>
+    <string name="login_text">Login</string>
+    <string name="username_text">Username</string>
+    <string name="nickname_text">Nickname</string>
+    <string name="email_text_reg">Email Address</string>
+    <string name="register_new_account">Register New Account</string>
+    <string name="hint_username">Username</string>
+    <string name="hint_password">Password</string>
+    <string name="btn_link_to_register">Not a member? Sign up now.</string>
+    <string name="welcome">Welcome</string>
+    <string name="title_profile">Profile</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_search">Search</string>
+    <string name="title_publics">Publics</string>
+    <string name="postsTextProfile">Posts</string>
+    <string name="followingTextProfile">Following</string>
+    <string name="detailsTextProfile">Details</string>
+    <string name="likesText">Likes</string>
+    <string name="title_posts">Posts</string>
+    <string name="title_ratings">Reviews</string>
+    <string name="title_about">About</string>
+    <string name="player_rating_review">Player Rating/Review</string>
+    <string name="tell_us_about_this_player">Tell us about this player…</string>
+    <string name="submit_review">Submit Review</string>
+    <string name="great">Great!</string>
+    <string name="bad">Bad</string>
+    <string name="cusi">Could use some improvement</string>
+    <string name="average">Average</string>
+    <string name="good">Good</string>
+    <string name="what_are_you_playing">Let your followers know what you\'re up to…</string>
+    <string name="submit">Submit</string>
+    <string name="nav_publics">Publics</string>
+    <string name="comments">Comments</string>
+    <string name="time_message">A little while ago</string>
+    <string name="action_follow">Follow</string>
+    <string name="label_followers">Followers</string>
+    <string name="label_publics">Publics Posts</string>
+    <string name="label_reviews">Reviews</string>
+    <string name="new_post">New Post</string>
+    <string name="edit">Edit</string>
+    <string name="add_friend">Connect</string>
+    <string name="follow">Follow</string>
+    <string name="send_message">Send Message</string>
+    <string name="more">More</string>
+    <string name="profile_information_only_for_friends">Profile information is available only for connections.</string>
+    <string name="see_all">See All</string>
+    <string name="error">Error</string>
+    <string name="account_disabled">Account Disabled</string>
+    <string name="choose_photo">Choose Photo</string>
+    <string name="upload_image">Upload Image</string>
+    <string name="uploading">Uploading…</string>
+    <string name="player_reviews">Player Reviews</string>
+    <string name="ratings_and_reviews">Ratings and Reviews</string>
+    <string name="game_reviews">Game Reviews</string>
+    <string name="action_followed">Following</string>
+    <string name="friend">Connected</string>
+    <string name="requested">Requested</string>
+    <string name="bio">Bio</string>
+    <string name="tell_us_what_you_think_of_this_game">Tell us what you think of this game…</string>
+    <string name="game_rating_review">Game Rating/Review</string>
+
+    <string name="posttype_prompt">Choose a post type…</string>
+    <string name="contacttype_prompt">Choose a reason for contact…</string>
+    <string name="when_prompt">Choose a time…</string>
+    <string name="we_re_excited_to_have_you_back">Sign in to start dominating the randoms!</string>
+
+    <string name="navigation_drawer_open">Open</string>
+    <string name="navigation_drawer_close">Close</string>
+    <string name="messages">Messages</string>
+    <string name="account_settings">Account Settings</string>
+    <string name="no_internets">No internets!</string>
+    <string name="connect_to_review_this_player">Connect to review this player!</string>
+    <string name="no_reviews">No reviews!</string>
+    <string name="connections">Connections</string>
+    <string name="loading">Loading…</string>
+    <string name="request_sent">Sent</string>
+
+    <string name="mark_all_as_read">Mark all as read</string>
+    <string name="title_chat_requests">Requests</string>
+    <string name="title_chat_inbox">Inbox</string>
+    <string name="reviews">Reviews</string>
+    <string name="report">Report</string>
+    <string name="block">Block</string>
+    <string name="search">Search…</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="password_recovery">Password Recovery</string>
+    <string name="input_your_email_and_username_and_we_ll_send_you_a_link_to_reset_your_password">Input your Email and Username and we\'ll send you a link to reset your password!</string>
+    <string name="recover">Recover</string>
+    <string name="members">Members</string>
+    <string name="clans">Clans</string>
+    <string name="support">Support</string>
+    <string name="contact">Contact Us</string>
+    <string name="followed_clans">Joined Clans</string>
+    <string name="not_following_clans">Not a member of any clans! Why not create one?</string>
+    <string name="label_events">Events</string>
+    <string name="label_join">Join</string>
+    <string name="label_joined">Joined</string>
+    <string name="searches">Searches</string>
+    <string name="clan_name_string">Clan Name</string>
+    <string name="clan_tag_string">[CLANTAG]</string>
+    <string name="start_new_clan">Start New Clan</string>
+    <string name="submit_clan">Submit New Clan</string>
+    <string name="new_clan_start">Start New Clan</string>
+    <string name="admin_panel">Admin Panel</string>
+    <string name="follow_to_review_this_game">Follow to review this game!</string>
+    <string name="manage_members">Manage Members</string>
+    <string name="clan_name">Clan Name</string>
+    <string name="reason_for_contact">Reason for contact:</string>
+    <string name="etsubject">Subject…</string>
+    <string name="etsubject2">Subject… (up to 30 characters)</string>
+    <string name="etdescription">Description…</string>
+    <string name="clan_tag">Clan Tag</string>
+    <string name="other">Other…</string>
+    <string name="other2">Other</string>
+    <string name="clan_reviews">Clan Reviews</string>
+    <string name="become_a_member_to_review_this_clan">Become a member to review this clan!</string>
+    <string name="accept">Accept</string>
+    <string name="remove">Remove</string>
+    <string name="no_member_requests">No Member Requests!</string>
+    <string name="no_posts_to_show">No posts to show!</string>
+    <string name="no_messages_to_show">No messages to show!</string>
+    <string name="requests">Requests</string>
+    <string name="new_publics">New Publics</string>
+    <string name="new_topic">New Topic</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="platform">Platform:</string>
+    <string name="when">When:</string>
+    <string name="players_needed">Players needed (excluding yourself):</string>
+    <string name="players">players</string>
+    <string name="when_colon">When:</string>
+    <string name="steam">Steam</string>
+    <string name="back">Back</string>
+    <string name="purchasealterdialog">You\'re leaving Sabot Community and opening this games\'s purchase link.\n\nChoose a method:</string>
+    <string name="lfgonly">Submitting here is strictly for LFG (Looking For Group) purposes only.</string>
+    <string name="join_request_accepted">Join Request Accepted!</string>
+    <string name="join_requested">Join Requested!</string>
+    <string name="request_to_join">Request to join</string>
+    <string name="manage_requests">Manage Requests</string>
+    <string name="no_join_requests">No join requests!</string>
+    <string name="terms_and_conditions">Terms and Conditions</string>
+    <string name="leave_publics_topic">Opt out of event?</string>
+    <string name="leave_publics_topic_requested">Remove request to join?</string>
+    <string name="you_cannot_respond_to_this_message">You cannot respond to this message…</string>
+    <string name="write_message">Write message</string>
+    <string name="please_select_a_rating">Please select a rating!</string>
+    <string name="title">Title…</string>
+    <string name="review_text">Review</string>
+    <string name="please_select_a_rating_et">Please select a rating!</string>
+    <string name="comment_et">Comment…</string>
+    <string name="follow_to_view_publics">Follow To View Publics Posts And Chatroom</string>
+    <string name="delete_topic">Delete Topic</string>
+    <string name="post_deleted">Post deleted</string>
+    <string name="no_members">No members!</string>
+    <string name="view_player">View Player</string>
+    <string name="report_top_text">Having a problem with a user, Publics, or clan? Anonymously submit a complaint here.</string>
+    <string name="inappro_clan_name">Clans with inappropriate names, tag, or description will be removed</string>
+    <string name="clan_name_dot">Clan name…</string>
+    <string name="clan_description_dot">Clan description…</string>
+    <string name="current_publics">Current Publics</string>
+    <string name="close_account">Close Account</string>
+    <string name="closing_account">Disabling account, re-open account by signing back in.\n\nContinue?</string>
+    <string name="user_closed">User Closed!</string>
+    <string name="could_not_close_account">Error: could not close account, please contact us about this error!</string>
+    <string name="no_content">No content!</string>
+    <string name="platform_filter">Platform Filter</string>
+    <string name="selected_platform">Selected Platform:</string>
+    <string name="no_current_publics">No Current Publics!\nBe seen here when you post</string>
+    <string name="no_current_publics_cont">looking for new players!</string>
+    <string name="registered_title">Thank you for registering!</string>
+    <string name="registered_desc">You\'re only a few clicks away from meeting new players!\n\nWould you like to build your profile now?</string>
+    <string name="yes">Yes</string>
+    <string name="filter">Filter:</string>
+    <string name="save_settings_query">Save current settings?</string>
+    <string name="leaving_account_settings">You\'re leaving account settings! Would you like to save your current settings?</string>
+    <string name="no">No</string>
+    <string name="nothing_to_show">Nothing to show!</string>
+    <string name="clan_posts">Clan Posts</string>
+    <string name="profile_posts">Profile Posts</string>
+    <string name="publics_posts_text">Publics Posts</string>
+    <string name="new_to_sabot_community_text">New to Sabot Community?</string>
+    <string name="take_our_3_minute_walk_through_text">Take our 3 minute walk-through!</string>
+    <string name="next">Next</string>
+    <string name="skip">Skip</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="chat_room_publics">Chat Room</string>
+    <string name="previous_publics_text">Previous Publics</string>
+    <string name="last_reply_text">Last Reply:</string>
+    <string name="game_unfollow">Game Unfollow</string>
+    <string name="unfollow">Unfollow</string>
+    <string name="others_text">Others</string>
+    <string name="last_notification_text">Last Notification:</string>
+    <string name="publics_frequency_text">Publics Push Notification Frequency</string>
+    <string name="publics_noti_info_message">How often you\'ll receive push notifications when someone posts a new Publics topic for a game you follow.</string>
+    <string name="publics_post_push_notification_frequency">Publics Post Push Notification Frequency</string>
+    <string name="change_photo">Change Photo</string>
+    <string name="all_posts">All Posts</string>
+    <string name="no_clans_text">No Clans!</string>
+    <string name="profile_posts_text">Profile Posts</string>
+    <string name="clans_joined_text">Clans Joined</string>
+    <string name="no_more_posts_text">No More Posts!</string>
+    <string name="see_joined_members">See Joined Members</string>
+    <string name="merch">Merch</string>
+    <string name="ok">Okay</string>
+    <string name="thank_you_for_your_order">Thank you for your order!</string>
+    <string name="order_message1">"Your payment helps us grow! You should get an e-mail soon confirming your purchase!"</string>
+    <string name="home_address">Tell us where to ship your merch!</string>
+    <string name="send_connection_request">Send connection request?</string>
+    <string name="send_connection_request_message">By requesting to join, you\'ll be sending the post owner a connection request. This means that if you\'re accepted, you both will be connected permanently, giving you both the ability to rate and review each-other. (Also, please review everyone you play with!)</string>
+    <string name="accept_connection_request_publics">Accept connection request?</string>
+    <string name="accept_connection_request_publics_message">By requesting to join, you\'re accepting their connection request! This means that you\'ll be able to mutually rate and review each-other permanently (and please do so!).</string>
+    <string name="accept_connection_request_publics_message_owner">By accepting this member, you\'re accepting their connection request! This means that you\'ll be able to mutually rate and review each-other permanently (and please do so!).</string>
+    <string name="get_notifications_for_platforms">Select platforms you receive push notifications for</string>
+    <string name="save_text">Save</string>
+    <string name="noti_platform_message">When you follow games, you\'ll receive notifications when someone posts looking for other players. Select which platforms you want those notifications from here:</string>
+    <string name="comment_likes">Comment Likes</string>
+    <string name="post_likes">Post Likes</string>
+    <string name="edit_publics_post_text">Edit Post</string>
+    <string name="how_does_this_work">How does this work?</string>
+    <string name="subject_text">Subject:</string>
+    <string name="description_text">Description:</string>
+    <string name="how_it_works">When you submit a post here (a Publics post), your post will show on the game view and Dashboard of all users, regardless of the games they follow. Anyone who follows this game will receive a push notification that you\'re searching for players as long as the platforms that they choose to get notifications for contain what you choose here. After your post\'s time is up, it is removed from all public views and can then be found either through the notifications users get, or in \"Previous Publics\" in the game view. Players won\'t be able to request to join, but they\'ll still be able to leave comments.\n\nPlayers will have the ability to request to join, at which point you\'ll receive a \"connection request\" from them as well which if accepted, you both will have the ability to rate and review one\-another. You\'ll be able to edit the post after submitting to change title, description, or players needed if need be.\n\nPlease do NOT delete Publics posts after the time is up if you want users to still be able to contact you after the time is up!</string>
+    <string name="platform_how_it_works">Choose what platform you\'re playing on, or \"Cross-Platform\" if available to play with users from any platform.</string>
+    <string name="when_how_it_works">This is how long you want the post to be public for. Every option gets an additional +10 minute grace period, meaning a 30 minute option stays open for 40 minutes before it\'s removed from public view and placed in \"Previous Publics\" in the game\'s view. (\"Now\" option is currently removed.)</string>
+    <string name="players_how_it_works">How many players you\'re currently searching for in this post. This can be changed in \"Edit Post\" if you would like to change it at any point.</string>
+    <string name="subject_how_it_works">The subject of your post, this can be as simple as a gamemode you\'re looking to play specifically, or even \"No scrubs pls\", the choice is yours to make.</string>
+    <string name="desc_how_it_works">PLEASE be descriptive here. Here you can specify exactly who you\'re looking for, what you\'re trying to do, and what the potential requirements should be (i.e.: Rank, \"mic required\", \"18+ only\", etc.).</string>
+    <string name="new_group_message_text">New Group Message</string>
+    <string name="group_message_name_text">Group Message Name</string>
+    <string name="options_text">Options</string>
+    <string name="submit_new_group_message_text">Submit New Group Message</string>
+    <string name="mute_conversation">(Un)Mute Conversation</string>
+    <string name="players_added">Players Added</string>
+    <string name="group_options">Group Options</string>
+    <string name="invite_players">Invite Players</string>
+    <string name="leave_group">Leave Group</string>
+    <string name="leave_group_message_text">Leave Group Message?</string>
+    <string name="messages_manage_user">Manage User</string>
+    <string name="message_requests_text">Message Requests</string>
+    <string name="no_message_requests_text">No message requests to show!</string>
+    <string name="remove_group_request">Deny</string>
+    <string name="accept_group_request">Accept</string>
+    <string name="group_options_text">Group Options</string>
+    <string name="submit_changes_text">Submit Changes</string>
+    <string name="new_comment_text">New Comment</string>
+    <string name="what_are_you_playing_clan">Let other members know what you\'re up to...</string>
+    <string name="playing_now_text">Playing Now</string>
+    <string name="keep_post_open">Keep post open for:</string>
+    <string name="delete_post_string">Delete Post</string>
+    <string name="edit_post_menu">Edit Post</string>
+    <string name="edited_text">Edited</string>
+    <string name="new_update_available">A new update is available!</string>
+    <string name="gp_redirect">Go to Google Play to download now?</string>
+    <string name="edit_profile_text">Edit Profile</string>
+    <string name="edit_post_text">Edit Post</string>
+    <string name="confirm">Are you sure?</string>
+    <string name="discord_server_text">Discord Server</string>
+    <string name="choose_a_rating_text">Choose a rating</string>
+    <string name="no_notifications_text">No notifications!</string>
+    <string-array name="contact_array">
+        <item>Complaint</item>
+        <item>Report a problem</item>
+        <item>Suggestion</item>
+        <item>Advertising</item>
+    </string-array>
+    <string-array name="report_array">
+        <item>Abuse</item>
+        <item>Offensive Name</item>
+        <item>Fake User/Clan</item>
+        <item>Inappropriate Posts</item>
+        <item>User/Clan Hacked</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="platform_array">
+        <item>General</item>
+        <item>PlayStation</item>
+        <item>Xbox</item>
+        <item>Steam</item>
+        <item>PC</item>
+        <item>Mobile</item>
+        <item>Switch</item>
+    </string-array>
+    <string-array name="platform_array_w_all">
+        <item>PlayStation</item>
+        <item>Xbox</item>
+        <item>Steam</item>
+        <item>PC</item>
+        <item>Mobile</item>
+        <item>Switch</item>
+        <item>Cross-Platform</item>
+        <item>Other</item>
+        <item>All</item>
+    </string-array>
+    <string-array name="num_players_array">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+    </string-array>
+
+    <!--<item>Now</item>-->
+    <string-array name="publics_topic_time_array">
+        <item>30 Minutes</item>
+        <item>1 Hour</item>
+        <item>2 Hours</item>
+        <item>3 Hours</item>
+        <item>4 Hours</item>
+        <item>5 Hours</item>
+        <item>6 Hours</item>
+        <item>7 Hours</item>
+        <item>8 Hours</item>
+    </string-array>
+    <string-array name="publics_push_noti_frequency">
+        <item>Always</item>
+        <item>1 Hour</item>
+        <item>2 Hours</item>
+        <item>4 Hours</item>
+        <item>8 Hours</item>
+        <item>12 Hours</item>
+        <item>24 Hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="publics_sort_by">
+        <item>Followers</item>
+        <item>Recently Added</item>
+        <item>A-Z</item>
+        <item>Posts</item>
+        <item>Reviews</item>
+    </string-array>
+
+</resources>

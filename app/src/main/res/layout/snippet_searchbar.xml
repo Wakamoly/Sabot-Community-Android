@@ -1,0 +1,43 @@
+<merge xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/topbar">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/searchToolBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:buttonGravity="bottom"
+            app:contentInsetStartWithNavigation="12dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+
+                <!--<SearchView
+                    android:id="@+id/search"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerVertical="true"
+                    android:background="@null"
+                    android:hint="Search..."
+                    android:iconifiedByDefault="false"
+                    android:textColor="#fff"
+                    android:textSize="20sp" /><-->
+
+
+            </RelativeLayout>
+
+
+        </androidx.appcompat.widget.Toolbar>
+
+
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+</merge>

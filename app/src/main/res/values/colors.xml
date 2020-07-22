@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimaryDark">#0C0C0C</color>
+    <color name="colorPrimary">#111111</color>
+    <color name="colorAccent">#333333</color>
+    <color name="buttonGreen">#71CE61</color>
+    <color name="input_register_hint">#5e6266</color>
+    <color name="InactiveBottomNavIconColor">#fff</color>
+    <color name="white">#fff</color>
+    <color name="grey">#d3d3d3</color>
+    <color name="topbar">#1D1D1D</color>
+    <color name="orange">#FB8C00</color>
+
+
+    <color name="gray">#808285</color>
+    <color name="gray_bg">#E5E5E5</color>
+    <color name="gray_text">#757575</color>
+    <color name="dark_blue">#204062</color>
+    <color name="light_blue">#1E88E5</color>
+    <color name="gray_border">#D3D3D3</color>
+    <color name="stock_gray">#85414141</color>
+
+    <color name="green">#45B431</color>
+    <color name="sponsored">#FF8500</color>
+    <color name="pin">#DB4437</color>
+
+    <!-- added for version 3.7 -->
+
+    <color name="overlay_white">#656668</color>
+
+    <!-- added for version 4.7 -->
+
+    <color name="grey_20">#cccccc</color>
+    <color name="grey_40">#999999</color>
+    <color name="grey_80">#464646</color>
+    <color name="grey_90">#2C2C2C</color>
+
+    <!-- added for version 4.8 -->
+
+    <color name="grey_medium">#BDBFC1</color>
+    <color name="grey_dark">#262626</color>
+
+    <color name="overlay_light_90">#E6FFFFFF</color>
+
+    <color name="profile_action_icon_bg">#EBEDF0</color>
+    <color name="profile_action_icon_tint">#1C1E21</color>
+
+    <!-- For version 4.9 -->
+
+</resources>

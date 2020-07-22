@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_messages"
+            android:icon="@drawable/ic_action_messages"
+            android:title="@string/messages" />
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_action_settings"
+            android:title="@string/account_settings" />
+
+    </group>
+
+    <item android:title="@string/others_text">
+        <menu>
+            <item
+                android:id="@+id/nav_profile"
+                android:icon="@drawable/ic_action_profile"
+                android:title="@string/title_profile" />
+            <item
+                android:id="@+id/nav_publics"
+                android:icon="@drawable/ic_group_add_black_24dp"
+                android:title="@string/title_publics" />
+            <item
+                android:id="@+id/nav_clans"
+                android:icon="@drawable/ic_action_groups"
+                android:title="@string/clans" />
+        </menu>
+    </item>
+
+    <item android:title="@string/support">
+        <menu>
+            <item
+                android:id="@+id/nav_contact_us"
+                android:icon="@drawable/ic_messages_24dp"
+                android:title="@string/contact" />
+            <item
+                android:id="@+id/nav_merch"
+                android:icon="@drawable/ic_launcher_trans"
+                android:title="@string/merch" />
+            <item
+                android:id="@+id/nav_about"
+                android:icon="@drawable/ic_action_report"
+                android:title="@string/title_about" />
+        </menu>
+    </item>
+
+</menu>

@@ -1,0 +1,651 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+
+    <LinearLayout
+        android:id="@+id/postDeletedScreenContent"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/ivError2"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:src="@drawable/ic_error"
+            android:tint="@color/dark_blue" />
+
+        <TextView
+            android:id="@+id/deletedScreenMsg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:text="@string/post_deleted"
+            android:textColor="@color/dark_blue"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/publicsPostsSwipe"
+        android:layout_above="@+id/submitComment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/topicLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:orientation="vertical"
+                android:visibility="invisible"
+                tools:visibility="visible">
+
+                <com.google.android.material.appbar.AppBarLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@color/topbar">
+
+                    <androidx.appcompat.widget.Toolbar
+                        android:id="@+id/publicsTopicToolBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <ImageView
+                                android:id="@+id/publicsTopicMenu"
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:layout_alignParentEnd="true"
+                                android:layout_centerVertical="true"
+                                android:layout_marginEnd="20dp"
+                                android:src="@drawable/ic_ellipses" />
+
+                            <TextView
+                                android:id="@+id/publicsPostTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:layout_marginStart="15dp"
+                                android:focusable="true"
+                                android:focusableInTouchMode="true"
+                                android:text="Publics Topic"
+                                android:textColor="@color/white"
+                                android:textSize="20sp" />
+                        </RelativeLayout>
+
+
+                    </androidx.appcompat.widget.Toolbar>
+
+
+                </com.google.android.material.appbar.AppBarLayout>
+
+                <LinearLayout
+                    android:id="@+id/whenLayout"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:background="@drawable/orange_button"
+                    android:padding="5dp">
+
+                    <TextView
+                    android:id="@+id/topicTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="italic"
+                    tools:text="Title" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="end"
+                            android:text="@string/when_colon"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvWhen"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="3dp"
+                            android:text=""
+                            android:textStyle="bold"
+                            tools:text="11 minutes" />
+
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:id="@+id/userPublicsPostsListLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/publicsImageView"
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        android:layout_margin="1dp"
+                        android:scaleType="centerCrop" />
+
+                    <LinearLayout
+                        android:id="@+id/blob_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/darker_gray_transparent_blob"
+                        android:minHeight="152dp"
+                        android:orientation="horizontal"
+                        android:padding="3dp">
+
+                        <RelativeLayout
+                            android:layout_gravity="center_vertical"
+                            android:padding="4dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <de.hdodenhof.circleimageview.CircleImageView
+                                android:id="@+id/publicsPostsProfile_image_top"
+                                android:layout_width="50dp"
+                                android:layout_height="50dp" />
+
+                            <de.hdodenhof.circleimageview.CircleImageView
+                                android:id="@+id/verified"
+                                android:layout_width="@dimen/spacing_large"
+                                android:layout_height="@dimen/spacing_large"
+                                android:layout_marginTop="40dp"
+                                android:src="@drawable/ic_verified"
+                                android:visibility="gone"
+                                app:civ_border_color="@color/gray_bg"
+                                app:civ_border_width="1dp"
+                                tools:visibility="visible" />
+
+                            <de.hdodenhof.circleimageview.CircleImageView
+                                android:id="@+id/online"
+                                android:layout_width="@dimen/spacing_large"
+                                android:layout_height="@dimen/spacing_large"
+                                android:layout_marginStart="35dp"
+                                android:layout_marginTop="40dp"
+                                android:src="@drawable/ic_online"
+                                android:visibility="gone"
+                                app:civ_border_color="@color/gray_bg"
+                                app:civ_border_width="1dp"
+                                tools:visibility="visible" />
+
+                        </RelativeLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:orientation="vertical">
+
+                            <RelativeLayout
+                                android:id="@+id/publicsPostsUserInfo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content">
+
+                                <LinearLayout
+                                    android:id="@+id/nicknameLayout"
+                                    android:orientation="horizontal"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content">
+
+                                    <TextView
+                                        android:id="@+id/clantag"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="5dp"
+                                        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                                        android:textColor="@color/pin"
+                                        android:textSize="13sp"
+                                        android:textStyle="bold"
+                                        tools:text="[CLAN]" />
+
+                                    <TextView
+                                        android:id="@+id/publicsPostsNickname_top"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="2dp"
+                                        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                                        android:textColor="@color/green"
+                                        android:textSize="13sp"
+                                        tools:text="@string/nickname_text" />
+
+                                    <ImageView
+                                        android:id="@+id/platformType"
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
+                                        android:layout_marginStart="5dp"
+                                        android:src="@drawable/icons8_xbox_50"
+                                        android:visibility="gone"
+                                        tools:visibility="visible" />
+
+                                </LinearLayout>
+
+
+                                <TextView
+                                    android:id="@+id/publicsPostsUsername_top"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@id/nicknameLayout"
+                                    android:layout_centerVertical="true"
+                                    android:layout_marginStart="5dp"
+                                    android:layout_marginTop="-5dp"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                    android:textColor="@color/light_blue"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold"
+                                    tools:text="@string/username_text" />
+
+                                <LinearLayout
+                                    android:id="@+id/playingNowLayout"
+                                    android:gravity="center_vertical"
+                                    android:layout_below="@id/publicsPostsUsername_top"
+                                    android:layout_width="match_parent"
+                                    android:padding="3dp"
+                                    android:layout_centerVertical="true"
+                                    android:layout_height="wrap_content"
+                                    android:visibility="gone"
+                                    tools:visibility="visible">
+
+                                    <de.hdodenhof.circleimageview.CircleImageView
+                                        android:src="@drawable/ic_check"
+                                        android:layout_width="16dp"
+                                        android:layout_height="16dp"
+                                        android:layout_marginEnd="3dp"
+                                        app:civ_circle_background_color="@color/green"/>
+
+                                    <TextView
+                                        android:text="@string/playing_now_text"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"/>
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_alignParentEnd="true"
+                                    android:layout_gravity="end"
+                                    android:layout_marginEnd="30dp"
+                                    android:gravity="end">
+
+                                    <TextView
+                                        android:id="@+id/numPlayersAdded"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@android:color/holo_orange_dark"
+                                        tools:text="0" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="/"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:id="@+id/numPlayersNeeded"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/pin"
+                                        android:textStyle="bold"
+                                        tools:text="5" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="3dp"
+                                        android:text="@string/players" />
+
+                                </LinearLayout>
+
+                            </RelativeLayout>
+
+                            <RelativeLayout
+                                android:id="@+id/publicsPostsBodyInfo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="30dp">
+
+                                <TextView
+                                    android:id="@+id/publicsPostBody_top"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="5dp"
+                                    android:textColor="@color/white"
+                                    android:textSize="14sp"
+                                    tools:text="Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text " />
+
+                                <TextView
+                                    android:id="@+id/textViewNumPublicsPoints_top"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@id/publicsPostBody_top"
+                                    android:layout_marginStart="5dp"
+                                    android:layout_marginEnd="3dp"
+                                    android:text="0"
+                                    android:textColor="@android:color/secondary_text_dark"
+                                    android:textSize="14sp" />
+
+                                <TextView
+                                    android:id="@+id/TvPublicsPostsPoints_top"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@id/publicsPostBody_top"
+                                    android:layout_toEndOf="@+id/textViewNumPublicsPoints_top"
+                                    android:text="points"
+                                    android:textColor="@android:color/secondary_text_dark"
+                                    android:textSize="14sp" />
+
+                                <TextView
+                                    android:id="@+id/publicsPostsDateTime_top"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@id/publicsPostBody_top"
+                                    android:layout_alignParentEnd="true"
+                                    android:layout_centerVertical="true"
+                                    android:layout_marginStart="10dp"
+                                    android:layout_toEndOf="@+id/TvPublicsPostsPoints_top"
+                                    android:gravity="end"
+                                    android:paddingEnd="3dp"
+                                    android:textColor="@android:color/secondary_text_dark"
+                                    android:textSize="14sp"
+                                    tools:text="45 minutes ago" />
+                            </RelativeLayout>
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:id="@+id/requestLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_below="@id/blob_layout"
+                        android:layout_marginTop="5dp">
+
+                        <ProgressBar
+                            android:layout_margin="2dp"
+                            android:id="@+id/requestProgressBar"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1" />
+
+                        <Button
+                            android:layout_margin="2dp"
+                            android:id="@+id/noRequests"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/grey_button"
+                            android:text="@string/no_join_requests"
+                            android:textAllCaps="false"
+                            android:visibility="gone"
+                            style="?android:attr/borderlessButtonStyle"
+                            tools:visibility="visible" />
+
+                        <Button
+                            android:layout_margin="2dp"
+                            android:id="@+id/joinRequests"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/details_button"
+                            android:text="@string/manage_requests"
+                            android:textAllCaps="false"
+                            android:visibility="gone"
+                            style="?android:attr/borderlessButtonStyle"
+                            tools:visibility="visible" />
+
+                        <Button
+                            android:layout_margin="2dp"
+                            android:id="@+id/requestToJoin"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/details_button"
+                            android:text="@string/request_to_join"
+                            android:textAllCaps="false"
+                            android:visibility="gone"
+                            style="?android:attr/borderlessButtonStyle"
+                            tools:visibility="visible" />
+
+                        <Button
+                            android:layout_margin="2dp"
+                            android:id="@+id/requestedToJoin"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/orange_button"
+                            android:text="@string/join_requested"
+                            android:textAllCaps="false"
+                            android:visibility="gone"
+                            style="?android:attr/borderlessButtonStyle"
+                            tools:visibility="visible" />
+
+                        <Button
+                            android:layout_margin="2dp"
+                            android:id="@+id/topicJoined"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/details_button"
+                            android:text="@string/join_request_accepted"
+                            android:textAllCaps="false"
+                            android:visibility="gone"
+                            style="?android:attr/borderlessButtonStyle"
+                            tools:visibility="visible" />
+
+                        <Button
+                            android:layout_margin="2dp"
+                            android:id="@+id/topicMembers"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/blue_button"
+                            android:text="@string/see_joined_members"
+                            android:textAllCaps="false"
+                            android:visibility="gone"
+                            style="?android:attr/borderlessButtonStyle"
+                            tools:visibility="visible" />
+
+                        <Button
+                            android:layout_margin="2dp"
+                            android:id="@+id/topicEdit"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/blue_button"
+                            android:text="@string/edit_publics_post_text"
+                            android:textAllCaps="false"
+                            style="?android:attr/borderlessButtonStyle"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
+
+                        <Button
+                            android:layout_margin="2dp"
+                            android:id="@+id/deleteTopic"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/red_button"
+                            android:text="@string/delete_topic"
+                            android:textAllCaps="false"
+                            android:visibility="gone"
+                            style="?android:attr/borderlessButtonStyle"
+                            tools:visibility="visible" />
+
+                    </LinearLayout>
+
+                    <Button
+                        android:layout_below="@+id/requestLayout"
+                        android:layout_marginBottom="5dp"
+                        android:layout_margin="2dp"
+                        android:layout_height="40dp"
+                        android:id="@+id/newComment"
+                        android:layout_width="match_parent"
+                        android:background="@drawable/details_button"
+                        android:text="@string/new_comment_text"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:textAllCaps="false" />
+
+                    <LinearLayout
+                        android:id="@+id/voteLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_above="@id/requestLayout"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="-30dp"
+                        android:layout_toEndOf="@id/blob_layout"
+                        android:gravity="top"
+                        android:orientation="vertical">
+
+                        <ProgressBar
+                            android:id="@+id/voteProgress"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
+
+                        <ImageView
+                            android:id="@+id/publicsPostsUpvoteWhite_top"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:src="@drawable/ic_keyboard_arrow_up_white_24dp" />
+
+                        <ImageView
+                            android:id="@+id/publicsPostsUpvoteGreen_top"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:src="@drawable/ic_keyboard_arrow_up_green_24dp"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
+
+                        <ImageView
+                            android:id="@+id/publicsPostsDownvoteWhite"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_marginTop="10dp"
+                            android:src="@drawable/ic_keyboard_arrow_down_white_24dp" />
+
+                        <ImageView
+                            android:id="@+id/publicsPostsDownvoteRed_top"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_marginTop="10dp"
+                            android:src="@drawable/ic_keyboard_arrow_down_red_24dp"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
+
+                    </LinearLayout>
+
+
+                </RelativeLayout>
+
+                <!--                </com.balysv.materialripple.MaterialRippleLayout>-->
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerPublicsTopic"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="85dp" />
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <ProgressBar
+        android:id="@+id/topicProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:indeterminate="true"
+        android:visibility="visible" />
+
+    <RelativeLayout
+        android:id="@+id/newCommentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="-70dp"
+        android:background="@drawable/grey_button"
+        android:padding="5dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+
+        <EditText
+            android:id="@+id/commentEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/colorprimary_button"
+            android:hint="@string/comment_et"
+            android:inputType="textCapSentences|textMultiLine"
+            android:minLines="4"
+            android:maxLength="2000"
+            android:maxLines="10"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:textColorHighlight="@color/white"
+            android:textCursorDrawable="@drawable/cursor_color"
+            android:textSize="14sp" />
+
+    </RelativeLayout>
+
+    <com.balysv.materialripple.MaterialRippleLayout
+        android:id="@+id/submitComment"
+        style="@style/RippleStyleWhite"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_above="@id/newCommentLayout"
+        android:layout_marginBottom="70dp"
+        android:background="@drawable/submitbuttonshape"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/transparent"
+            android:padding="0dp"
+            style="?android:attr/borderlessButtonStyle"
+            android:text="@string/submit" />
+
+    </com.balysv.materialripple.MaterialRippleLayout>
+
+</RelativeLayout>
