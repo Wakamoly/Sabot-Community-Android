@@ -550,7 +550,7 @@ public class FragmentProfile extends Fragment {
                     }else{
                         connectionRequest(username);
                     }
-                    if(!(isConnected.equals("no"))&&!(userProfileID.equals(userID))){
+                    if(!(isConnected.equals("yes"))&&!(userProfileID.equals(userID))){
                         addItemButton.setVisibility(GONE);
                     }
                 } else {
