@@ -107,6 +107,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="textNoSuggestions"
                     android:maxLength="25"
+                    android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890_."
                     android:textColor="@color/white"
                     android:textCursorDrawable="@drawable/cursor_color"
                     android:textSize="12sp" />
@@ -185,6 +186,7 @@
                         android:layout_height="35dp"
                         android:layout_centerVertical="true"
                         android:layout_toEndOf="@id/twitchInput"
+                        android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 ._-"
                         android:hint="Twitch.TV Username"
                         android:inputType="textPersonName"
                         android:maxLength="100"
@@ -214,6 +216,7 @@
                         android:layout_height="35dp"
                         android:layout_centerVertical="true"
                         android:layout_toEndOf="@id/mixerInput"
+                        android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 ._-"
                         android:hint="Mixer Username"
                         android:inputType="textPersonName"
                         android:maxLength="100"
@@ -366,6 +369,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="35dp"
                         android:layout_centerVertical="true"
+                        android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 ._-#"
                         android:layout_toEndOf="@id/userDiscordProfilePic"
                         android:hint="Discord Username (with numbers)"
                         android:maxLength="200"
@@ -395,6 +399,7 @@
                         android:layout_centerVertical="true"
                         android:layout_toEndOf="@id/instagramInput"
                         android:hint="Instagram @username"
+                        android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 ._-"
                         android:maxLength="200"
                         android:textColor="@color/white"
                         android:textSize="12sp" />
@@ -449,6 +454,7 @@
                         android:layout_centerVertical="true"
                         android:layout_toEndOf="@id/twitterInput"
                         android:hint="Twitter @username"
+                        android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 ._-"
                         android:maxLength="200"
                         android:textColor="@color/white"
                         android:textSize="12sp" />
