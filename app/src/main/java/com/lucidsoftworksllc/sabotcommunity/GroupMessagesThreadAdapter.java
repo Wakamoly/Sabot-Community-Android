@@ -57,7 +57,7 @@ public class GroupMessagesThreadAdapter extends RecyclerView.Adapter<GroupMessag
         holder.textViewTime.setText(message.getDate());
         if(!message.getImage().equals("")){
             holder.img_msg.setVisibility(View.VISIBLE);
-            Glide.with(context)
+            Glide.with((ChatActivity)context)
                     .load(Constants.BASE_URL+ message.getImage())
                     .thumbnail(0.5f)
                     .into(holder.img_msg);
@@ -76,7 +76,7 @@ public class GroupMessagesThreadAdapter extends RecyclerView.Adapter<GroupMessag
             holder.img_msg.setVisibility(View.GONE);
         }
         String profile_pic = message.getProfile_pic().substring(0, message.getProfile_pic().length() - 4)+"_r.JPG";
-        Glide.with(context)
+        Glide.with((ChatActivity)context)
                 .load(Constants.BASE_URL+ profile_pic)
                 .error(R.mipmap.ic_launcher)
                 .into(holder.profile_pic_group);

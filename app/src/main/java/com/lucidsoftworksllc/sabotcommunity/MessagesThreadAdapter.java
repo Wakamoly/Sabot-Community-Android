@@ -57,7 +57,7 @@ public class MessagesThreadAdapter extends RecyclerView.Adapter<MessagesThreadAd
         holder.textViewTime.setText(message.getDate());
         if(!message.getImage().equals("")){
             holder.img_msg.setVisibility(View.VISIBLE);
-            Glide.with(context)
+            Glide.with((ChatActivity)context)
                     .load(Constants.BASE_URL+ message.getImage())
                     .error(R.mipmap.ic_launcher)
                     .into(holder.img_msg);

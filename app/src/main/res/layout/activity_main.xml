@@ -67,7 +67,7 @@
                         android:id="@+id/editTextUsername"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890_"
+                        android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890_."
                         android:hint="GamerDude321"
                         android:inputType="textShortMessage"
                         android:singleLine="true"

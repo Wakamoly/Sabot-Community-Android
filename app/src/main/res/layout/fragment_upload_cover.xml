@@ -17,10 +17,11 @@
 
     <LinearLayout
         android:id="@+id/uploadProgress"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center">
+        android:gravity="center"
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <ProgressBar
             android:layout_width="wrap_content"
@@ -41,11 +42,12 @@
 
 
     <Button
+        android:id="@+id/btnUpload"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/upload_image"
-        android:id="@+id/btnUpload"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        tools:visibility="visible" />
 
 
 

@@ -1113,10 +1113,8 @@ public class FragmentProfile extends Fragment {
             loadProfilenews();
             textViewTvPosts.setVisibility(VISIBLE);
             profileItemsLabel.setText(mContext.getString(R.string.profile_posts_text));
-            //TODO: Fix this with see all fragment --> clans
             profileNewsMoreBtn.setVisibility(VISIBLE);
-        }
-        if (clicked == profileClansButton){
+        }else if (clicked == profileClansButton){
             profilePostsButton.setBackgroundColor(mContext.getResources().getColor(R.color.grey_80));
             publicsPostsButton.setBackgroundColor(mContext.getResources().getColor(R.color.grey_80));
             profileClansButton.setBackgroundColor(mContext.getResources().getColor(R.color.green));
@@ -1126,8 +1124,7 @@ public class FragmentProfile extends Fragment {
             profileItemsLabel.setText(mContext.getString(R.string.clans_joined_text));
             //TODO: Fix this with see all fragment --> clans
             profileNewsMoreBtn.setVisibility(GONE);
-        }
-        if (clicked == publicsPostsButton){
+        }else if (clicked == publicsPostsButton){
             profileClansButton.setBackgroundColor(mContext.getResources().getColor(R.color.grey_80));
             profilePostsButton.setBackgroundColor(mContext.getResources().getColor(R.color.grey_80));
             publicsPostsButton.setBackgroundColor(mContext.getResources().getColor(R.color.green));
@@ -1135,7 +1132,6 @@ public class FragmentProfile extends Fragment {
             loadProfilePublicsnews();
             textViewTvPosts.setVisibility(GONE);
             profileItemsLabel.setText(mContext.getString(R.string.publics_posts_text));
-            //TODO: Fix this with see all fragment --> clans
             profileNewsMoreBtn.setVisibility(VISIBLE);
         }
     }

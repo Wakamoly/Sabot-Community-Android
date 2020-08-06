@@ -124,10 +124,9 @@
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/emailEditText"
-                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 @."
+                android:layout_marginTop="10dp"
                 android:hint="@string/email_text_reg"
                 android:inputType="textEmailAddress"
                 android:textColor="@color/white"
