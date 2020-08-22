@@ -154,14 +154,14 @@ public class PlayerReviewFragment extends Fragment {
                 reviewStarRating.setRating(Float.parseFloat(average));
                 tvInteger.setText(average);
                 numReviews.setText(String.valueOf(count));
-                if (count < 2){
+                if (count == 1){
                     tvTotalReviews.setText(getString(R.string.review_text));
                 }
                 player_review_progress.setVisibility(View.GONE);
                 player_review_center.setVisibility(View.VISIBLE);
                 player_review_recycler_layout.setVisibility(View.VISIBLE);
                 String[] array = all_friend_array.split(",");
-                if(Arrays.asList(array).contains(SharedPrefManager.getInstance(getActivity()).getUsername())){
+                if(Arrays.asList(array).contains(SharedPrefManager.getInstance(mContext).getUsername())){
                     reviewButton.setVisibility(View.VISIBLE);
                 } else if(!userProfileID.equals(userID)) {
                     connectToReview.setVisibility(View.VISIBLE);

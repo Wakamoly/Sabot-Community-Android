@@ -11,6 +11,8 @@ public class PlayerReview_Recycler {
     private String nickname;
     private String user_id;
 
+    //TODO Add ID of review, verified, online
+
     public PlayerReview_Recycler(String ratingnumber, String title, String comments, String reply, String time, String profile_pic, String nickname, String user_id) {
         this.ratingnumber = ratingnumber;
         this.title = title;
