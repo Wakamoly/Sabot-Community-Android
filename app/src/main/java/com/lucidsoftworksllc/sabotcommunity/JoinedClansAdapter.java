@@ -22,9 +22,9 @@ import java.util.List;
 public class JoinedClansAdapter extends RecyclerView.Adapter<JoinedClansAdapter.ViewHolder> {
 
     private Context mCtx;
-    private List<Clans_Recycler> clansList;
+    private List<ClansRecycler> clansList;
 
-    public JoinedClansAdapter(Context mCtx, List<Clans_Recycler> clansList) {
+    public JoinedClansAdapter(Context mCtx, List<ClansRecycler> clansList) {
         this.mCtx = mCtx;
         this.clansList = clansList;
     }
@@ -40,7 +40,7 @@ public class JoinedClansAdapter extends RecyclerView.Adapter<JoinedClansAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull JoinedClansAdapter.ViewHolder holder, int position) {
-        final Clans_Recycler clans = clansList.get(position);
+        final ClansRecycler clans = clansList.get(position);
 
         holder.textViewTag.setText("["+clans.getTag()+"]");
         holder.textViewTag.setAllCaps(true);

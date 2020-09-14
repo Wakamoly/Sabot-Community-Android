@@ -1,215 +1,215 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.content.Context;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.bumptech.glide.Glide;
+import android.content.Context
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.StringRequest
+import com.bumptech.glide.Glide
+import org.json.JSONException
+import org.json.JSONObject
+import java.util.*
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+class EditPublicsTopic : Fragment() {
+    private var gamename: String? = null
+    private var platform: String? = null
+    private var finalPlatform: String? = null
+    private var numPlayers: String? = null
+    private var gameimage: String? = null
+    private var userID: String? = null
+    private var username: String? = null
+    private var topicId: String? = null
+    private var content: String? = null
+    private var gameid: String? = null
+    private var title: String? = null
+    private var mContext: Context? = null
+    private var btnSubmit: Button? = null
+    private var platformSpinner: Spinner? = null
+    private var numPlayersSpinner: Spinner? = null
+    private var etOther: EditText? = null
+    private var etSubject: EditText? = null
+    private var etDescription: EditText? = null
+    private var newPublicsTopicProgressBar: ProgressBar? = null
+    private var spinnerProgress: ProgressBar? = null
+    private var textViewGame: TextView? = null
+    private var backArrow: ImageView? = null
+    private var newTopicImage: ImageView? = null
+    private var submitDetails: LinearLayout? = null
+    private var platformArrayList: ArrayList<PlatformModel>? = null
+    private val platforms = ArrayList<String>()
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val newPublicsRootView = inflater.inflate(R.layout.fragment_editpublicstopic, null)
+        mContext = activity
+        btnSubmit = newPublicsRootView.findViewById(R.id.btnSubmit)
+        textViewGame = newPublicsRootView.findViewById(R.id.textViewGame)
+        platformSpinner = newPublicsRootView.findViewById(R.id.platformSpinner)
+        etOther = newPublicsRootView.findViewById(R.id.etOther)
+        etSubject = newPublicsRootView.findViewById(R.id.etSubject)
+        etDescription = newPublicsRootView.findViewById(R.id.etDescription)
+        numPlayersSpinner = newPublicsRootView.findViewById(R.id.numPlayersSpinner)
+        newPublicsTopicProgressBar = newPublicsRootView.findViewById(R.id.newPublicsTopicProgressBar)
+        submitDetails = newPublicsRootView.findViewById(R.id.submitDetails)
+        newTopicImage = newPublicsRootView.findViewById(R.id.newTopicImage)
+        spinnerProgress = newPublicsRootView.findViewById(R.id.spinnerProgress)
+        userID = SharedPrefManager.getInstance(mContext).userID
+        username = SharedPrefManager.getInstance(mContext).username
+        gamename = requireArguments().getString("gamename")
+        gameimage = requireArguments().getString("gameimage")
+        gameid = requireArguments().getString("gameid")
+        topicId = requireArguments().getString("topic_id")
+        content = requireArguments().getString("content")
+        title = requireArguments().getString("title")
+        numPlayers = requireArguments().getString("num_players")
+        textViewGame?.text = gamename
+        etDescription?.setText(content)
+        etSubject?.setText(title)
+        backArrow = newPublicsRootView.findViewById(R.id.backArrow)
+        backArrow?.setOnClickListener { requireActivity().supportFragmentManager.popBackStackImmediate() }
+        platform = platformSpinner?.selectedItem.toString()
 
-import static android.view.View.GONE;
+        numPlayersSpinner?.setSelection(getIndex(numPlayersSpinner, numPlayers!!))
 
-public class EditPublicsTopic extends Fragment {
-
-    private static final String EDIT_TOPIC = Constants.ROOT_URL+"publics_topic_edit_submit.php";
-    private static final String LOAD_GAME_PLATFORMS = Constants.ROOT_URL+"load_game_platforms.php";
-
-    private String gamename, platform, finalPlatform, numPlayers, gameimage, userID, username, topic_id, content, gameid, title;
-    private Context mContext;
-    private Button btnSubmit;
-    private Spinner platformSpinner, numPlayersSpinner;
-    private EditText etOther, etSubject, etDescription;
-    private ProgressBar newPublicsTopicProgressBar, spinnerProgress;
-    private TextView textViewGame;
-    private ImageView backArrow, newTopicImage;
-    private LinearLayout submitDetails;
-    private ArrayList<PlatformModel> PlatformArrayList;
-    private ArrayList<String> platforms = new ArrayList<>();
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View newPublicsRootView = inflater.inflate(R.layout.fragment_editpublicstopic, null);
-
-        mContext = getActivity();
-        btnSubmit = newPublicsRootView.findViewById(R.id.btnSubmit);
-        textViewGame = newPublicsRootView.findViewById(R.id.textViewGame);
-        platformSpinner = newPublicsRootView.findViewById(R.id.platformSpinner);
-        etOther = newPublicsRootView.findViewById(R.id.etOther);
-        etSubject = newPublicsRootView.findViewById(R.id.etSubject);
-        etDescription = newPublicsRootView.findViewById(R.id.etDescription);
-        numPlayersSpinner = newPublicsRootView.findViewById(R.id.numPlayersSpinner);
-        newPublicsTopicProgressBar = newPublicsRootView.findViewById(R.id.newPublicsTopicProgressBar);
-        submitDetails = newPublicsRootView.findViewById(R.id.submitDetails);
-        newTopicImage = newPublicsRootView.findViewById(R.id.newTopicImage);
-        spinnerProgress = newPublicsRootView.findViewById(R.id.spinnerProgress);
-        userID = SharedPrefManager.getInstance(mContext).getUserID();
-        username = SharedPrefManager.getInstance(mContext).getUsername();
-        assert getArguments() != null;
-        gamename = getArguments().getString("gamename");
-        gameimage = getArguments().getString("gameimage");
-        gameid = getArguments().getString("gameid");
-        topic_id = getArguments().getString("topic_id");
-        content = getArguments().getString("content");
-        title = getArguments().getString("title");
-        numPlayers = getArguments().getString("num_players");
-        textViewGame.setText(gamename);
-        etDescription.setText(content);
-        etSubject.setText(title);
-        backArrow = newPublicsRootView.findViewById(R.id.backArrow);
-        backArrow.setOnClickListener(v -> requireActivity().getSupportFragmentManager().popBackStackImmediate());
-        platform = String.valueOf(platformSpinner.getSelectedItem());
-        numPlayersSpinner.setSelection(((ArrayAdapter)numPlayersSpinner.getAdapter()).getPosition(numPlayers));
-        Glide.with(mContext)
-                .load(Constants.BASE_URL+gameimage)
+        Glide.with(mContext!!)
+                .load(Constants.BASE_URL + gameimage)
                 .error(R.mipmap.ic_launcher)
-                .into(newTopicImage);
+                .into(newTopicImage!!)
+        numPlayersSpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
+                numPlayers = numPlayersSpinner?.selectedItem.toString()
+            }
 
-        numPlayersSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                numPlayers = String.valueOf(numPlayersSpinner.getSelectedItem());
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+        platformSpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
+                platform = platformSpinner?.selectedItem.toString()
+                if (platform == "Other") etOther?.visibility = View.VISIBLE
             }
-            @Override public void onNothingSelected(AdapterView<?> parent) {}
-        });
-        platformSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(final AdapterView<?> parent, View view, int position, long id) {
-                platform = String.valueOf(platformSpinner.getSelectedItem());
-                if (platform.equals("Other"))
-                    etOther.setVisibility(View.VISIBLE);
-            }
-            @Override public void onNothingSelected(AdapterView<?> parent) {}
-        });
 
-        btnSubmit.setOnClickListener(v -> {
-            String body = etDescription.getText().toString();
-            String subject = etSubject.getText().toString();
-            if (platform.equals("Other")){
-                finalPlatform = etOther.getText().toString();
-            }else{
-                finalPlatform = platform;
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+        btnSubmit?.setOnClickListener {
+            val body = etDescription?.text.toString()
+            val subject = etSubject?.text.toString()
+            finalPlatform = if (platform == "Other") {
+                etOther?.text.toString()
+            } else {
+                platform
             }
-            if(!body.equals("")&&!subject.equals("")&&!finalPlatform.equals("")){
-                SubmitEditPublicsTopic(finalPlatform, numPlayers, topic_id, body, subject, userID, username);
-            }else{
-                Toast.makeText(mContext,"Please fill in each field!", Toast.LENGTH_SHORT).show();
+            if (body != "" && subject != "" && finalPlatform != "") {
+                submitEditPublicsTopic(finalPlatform, numPlayers, topicId, body, subject, userID, username)
+            } else {
+                Toast.makeText(mContext, "Please fill in each field!", Toast.LENGTH_SHORT).show()
             }
-        });
-
-        loadPlatforms();
-        return newPublicsRootView;
+        }
+        loadPlatforms()
+        return newPublicsRootView
     }
 
-    private void SubmitEditPublicsTopic(final String finalPlatform, final String numPlayers, final String topic_id, final String body, final String subject, final String submitted_by_id, final String submitted_by){
-        submitDetails.setVisibility(GONE);
-        newPublicsTopicProgressBar.setVisibility(View.VISIBLE);
-        StringRequest stringRequest=new StringRequest(Request.Method.POST, EDIT_TOPIC, response -> {
+    private fun submitEditPublicsTopic(finalPlatform: String?, numPlayers: String?, topic_id: String?, body: String, subject: String, submitted_by_id: String?, submitted_by: String?) {
+        submitDetails!!.visibility = View.GONE
+        newPublicsTopicProgressBar!!.visibility = View.VISIBLE
+        val stringRequest: StringRequest = object : StringRequest(Method.POST, EDIT_TOPIC, Response.Listener { response: String? ->
             try {
-                JSONObject jsonObject = new JSONObject(response);
-                if(jsonObject.getString("error").equals("false")){
-                    Toast.makeText(mContext,"Post edited!", Toast.LENGTH_LONG).show();
-                    if (jsonObject.has("topicid")){
-                        if (mContext instanceof FragmentContainer) {
-                            PublicsTopicFragment ldf = new PublicsTopicFragment ();
-                            Bundle args = new Bundle();
-                            args.putString("PublicsId", jsonObject.getString("topicid"));
-                            ldf.setArguments(args);
-                            ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).commit();
+                val jsonObject = JSONObject(response!!)
+                if (jsonObject.getString("error") == "false") {
+                    Toast.makeText(mContext, "Post edited!", Toast.LENGTH_LONG).show()
+                    if (jsonObject.has("topicid")) {
+                        if (mContext is FragmentContainer) {
+                            val ldf = PublicsTopicFragment()
+                            val args = Bundle()
+                            args.putString("PublicsId", jsonObject.getString("topicid"))
+                            ldf.arguments = args
+                            (mContext as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).commit()
                         }
-                    }else {
-                        requireActivity().getSupportFragmentManager().popBackStackImmediate();
+                    } else {
+                        requireActivity().supportFragmentManager.popBackStackImmediate()
                     }
-                }else{
-                    Toast.makeText(mContext, jsonObject.getString("message"), Toast.LENGTH_SHORT).show();
-                    newPublicsTopicProgressBar.setVisibility(GONE);
-                    submitDetails.setVisibility(View.VISIBLE);
+                } else {
+                    Toast.makeText(mContext, jsonObject.getString("message"), Toast.LENGTH_SHORT).show()
+                    newPublicsTopicProgressBar!!.visibility = View.GONE
+                    submitDetails!!.visibility = View.VISIBLE
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
-        }, error -> {
-            newPublicsTopicProgressBar.setVisibility(GONE);
-            Toast.makeText(mContext,"Error, please try again later...",Toast.LENGTH_LONG).show();
-        }){
-            @Override
-            protected Map<String, String> getParams()  {
-                Map<String,String> parms= new HashMap<>();
-                parms.put("platform",finalPlatform);
-                parms.put("numplayers",numPlayers);
-                parms.put("topic_id",topic_id);
-                parms.put("submitted_by_id",submitted_by_id);
-                parms.put("body",body);
-                parms.put("subject",subject);
-                parms.put("submitted_by",submitted_by);
-                parms.put("gamename",gamename);
-                return parms;
+        }, Response.ErrorListener {
+            newPublicsTopicProgressBar!!.visibility = View.GONE
+            Toast.makeText(mContext, "Error, please try again later...", Toast.LENGTH_LONG).show()
+        }) {
+            override fun getParams(): Map<String, String> {
+                val parms: MutableMap<String, String> = HashMap()
+                parms["platform"] = finalPlatform!!
+                parms["numplayers"] = numPlayers!!
+                parms["topic_id"] = topic_id!!
+                parms["submitted_by_id"] = submitted_by_id!!
+                parms["body"] = body
+                parms["subject"] = subject
+                parms["submitted_by"] = submitted_by!!
+                parms["gamename"] = gamename!!
+                return parms
             }
-        };
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
+        }
+        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
-    private void loadPlatforms(){
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, LOAD_GAME_PLATFORMS+"?userid="+userID+"&username="+username+"&gameid="+gameid,
-                response -> {
+    private fun loadPlatforms() {
+        val stringRequest = StringRequest(Request.Method.GET, "$LOAD_GAME_PLATFORMS?userid=$userID&username=$username&gameid=$gameid",
+                { response: String? ->
                     try {
-                        JSONObject obj = new JSONObject(response);
-                        if(obj.optString("error").equals("false")){
-                            PlatformArrayList = new ArrayList<>();
-                            JSONArray dataArray  = obj.getJSONArray("platforms");
-                            for (int i = 0; i < dataArray.length(); i++) {
-                                PlatformModel platformModel = new PlatformModel();
-                                JSONObject dataobj = dataArray.getJSONObject(i);
-                                if(!dataobj.getString("platform").equals("")){
-                                    platformModel.setPlatform(dataobj.getString("platform"));
-                                    PlatformArrayList.add(platformModel);
+                        val obj = JSONObject(response!!)
+                        if (obj.optString("error") == "false") {
+                            platformArrayList = ArrayList()
+                            val dataArray = obj.getJSONArray("platforms")
+                            for (i in 0 until dataArray.length()) {
+                                val platformModel = PlatformModel()
+                                val dataobj = dataArray.getJSONObject(i)
+                                if (dataobj.getString("platform") != "") {
+                                    platformModel.platform = dataobj.getString("platform")
+                                    platformArrayList!!.add(platformModel)
                                 }
                             }
-                            for (int i = 0; i < PlatformArrayList.size(); i++) {
-                                platforms.add(PlatformArrayList.get(i).getPlatform());
+                            for (i in platformArrayList!!.indices) {
+                                platforms.add(platformArrayList!![i].platform)
                             }
-                            platforms.add("Other");
-                            ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(mContext, R.layout.spinner_item, platforms);
-                            spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                            platformSpinner.setAdapter(spinnerArrayAdapter);
-                            platformSpinner.setSelection(0);
-                            spinnerProgress.setVisibility(View.GONE);
-                            platformSpinner.setVisibility(View.VISIBLE);
-                        }else{
-                            platformSpinner.setVisibility(GONE);
-                            spinnerProgress.setVisibility(GONE);
+                            platforms.add("Other")
+                            val spinnerArrayAdapter = ArrayAdapter(mContext!!, R.layout.spinner_item, platforms)
+                            spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                            platformSpinner!!.adapter = spinnerArrayAdapter
+                            platformSpinner!!.setSelection(0)
+                            spinnerProgress!!.visibility = View.GONE
+                            platformSpinner!!.visibility = View.VISIBLE
+                        } else {
+                            platformSpinner!!.visibility = View.GONE
+                            spinnerProgress!!.visibility = View.GONE
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
                     }
-                },
-                error -> Toast.makeText(mContext, error.getMessage(), Toast.LENGTH_SHORT).show());
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
+                }
+        ) { error: VolleyError -> Toast.makeText(mContext, error.message, Toast.LENGTH_SHORT).show() }
+        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
+    private fun getIndex(spinner: Spinner?, myString: String): Int {
+        var index = 0
+        for (i in 0 until spinner!!.count) {
+            if (spinner.getItemAtPosition(i) == myString) {
+                index = i
+            }
+        }
+        return index
+    }
+
+    companion object {
+        private const val EDIT_TOPIC = Constants.ROOT_URL + "publics_topic_edit_submit.php"
+        private const val LOAD_GAME_PLATFORMS = Constants.ROOT_URL + "load_game_platforms.php"
+    }
 }

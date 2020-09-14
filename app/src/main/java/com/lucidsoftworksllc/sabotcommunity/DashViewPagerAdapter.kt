@@ -1,62 +1,42 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.fragment.app.FragmentActivity
+import androidx.viewpager.widget.PagerAdapter
+import androidx.viewpager.widget.ViewPager
+import com.android.volley.Response
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.StringRequest
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.Target
+import java.util.*
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentActivity;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.Target;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-
-public class DashViewPagerAdapter extends PagerAdapter {
-
-    private static final String URL_CLICKED = Constants.ROOT_URL+"dashboard_ad_interaction.php";
-
-    private Context context;
-    private LayoutInflater layoutInflater;
-    private List<SliderUtilsDash> sliderImg;
-
-    public DashViewPagerAdapter(List sliderImg, Context context) {
-        this.sliderImg = sliderImg;
-        this.context = context;
+class DashViewPagerAdapter(private val sliderImg: List<SliderUtilsDash>, private val context: Context) : PagerAdapter() {
+    private var layoutInflater: LayoutInflater? = null
+    override fun getCount(): Int {
+        return sliderImg.size
     }
 
-    @Override public int getCount() {
-        return sliderImg.size();
+    override fun isViewFromObject(view: View, `object`: Any): Boolean {
+        return view === `object`
     }
-    @Override public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
-        return view == object;
-    }
-    @NonNull
-    @Override
-    public Object instantiateItem(@NonNull final ViewGroup container, final int position) {
-        layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = layoutInflater.inflate(R.layout.layout_viewpager_slider_dash, null);
-        final SliderUtilsDash utils = sliderImg.get(position);
-        ImageView imageView = view.findViewById(R.id.sliderImageView);
-        TextView textViewTitle = view.findViewById(R.id.textViewSliderTitle);
-        TextView textViewDescription = view.findViewById(R.id.textViewSliderDesc);
-        String finalBackImage = utils.getSliderImageUrl();
+
+    override fun instantiateItem(container: ViewGroup, position: Int): Any {
+        layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val view = layoutInflater!!.inflate(R.layout.layout_viewpager_slider_dash, null)
+        val utils = sliderImg[position]
+        val imageView = view.findViewById<ImageView>(R.id.sliderImageView)
+        val textViewTitle = view.findViewById<TextView>(R.id.textViewSliderTitle)
+        val textViewDescription = view.findViewById<TextView>(R.id.textViewSliderDesc)
+        val finalBackImage = utils.sliderImageUrl
         /*if (utils.getSliderImageUrl().contains(".jpg")){
             finalBackImage = finalBackImage.substring(0, utils.getSliderImageUrl().length() - 4)+"_r.jpg";
         }else if (utils.getSliderImageUrl().contains(".png")){
@@ -67,35 +47,32 @@ public class DashViewPagerAdapter extends PagerAdapter {
         Glide.with(context)
                 .load(finalBackImage)
                 .override(Target.SIZE_ORIGINAL)
-                .into(imageView);
-        view.setOnClickListener(v -> {
-            if (utils.getSliderType().equals("public")) {
-                FragmentPublicsCat ldf = new FragmentPublicsCat();
-                Bundle args = new Bundle();
-                args.putString("PublicsId", utils.getSliderID());
-                ldf.setArguments(args);
-                ((FragmentActivity) context).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
+                .into(imageView)
+        view.setOnClickListener {
+            if (utils.sliderType == "public") {
+                val ldf = FragmentPublicsCat()
+                val args = Bundle()
+                args.putString("PublicsId", utils.sliderID)
+                ldf.arguments = args
+                (context as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
             }
-            if (utils.getSliderType().equals("fragment")) {
-                if (utils.getSliderTag().equals("merch")){
-                    MerchFragment ldf = new MerchFragment();
-                    Bundle args = new Bundle();
-                    ldf.setArguments(args);
-                    ((FragmentActivity) context).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
+            if (utils.sliderType == "fragment") {
+                if (utils.sliderTag == "merch") {
+                    val ldf = MerchFragment()
+                    val args = Bundle()
+                    ldf.arguments = args
+                    (context as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
             }
-            if (utils.getSliderType().equals("url")){
-                if (context instanceof FragmentContainer) {
-                    context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(utils.getSliderTag())));
-                }
+            if (utils.sliderType == "url") {
+                (context as? FragmentContainer)?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(utils.sliderTag)))
             }
-            newAdClick(utils.getSliderAdID());
-        });
+            utils.sliderAdID?.let { it1 -> newAdClick(it1) }
+        }
+        val vp = container as ViewPager
+        vp.addView(view, 0)
 
-        ViewPager vp = (ViewPager) container;
-        vp.addView(view, 0);
-
-       /* String genreString = utils.getSliderGenre();
+        /* String genreString = utils.getSliderGenre();
         int len = genreString.length();
         String[] genreString2 = genreString.substring(1,len-1).split(",");
 
@@ -106,32 +83,33 @@ public class DashViewPagerAdapter extends PagerAdapter {
         }
         sb.deleteCharAt(sb.length() - 1);
 
-        textViewGenre.setText(sb);*/
-        textViewDescription.setText(utils.getSliderDescription());
-        textViewTitle.setText(utils.getSliderTitle());
-        return view;
+        textViewGenre.setText(sb);*/textViewDescription.text = utils.sliderDescription
+        textViewTitle.text = utils.sliderTitle
+        return view
     }
 
-    @Override
-    public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
-        ViewPager vp = (ViewPager) container;
-        View view = (View) object;
-        vp.removeView(view);
+    override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
+        val vp = container as ViewPager
+        val view = `object` as View
+        vp.removeView(view)
     }
 
-    public void newAdClick(final String adID){
-        StringRequest stringRequest=new StringRequest(Request.Method.POST, URL_CLICKED, response -> {}, error -> {}){
-            @Override
-            protected Map<String, String> getParams()  {
-                Map<String,String> parms= new HashMap<>();
-                parms.put("id", adID);
-                parms.put("method", "click");
-                parms.put("user_id",SharedPrefManager.getInstance(context).getUserID());
-                parms.put("username",SharedPrefManager.getInstance(context).getUsername());
-                return parms;
+    private fun newAdClick(adID: String) {
+        val stringRequest: StringRequest = object : StringRequest(Method.POST, URL_CLICKED, Response.Listener { response: String? -> }, Response.ErrorListener { error: VolleyError? -> }) {
+            override fun getParams(): Map<String, String> {
+                val parms: MutableMap<String, String> = HashMap()
+                parms["id"] = adID
+                parms["method"] = "click"
+                parms["user_id"] = SharedPrefManager.getInstance(context).userID
+                parms["username"] = SharedPrefManager.getInstance(context).username
+                return parms
             }
-        };
-        ((FragmentContainer)context).addToRequestQueue(stringRequest);
+        }
+        (context as FragmentContainer).addToRequestQueue(stringRequest)
+    }
+
+    companion object {
+        private const val URL_CLICKED = Constants.ROOT_URL + "dashboard_ad_interaction.php"
     }
 
 }

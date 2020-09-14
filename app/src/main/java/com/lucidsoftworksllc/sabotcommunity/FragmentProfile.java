@@ -86,7 +86,7 @@ public class FragmentProfile extends Fragment {
     private JoinedClansAdapter clansAdapter;
     private List<Profilenews_Recycler> profilenewsRecyclerList;
     private List<PublicsTopic_Recycler> profilepublicsnewsRecyclerList;
-    private List<Clans_Recycler> clans;
+    private List<ClansRecycler> clans;
     private TextView userSwitch,userTwitter,userDiscordProfile,profileWebsite,profileItemsLabel,followingTV,connectionsTV,followersTV,postsNoPosts, textViewClanTag, textViewTvPosts, textViewTvLikes, editProfile, textViewUsername, textViewNickname, textViewDescription, reviewCount, userTwitch, userMixer, userPSN, userXbox, userDiscord, userSteam, userInstagram, userYoutube, followersCount, friendsCount, followingCount;
     private ImageView starIcon, imageViewProfilePic, imageViewProfileCover, profileOnlineIcon, imageUploadBtn;
     private CircleImageView verifiedIcon;
@@ -941,7 +941,7 @@ public class FragmentProfile extends Fragment {
                             String games = obj.getString("games");
                             String id = obj.getString("id");
                             String avg = obj.getString("avg");
-                            Clans_Recycler clansObject = new Clans_Recycler(position,tag,name,num_members,insignia,games,id,avg);
+                            ClansRecycler clansObject = new ClansRecycler(position,tag,name,num_members,insignia,games,id,avg);
                             clans.add(clansObject);
                         }
 

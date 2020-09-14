@@ -1,216 +1,160 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentActivity;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.content.Context
+import android.graphics.Color
+import android.graphics.Typeface
+import android.os.Build
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Response
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.StringRequest
+import com.balysv.materialripple.MaterialRippleLayout
+import com.bumptech.glide.Glide
+import de.hdodenhof.circleimageview.CircleImageView
+import org.json.JSONException
+import org.json.JSONObject
+import java.util.*
 
-
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.balysv.materialripple.MaterialRippleLayout;
-import com.bumptech.glide.Glide;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import de.hdodenhof.circleimageview.CircleImageView;
-
-public class ConvosThreadAdapter extends RecyclerView.Adapter<ConvosThreadAdapter.ViewHolder> {
-
-    private Context mCtx;
-    private List<ConvosHelper> convosList;
-    private static final String SET_READ = Constants.ROOT_URL+"set_message_read.php";
-    private String deviceUsername;
-
-    public ConvosThreadAdapter(Context mCtx, List<ConvosHelper> convosList) {
-        this.mCtx = mCtx;
-        this.convosList = convosList;
+class ConvosThreadAdapter(private val mCtx: Context, private val convosList: List<ConvosHelper>) : RecyclerView.Adapter<ConvosThreadAdapter.ViewHolder>() {
+    private var deviceUsername: String? = null
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val inflater = LayoutInflater.from(mCtx)
+        val view = inflater.inflate(R.layout.recycler_userslist_messages, null)
+        val holder = ViewHolder(view)
+        deviceUsername = SharedPrefManager.getInstance(mCtx).username
+        return holder
     }
 
-    @NonNull
-    @Override
-    public ConvosThreadAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(mCtx);
-        View view = inflater.inflate(R.layout.recycler_userslist_messages, null);
-        ConvosThreadAdapter.ViewHolder holder = new ViewHolder(view);
-        deviceUsername = SharedPrefManager.getInstance(mCtx).getUsername();
-        return holder;
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull ConvosThreadAdapter.ViewHolder holder, int position) {
-        final ConvosHelper convos = convosList.get(position);
-        if (convos.getType().equals("user")){
-            holder.convoUsername.setText(String.format("@%s", convos.getSent_by()));
-            holder.convoUsername.setTextColor(mCtx.getResources().getColor(android.R.color.secondary_text_dark));
-            holder.convoBodyPreview.setText(convos.getBody_split());
-            if(convos.getBody_split().contains("Them: ")){
-                holder.convoBodyPreview.setTypeface(null, Typeface.BOLD);
-            }else{
-                holder.convoBodyPreview.setTypeface(null,Typeface.NORMAL);
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val convos = convosList[position]
+        if (convos.type == "user") {
+            holder.convoUsername.text = String.format("@%s", convos.sent_by)
+            holder.convoUsername.setTextColor(mCtx.resources.getColor(android.R.color.secondary_text_dark))
+            holder.convoBodyPreview.text = convos.body_split
+            if (convos.body_split.contains("Them: ")) {
+                holder.convoBodyPreview.setTypeface(null, Typeface.BOLD)
+            } else {
+                holder.convoBodyPreview.setTypeface(null, Typeface.NORMAL)
             }
-            holder.convoTimeMessage.setText(convos.getTime_message());
-            holder.convoNickname.setText(convos.getNickname());
-            if(convos.getViewed().equals("yes")|| convos.getUser_from().equals(deviceUsername)){
-                holder.userLayout.setBackgroundColor(Color.parseColor("#111111"));
-            } else{
-                holder.userLayout.setBackgroundColor(Color.parseColor("#222222"));
+            holder.convoTimeMessage.text = convos.time_message
+            holder.convoNickname.text = convos.nickname
+            if (convos.viewed == "yes" || convos.user_from == deviceUsername) {
+                holder.userLayout.setBackgroundColor(Color.parseColor("#111111"))
+            } else {
+                holder.userLayout.setBackgroundColor(Color.parseColor("#222222"))
             }
-            holder.userLayout.setOnClickListener(v -> {
-                MessageFragment ldf = new MessageFragment();
-                Bundle args = new Bundle();
-                args.putString("user_to", convos.getSent_by());
-                ldf.setArguments(args);
-                ((FragmentActivity)mCtx).getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit();
-                if (!convos.getViewed().equals("yes") && !convos.getSent_by().equals(deviceUsername)){
-                    StringRequest stringRequest = new StringRequest(Request.Method.POST, SET_READ, response -> {
+            holder.userLayout.setOnClickListener {
+                val ldf = MessageFragment()
+                val args = Bundle()
+                args.putString("user_to", convos.sent_by)
+                ldf.arguments = args
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
+                if (convos.viewed != "yes" && convos.sent_by != deviceUsername) {
+                    val stringRequest: StringRequest = object : StringRequest(Method.POST, SET_READ, Response.Listener { response: String? ->
                         try {
-                            JSONObject obj = new JSONObject(response);
+                            val obj = JSONObject(response!!)
                             if (obj.getBoolean("error")) {
-                                Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show();
+                                Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show()
                             }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        } catch (e: JSONException) {
+                            e.printStackTrace()
                         }
-                    }, error -> Toast.makeText(mCtx, "Could not set message as read, please try again later...", Toast.LENGTH_LONG).show()) {
-                        @Override
-                        protected Map<String, String> getParams() {
-                            Map<String, String> parms = new HashMap<>();
-                            parms.put("username", deviceUsername);
-                            parms.put("id", convos.getId());
-                            return parms;
+                    }, Response.ErrorListener { Toast.makeText(mCtx, "Could not set message as read, please try again later...", Toast.LENGTH_LONG).show() }) {
+                        override fun getParams(): MutableMap<String, String?> {
+                            val params: MutableMap<String, String?> = HashMap()
+                            params["username"] = deviceUsername
+                            params["id"] = convos.id
+                            return params
                         }
-                    };
-                    ((ChatActivity)mCtx).addToRequestQueue(stringRequest);
+                    }
+                    (mCtx as ChatActivity).addToRequestQueue(stringRequest)
                 }
-            });
-            if (convos.getLast_online().equals("yes")){
-                holder.last_online.setVisibility(View.VISIBLE);
+            }
+            if (convos.last_online == "yes") {
+                holder.lastOnline.visibility = View.VISIBLE
             } else {
-                holder.last_online.setVisibility(View.GONE);
+                holder.lastOnline.visibility = View.GONE
             }
-            if (convos.getVerified().equals("yes")){
-                holder.verified.setVisibility(View.VISIBLE);
-            }else{
-                holder.verified.setVisibility(View.GONE);
-            }
-            String profile_pic = convos.getProfile_pic().substring(0, convos.getProfile_pic().length() - 4)+"_r.JPG";
-            Glide.with(mCtx)
-                    .load(Constants.BASE_URL+profile_pic)
-                    .into(holder.userImageView);
-            String profile_pic2 = convos.getLatest_profile_pic().substring(0, convos.getLatest_profile_pic().length() - 4)+"_r.JPG";
-            Glide.with(mCtx)
-                    .load(Constants.BASE_URL+profile_pic2)
-                    .into(holder.lastRepliedProfilePic);
-        }else if (convos.getType().equals("group")){
-            String usernameText = convos.getSent_by()+" users in conversation";
-            holder.convoUsername.setText(usernameText);
-            holder.convoUsername.setTextColor(mCtx.getResources().getColor(R.color.light_blue));
-            holder.convoBodyPreview.setText(convos.getBody_split());
-            holder.convoTimeMessage.setText(convos.getTime_message());
-            holder.convoNickname.setText(convos.getNickname());
-            if(convos.getViewed().equals("yes")|| convos.getUser_from().equals(deviceUsername)){
-                holder.userLayout.setBackgroundColor(Color.parseColor("#111111"));
-            } else{
-                holder.userLayout.setBackgroundColor(Color.parseColor("#222222"));
-            }
-            holder.userLayout.setOnClickListener(v -> {
-                MessageGroupFragment ldf = new MessageGroupFragment();
-                Bundle args = new Bundle();
-                args.putString("group_id", convos.getGroup_id());
-                ldf.setArguments(args);
-                ((FragmentActivity)mCtx).getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit();
-                //Toast.makeText(context, "You clicked " + user.getId(), Toast.LENGTH_LONG).show();
-                /*if (!convos.getViewed().equals("yes") && !convos.getSent_by().equals(deviceUsername)){
-                    StringRequest stringRequest = new StringRequest(Request.Method.POST, SET_READ, new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            try {
-                                JSONObject obj = new JSONObject(response);
-                                if (obj.getBoolean("error")) {
-                                    Toast.makeText(
-                                            mCtx,
-                                            obj.getString("message"),
-                                            Toast.LENGTH_LONG
-                                    ).show();
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(mCtx, "Could not set message as read, please try again later...", Toast.LENGTH_LONG).show();
-                        }
-                    }) {
-                        @Override
-                        protected Map<String, String> getParams() {
-                            Map<String, String> parms = new HashMap<String, String>();
-                            parms.put("username", deviceUsername);
-                            parms.put("id", convos.getId());
-                            return parms;
-                        }
-                    };
-    ((ChatActivity)mContext).addToRequestQueue(stringRequest);
-                }*/
-            });
-
-            if (convos.getLast_online().equals("yes")){
-                holder.last_online.setVisibility(View.VISIBLE);
+            if (convos.verified == "yes") {
+                holder.verified.visibility = View.VISIBLE
             } else {
-                holder.last_online.setVisibility(View.GONE);
+                holder.verified.visibility = View.GONE
             }
-            if (convos.getVerified().equals("yes")){
-                holder.verified.setVisibility(View.VISIBLE);
-            }else{
-                holder.verified.setVisibility(View.GONE);
+            val profilePic = convos.profile_pic.substring(0, convos.profile_pic.length - 4) + "_r.JPG"
+            Glide.with(mCtx)
+                    .load(Constants.BASE_URL + profilePic)
+                    .into(holder.userImageView)
+            val profilePic2 = convos.latest_profile_pic.substring(0, convos.latest_profile_pic.length - 4) + "_r.JPG"
+            Glide.with(mCtx)
+                    .load(Constants.BASE_URL + profilePic2)
+                    .into(holder.lastRepliedProfilePic)
+        } else if (convos.type == "group") {
+            val usernameText = convos.sent_by + " users in conversation"
+            holder.convoUsername.text = usernameText
+
+            //color deprecation
+            holder.convoUsername.setTextColor(ContextCompat.getColor(mCtx, R.color.light_blue))
+
+            holder.convoBodyPreview.text = convos.body_split
+            holder.convoTimeMessage.text = convos.time_message
+            holder.convoNickname.text = convos.nickname
+            if (convos.viewed == "yes" || convos.user_from == deviceUsername) {
+                holder.userLayout.setBackgroundColor(Color.parseColor("#111111"))
+            } else {
+                holder.userLayout.setBackgroundColor(Color.parseColor("#222222"))
+            }
+            holder.userLayout.setOnClickListener {
+                val ldf = MessageGroupFragment()
+                val args = Bundle()
+                args.putString("group_id", convos.group_id)
+                ldf.arguments = args
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
+            }
+            if (convos.last_online == "yes") {
+                holder.lastOnline.visibility = View.VISIBLE
+            } else {
+                holder.lastOnline.visibility = View.GONE
+            }
+            if (convos.verified == "yes") {
+                holder.verified.visibility = View.VISIBLE
+            } else {
+                holder.verified.visibility = View.GONE
             }
             Glide.with(mCtx)
-                    .load(Constants.BASE_URL+convos.getProfile_pic())
-                    .into(holder.userImageView);
+                    .load(Constants.BASE_URL + convos.profile_pic)
+                    .into(holder.userImageView)
             Glide.with(mCtx)
-                    .load(Constants.BASE_URL+convos.getLatest_profile_pic())
-                    .into(holder.lastRepliedProfilePic);
-        }
-
-    }
-
-    @Override
-    public int getItemCount() {
-        return convosList.size();
-    }
-    static class ViewHolder extends RecyclerView.ViewHolder {
-        MaterialRippleLayout userLayout;
-        CircleImageView userImageView,verified,last_online,lastRepliedProfilePic;
-        TextView convoUsername,convoBodyPreview,convoTimeMessage, convoNickname;
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            userLayout = itemView.findViewById(R.id.userLayout);
-            userImageView = itemView.findViewById(R.id.userImageView);
-            lastRepliedProfilePic = itemView.findViewById(R.id.lastRepliedProfilePic);
-            verified = itemView.findViewById(R.id.verified);
-            last_online = itemView.findViewById(R.id.online);
-            convoUsername = itemView.findViewById(R.id.convoUsername);
-            convoNickname = itemView.findViewById(R.id.convoNickname);
-            convoBodyPreview = itemView.findViewById(R.id.convoBodyPreview);
-            convoTimeMessage = itemView.findViewById(R.id.convoTimeMessage);
+                    .load(Constants.BASE_URL + convos.latest_profile_pic)
+                    .into(holder.lastRepliedProfilePic)
         }
     }
 
+    override fun getItemCount(): Int {
+        return convosList.size
+    }
+
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var userLayout: MaterialRippleLayout = itemView.findViewById(R.id.userLayout)
+        var userImageView: CircleImageView = itemView.findViewById(R.id.userImageView)
+        var verified: CircleImageView = itemView.findViewById(R.id.verified)
+        var lastOnline: CircleImageView = itemView.findViewById(R.id.online)
+        var lastRepliedProfilePic: CircleImageView = itemView.findViewById(R.id.lastRepliedProfilePic)
+        var convoUsername: TextView = itemView.findViewById(R.id.convoUsername)
+        var convoBodyPreview: TextView = itemView.findViewById(R.id.convoBodyPreview)
+        var convoTimeMessage: TextView = itemView.findViewById(R.id.convoTimeMessage)
+        var convoNickname: TextView = itemView.findViewById(R.id.convoNickname)
+
+    }
+
+    companion object {
+        private const val SET_READ = Constants.ROOT_URL + "set_message_read.php"
+    }
 }

@@ -123,15 +123,15 @@ class AccountSettingsFragment : Fragment() {
         }
         notiPlatformButton?.setOnClickListener {
             val li = LayoutInflater.from(mCtx)
-            val dialog_view = li.inflate(R.layout.dialog_noti_platforms, null)
-            val playstationcb = dialog_view.findViewById<CheckBox>(R.id.playstation)
-            val xboxcb = dialog_view.findViewById<CheckBox>(R.id.xbox)
-            val steamcb = dialog_view.findViewById<CheckBox>(R.id.steam)
-            val pccb = dialog_view.findViewById<CheckBox>(R.id.pc)
-            val mobilecb = dialog_view.findViewById<CheckBox>(R.id.mobile)
-            val nswitchcb = dialog_view.findViewById<CheckBox>(R.id.nswitch)
-            val crossplatformcb = dialog_view.findViewById<CheckBox>(R.id.crossplatform)
-            val othercb = dialog_view.findViewById<CheckBox>(R.id.other)
+            val dialogView = li.inflate(R.layout.dialog_noti_platforms, null)
+            val playstationcb = dialogView.findViewById<CheckBox>(R.id.playstation)
+            val xboxcb = dialogView.findViewById<CheckBox>(R.id.xbox)
+            val steamcb = dialogView.findViewById<CheckBox>(R.id.steam)
+            val pccb = dialogView.findViewById<CheckBox>(R.id.pc)
+            val mobilecb = dialogView.findViewById<CheckBox>(R.id.mobile)
+            val nswitchcb = dialogView.findViewById<CheckBox>(R.id.nswitch)
+            val crossplatformcb = dialogView.findViewById<CheckBox>(R.id.crossplatform)
+            val othercb = dialogView.findViewById<CheckBox>(R.id.other)
             try {
                 val notiPlatformsData = JSONArray(SharedPrefManager.getInstance(mCtx).notiPlatforms)
                 val objectName = arrayOfNulls<String>(notiPlatformsData.length())
@@ -173,7 +173,7 @@ class AccountSettingsFragment : Fragment() {
                 e.printStackTrace()
             }
             val dialog = LovelyCustomDialog(mCtx)
-            dialog.setView(dialog_view)
+            dialog.setView(dialogView)
                     .setTopColorRes(R.color.green)
                     .setTitle(R.string.get_notifications_for_platforms)
                     .setIcon(R.drawable.ic_friend_add)
@@ -220,8 +220,8 @@ class AccountSettingsFragment : Fragment() {
                     .setIcon(R.drawable.ic_check)
                     .setTitle(R.string.save_settings_query)
                     .setMessage(R.string.leaving_account_settings)
-                    .setPositiveButton(R.string.yes) { v: View? -> saveChangesClick("toProfilePicture") }
-                    .setNegativeButton(R.string.no) { v: View? ->
+                    .setPositiveButton(R.string.yes) { saveChangesClick("toProfilePicture") }
+                    .setNegativeButton(R.string.no) {
                         val asf: Fragment = UploadProfilePhotoFragment()
                         val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
                         fragmentTransaction.replace(R.id.fragment_container, asf)
@@ -243,7 +243,7 @@ class AccountSettingsFragment : Fragment() {
                 val username = profiletopObject.getString("username")
                 val description = profiletopObject.getString("description")
                 //String signup_date = profiletopObject.getString("signup_date");
-                val profile_pic = profiletopObject.getString("profile_pic")
+                val profilePic = profiletopObject.getString("profile_pic")
                 val email = profiletopObject.getString("email")
                 val twitch = profiletopObject.getString("twitch")
                 val mixer = profiletopObject.getString("mixer")
@@ -257,7 +257,7 @@ class AccountSettingsFragment : Fragment() {
                 //String website = profiletopObject.getString("website");
                 val twitter = profiletopObject.getString("twitter")
                 val nintendo = profiletopObject.getString("nintendo")
-                val discord_user = profiletopObject.getString("discord_user")
+                val discordUser = profiletopObject.getString("discord_user")
                 currentTag = profiletopObject.getString("clantag")
                 frequencySpinner!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
@@ -268,7 +268,7 @@ class AccountSettingsFragment : Fragment() {
 
                     override fun onNothingSelected(parent: AdapterView<*>?) {}
                 }
-                frequencyInfoButton!!.setOnClickListener { v: View? ->
+                frequencyInfoButton!!.setOnClickListener {
                     LovelyInfoDialog(mCtx)
                             .setTopColorRes(R.color.colorPrimary)
                             .setIcon(R.drawable.ic_info_grey_24dp)
@@ -290,12 +290,12 @@ class AccountSettingsFragment : Fragment() {
                 discordInputET!!.setText(discord)
                 instagramInputET!!.setText(instagram)
                 youtubeInputET!!.setText(youtube)
-                discordUserET!!.setText(discord_user)
+                discordUserET!!.setText(discordUser)
                 //websiteInputET.setText(website);
                 twitterInputET!!.setText(twitter)
                 nintendoIDInputET!!.setText(nintendo)
                 Glide.with(mCtx!!)
-                        .load(Constants.BASE_URL + profile_pic)
+                        .load(Constants.BASE_URL + profilePic)
                         .error(R.mipmap.ic_launcher)
                         .into(imageViewProfilePic!!)
                 mProgressBar!!.visibility = View.GONE
@@ -362,7 +362,7 @@ class AccountSettingsFragment : Fragment() {
                     Response.Listener { response: String? ->
                         progressDialog!!.dismiss()
                         try {
-                            val jsonObject = JSONObject(response)
+                            val jsonObject = JSONObject(response!!)
                             Toast.makeText(mCtx, jsonObject.getString("message"), Toast.LENGTH_LONG).show()
                             if (jsonObject.getString("error") == "false") {
                                 if (action == "toProfile") {
@@ -433,7 +433,7 @@ class AccountSettingsFragment : Fragment() {
                                     }
                                 }
                                 for (i in clanTagModelArrayList!!.indices) {
-                                    tags.add(clanTagModelArrayList!![i].tag)
+                                    tags.add(clanTagModelArrayList!![i].tag!!)
                                 }
                                 tags.add("None")
                                 tags.add("[$currentTag]")

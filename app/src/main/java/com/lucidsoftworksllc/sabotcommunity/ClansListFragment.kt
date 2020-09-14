@@ -1,143 +1,123 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import android.app.ProgressDialog
+import android.content.Context
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.android.volley.Request
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.StringRequest
+import org.json.JSONException
+import org.json.JSONObject
+import java.util.*
 
-import android.view.LayoutInflater;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.PopupMenu;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-import static com.lucidsoftworksllc.sabotcommunity.Constants.ROOT_URL;
-
-public class ClansListFragment extends Fragment {
-
-    public static final String URL_JOINED_CLANS = ROOT_URL + "joined_clans.php";
-
-    private TextView noClans;
-    private SwipeRefreshLayout clansSwipe;
-    private ProgressBar clansProgressBar;
-    private RelativeLayout clansLayout;
-    private Context mContext;
-    private ProgressDialog dialog;
-    private String deviceUserID, deviceUsername;
-    private ImageView clansMenu;
-    private RecyclerView recyclerView;
-    private RecyclerView.LayoutManager layoutManager;
-    private RecyclerView.Adapter adapter;
-    private List<Clans_Recycler> clans;
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View clansRootView = inflater.inflate(R.layout.fragment_clans_list, null);
-
-        noClans = clansRootView.findViewById(R.id.noClans);
-        clansSwipe = clansRootView.findViewById(R.id.clansSwipe);
-        clansProgressBar = clansRootView.findViewById(R.id.clansProgressBar);
-        clansLayout = clansRootView.findViewById(R.id.clansLayout);
-        recyclerView = clansRootView.findViewById(R.id.recyclerClans);
-        clansMenu = clansRootView.findViewById(R.id.clansMenu);
-        mContext = getActivity();
-        deviceUserID = SharedPrefManager.getInstance(mContext).getUserID();
-        deviceUsername = SharedPrefManager.getInstance(mContext).getUsername();
-        clans = new ArrayList<>();
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-        dialog = new ProgressDialog(mContext);
-        dialog.setMessage("Loading joined clans...");
-        dialog.show();
-        adapter = new JoinedClansAdapter(mContext, clans);
-        recyclerView.setAdapter(adapter);
-        clansMenu.setOnClickListener(view -> {
-            PopupMenu popup = new PopupMenu(mContext, view);
-            MenuInflater inflater1 = popup.getMenuInflater();
-            inflater1.inflate(R.menu.clans_list_top_options_menu, popup.getMenu());
-            popup.setOnMenuItemClickListener(item -> {
-                if (item.getItemId() == R.id.menuNewClan) {
-                    NewClanFragment ldf = new NewClanFragment();
-                    ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
+class ClansListFragment : Fragment() {
+    private var noClans: TextView? = null
+    private var clansSwipe: SwipeRefreshLayout? = null
+    private var clansProgressBar: ProgressBar? = null
+    private var clansLayout: RelativeLayout? = null
+    private var mContext: Context? = null
+    private var dialog: ProgressDialog? = null
+    private var deviceUserID: String? = null
+    private var deviceUsername: String? = null
+    private var clansMenu: ImageView? = null
+    private var recyclerView: RecyclerView? = null
+    private val layoutManager: RecyclerView.LayoutManager? = null
+    private var adapter: RecyclerView.Adapter<*>? = null
+    private var clans: MutableList<ClansRecycler>? = null
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val clansRootView = inflater.inflate(R.layout.fragment_clans_list, null)
+        noClans = clansRootView.findViewById(R.id.noClans)
+        clansSwipe = clansRootView.findViewById(R.id.clansSwipe)
+        clansProgressBar = clansRootView.findViewById(R.id.clansProgressBar)
+        clansLayout = clansRootView.findViewById(R.id.clansLayout)
+        recyclerView = clansRootView.findViewById(R.id.recyclerClans)
+        clansMenu = clansRootView.findViewById(R.id.clansMenu)
+        mContext = activity
+        deviceUserID = SharedPrefManager.getInstance(mContext).userID
+        deviceUsername = SharedPrefManager.getInstance(mContext).username
+        clans = ArrayList()
+        recyclerView?.setHasFixedSize(true)
+        recyclerView?.layoutManager = LinearLayoutManager(mContext)
+        dialog = ProgressDialog(mContext)
+        dialog!!.setMessage("Loading joined clans...")
+        dialog!!.show()
+        adapter = JoinedClansAdapter(mContext, clans)
+        recyclerView?.adapter = adapter
+        clansMenu?.setOnClickListener { view: View? ->
+            val popup = PopupMenu(mContext, view)
+            val inflater1 = popup.menuInflater
+            inflater1.inflate(R.menu.clans_list_top_options_menu, popup.menu)
+            popup.setOnMenuItemClickListener { item: MenuItem ->
+                if (item.itemId == R.id.menuNewClan) {
+                    val ldf = NewClanFragment()
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
-                return true;
-            });
-            popup.show();
-        });
-
-        clansSwipe.setOnRefreshListener(() -> {
-            Fragment currentFragment = requireActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-            if (currentFragment instanceof ClansListFragment) {
-                FragmentTransaction fragTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
-                fragTransaction.detach(currentFragment);
-                fragTransaction.attach(currentFragment);
-                fragTransaction.commit();
+                true
             }
-            clansSwipe.setRefreshing(false);
-        });
-        loadJoinedClans();
-        return clansRootView;
+            popup.show()
+        }
+        clansSwipe?.setOnRefreshListener {
+            val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
+            if (currentFragment is ClansListFragment) {
+                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                fragTransaction.detach(currentFragment)
+                fragTransaction.attach(currentFragment)
+                fragTransaction.commit()
+            }
+            clansSwipe?.setRefreshing(false)
+        }
+        loadJoinedClans()
+        return clansRootView
     }
 
-    private void loadJoinedClans(){
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL_JOINED_CLANS+"?username="+deviceUsername+"&userid="+deviceUserID,
-                response -> {
+    private fun loadJoinedClans() {
+        val stringRequest = StringRequest(Request.Method.GET, "$URL_JOINED_CLANS?username=$deviceUsername&userid=$deviceUserID",
+                { response: String? ->
                     try {
-                        JSONObject res = new JSONObject(response);
-                        JSONArray thread = res.getJSONArray("clans");
-                        for (int i = 0; i < thread.length(); i++) {
-                            JSONObject obj = thread.getJSONObject(i);
-                            String position = obj.getString("position");
-                            String tag = obj.getString("tag");
-                            String name = obj.getString("name");
-                            String num_members = obj.getString("num_members");
-                            String insignia = obj.getString("insignia");
-                            String games = obj.getString("games");
-                            String id = obj.getString("id");
-                            String avg = obj.getString("avg");
-                            Clans_Recycler clansObject = new Clans_Recycler(position,tag,name,num_members,insignia,games,id,avg);
-                            clans.add(clansObject);
+                        val res = JSONObject(response!!)
+                        val thread = res.getJSONArray("clans")
+                        for (i in 0 until thread.length()) {
+                            val obj = thread.getJSONObject(i)
+                            val position = obj.getString("position")
+                            val tag = obj.getString("tag")
+                            val name = obj.getString("name")
+                            val numMembers = obj.getString("num_members")
+                            val insignia = obj.getString("insignia")
+                            val games = obj.getString("games")
+                            val id = obj.getString("id")
+                            val avg = obj.getString("avg")
+                            val clansObject = ClansRecycler(position, tag, name, numMembers, insignia, games, id, avg)
+                            clans!!.add(clansObject)
                         }
-                        if (thread.length()==0){
-                            noClans.setVisibility(View.VISIBLE);
-                            noClans.setOnClickListener(v -> {
-                                NewClanFragment ldf = new NewClanFragment();
-                                ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
-                            });
+                        if (thread.length() == 0) {
+                            noClans!!.visibility = View.VISIBLE
+                            noClans!!.setOnClickListener {
+                                val ldf = NewClanFragment()
+                                (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                            }
                         }
-                        dialog.dismiss();
-                        clansProgressBar.setVisibility(View.GONE);
-                        clansLayout.setVisibility(View.VISIBLE);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                        dialog!!.dismiss()
+                        clansProgressBar!!.visibility = View.GONE
+                        clansLayout!!.visibility = View.VISIBLE
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
                     }
-                },
-                error -> {});
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
+                }
+        ) { }
+        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
+    companion object {
+        const val URL_JOINED_CLANS = Constants.ROOT_URL + "joined_clans.php"
+    }
 }

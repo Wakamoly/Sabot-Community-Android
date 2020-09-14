@@ -1,76 +1,58 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.util.LruCache;
+import android.content.Context
+import android.graphics.Bitmap
+import android.util.LruCache
+import com.android.volley.Cache
+import com.android.volley.Network
+import com.android.volley.Request
+import com.android.volley.RequestQueue
+import com.android.volley.toolbox.BasicNetwork
+import com.android.volley.toolbox.DiskBasedCache
+import com.android.volley.toolbox.HurlStack
+import com.android.volley.toolbox.ImageLoader
 
-import com.android.volley.Cache;
-import com.android.volley.Network;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.BasicNetwork;
-import com.android.volley.toolbox.DiskBasedCache;
-import com.android.volley.toolbox.HurlStack;
-import com.android.volley.toolbox.ImageLoader;
+class DashSliderRequest private constructor(context: Context) {
+    private var requestQueue: RequestQueue?
+    private val imageLoader: ImageLoader
+    private fun getRequestQueue(): RequestQueue {
+        if (requestQueue == null) {
+            val cache: Cache = DiskBasedCache(context!!.cacheDir, 10 * 1024 * 1024)
+            val network: Network = BasicNetwork(HurlStack())
+            requestQueue = RequestQueue(cache, network)
+            requestQueue!!.start()
+        }
+        return requestQueue!!
+    }
 
-public class DashSliderRequest {
+    fun addToRequestQueue(req: Request<Any>?) {
+        getRequestQueue().add(req)
+    }
 
-    private static DashSliderRequest dashSliderRequest;
-    private static Context context;
-    private RequestQueue requestQueue;
-    private ImageLoader imageLoader;
+    companion object {
+        private var dashSliderRequest: DashSliderRequest? = null
+        private var context: Context? = null
+        @Synchronized
+        fun getInstance(context: Context): DashSliderRequest? {
+            if (dashSliderRequest == null) {
+                dashSliderRequest = DashSliderRequest(context)
+            }
+            return dashSliderRequest
+        }
+    }
 
-    private DashSliderRequest(Context context){
-
-        DashSliderRequest.context = context;
-        this.requestQueue = getRequestQueue();
-
-        imageLoader = new ImageLoader(requestQueue, new ImageLoader.ImageCache() {
-
-            private final LruCache<String, Bitmap> cache = new LruCache<String, Bitmap>(20);
-
-            @Override
-            public Bitmap getBitmap(String url) {
-                return cache.get(url);
+    init {
+        Companion.context = context
+        requestQueue = getRequestQueue()
+        imageLoader = ImageLoader(requestQueue, object : ImageLoader.ImageCache {
+            private val cache = LruCache<String, Bitmap>(20)
+            override fun getBitmap(url: String): Bitmap {
+                return cache[url]
             }
 
-            @Override
-            public void putBitmap(String url, Bitmap bitmap) {
-                cache.put(url, bitmap);
+            override fun putBitmap(url: String, bitmap: Bitmap) {
+                cache.put(url, bitmap)
             }
-        });
-
+        })
     }
-
-    public static synchronized DashSliderRequest getInstance(Context context){
-
-        if(dashSliderRequest == null){
-            dashSliderRequest = new DashSliderRequest(context);
-        }
-        return dashSliderRequest;
-    }
-
-    public RequestQueue getRequestQueue(){
-
-        if(requestQueue == null){
-
-            Cache cache = new DiskBasedCache(context.getCacheDir(), 10 * 1024 * 1024);
-            Network network = new BasicNetwork(new HurlStack());
-            requestQueue = new RequestQueue(cache, network);
-            requestQueue.start();
-
-        }
-        return requestQueue;
-    }
-
-    public  void addToRequestQueue(Request req) {
-        getRequestQueue().add(req);
-    }
-
-    public ImageLoader getImageLoader(){
-
-        return imageLoader;
-
-    }
-
 }

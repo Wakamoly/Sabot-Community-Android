@@ -20,7 +20,7 @@ class AboutFragment : Fragment() {
     var onesignal: TextView? = null
     var retrofit: TextView? = null
     var acra: TextView? = null
-    var jsoup: TextView? = null
+    private var jsoup: TextView? = null
     var lovelydialog: TextView? = null
     var imageCropper: TextView? = null
     var privacy: TextView? = null
