@@ -1,117 +1,85 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.content.Context;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import android.content.Context
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Request
+import com.android.volley.toolbox.StringRequest
+import org.json.JSONArray
+import org.json.JSONException
+import java.util.*
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static android.view.View.GONE;
-
-public class MerchFragment extends Fragment {
-
-    private ImageView backArrow;
-    private Context mContext;
-    private ProgressBar progressBar;
-    private RecyclerView merch_recycler;
-    private TextView nothingToShow;
-    private List<MerchList> merchList;
-    private MerchListAdapter merchListAdapter;
-
-    private static final String URL_MERCH = Constants.ROOT_URL+"merch_query.php";
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View merchRootView = inflater.inflate(R.layout.fragment_merch, null);
-
-        backArrow = merchRootView.findViewById(R.id.backArrow);
-        progressBar = merchRootView.findViewById(R.id.progressBar);
-        merch_recycler = merchRootView.findViewById(R.id.merch_recycler);
-        nothingToShow = merchRootView.findViewById(R.id.nothingToShow);
-        mContext = getActivity();
-
-        merchList =  new ArrayList<>();
-        merch_recycler.setHasFixedSize(true);
-        merch_recycler.setLayoutManager(new LinearLayoutManager(mContext));
-
-        backArrow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                assert getFragmentManager() != null;
-                getFragmentManager().popBackStackImmediate();
-            }
-        });
-        getQuery();
-
-        return merchRootView;
+class MerchFragment : Fragment() {
+    private var backArrow: ImageView? = null
+    private var mContext: Context? = null
+    private var progressBar: ProgressBar? = null
+    private var merch_recycler: RecyclerView? = null
+    private var nothingToShow: TextView? = null
+    private var merchList: MutableList<MerchList>? = null
+    private var merchListAdapter: MerchListAdapter? = null
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val merchRootView = inflater.inflate(R.layout.fragment_merch, null)
+        backArrow = merchRootView.findViewById(R.id.backArrow)
+        progressBar = merchRootView.findViewById(R.id.progressBar)
+        merch_recycler = merchRootView.findViewById(R.id.merch_recycler)
+        nothingToShow = merchRootView.findViewById(R.id.nothingToShow)
+        mContext = activity
+        merchList = ArrayList()
+        merch_recycler?.setHasFixedSize(true)
+        merch_recycler?.layoutManager = LinearLayoutManager(mContext)
+        backArrow?.setOnClickListener {
+            requireActivity().supportFragmentManager.popBackStackImmediate()
+        }
+        query
+        return merchRootView
     }
 
-    private void getQuery(){
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL_MERCH, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
+    private val query: Unit
+        get() {
+            val stringRequest = StringRequest(Request.Method.GET, URL_MERCH, { response ->
                 try {
-                    JSONArray merchArray = new JSONArray(response);
-                    for(int i = 0; i<merchArray.length(); i++){
-                        JSONObject merchObject = merchArray.getJSONObject(i);
-
-                        String name = merchObject.getString("name");
-                        String id = merchObject.getString("id");
-                        String options = merchObject.getString("options");
-                        String desc = merchObject.getString("desc");
-                        String image = merchObject.getString("image");
-                        String price = merchObject.getString("price");
-                        String sale_price = merchObject.getString("sale_price");
-                        String quantity = merchObject.getString("quantity");
-                        String sale_end = merchObject.getString("sale_end");
-                        String active = merchObject.getString("active");
-
-                        MerchList merchResult = new MerchList(id,name,options,desc,image,price,sale_price,quantity,sale_end,active);
-                        merchList.add(merchResult);
+                    val merchArray = JSONArray(response)
+                    for (i in 0 until merchArray.length()) {
+                        val merchObject = merchArray.getJSONObject(i)
+                        val name = merchObject.getString("name")
+                        val id = merchObject.getString("id")
+                        val options = merchObject.getString("options")
+                        val desc = merchObject.getString("desc")
+                        val image = merchObject.getString("image")
+                        val price = merchObject.getString("price")
+                        val salePrice = merchObject.getString("sale_price")
+                        val quantity = merchObject.getString("quantity")
+                        val saleEnd = merchObject.getString("sale_end")
+                        val active = merchObject.getString("active")
+                        val merchResult = MerchList(id, name, options, desc, image, price, salePrice, quantity, saleEnd, active)
+                        merchList!!.add(merchResult)
                     }
-                    if (merchArray.length()==0){
-                        nothingToShow.setVisibility(View.VISIBLE);
+                    if (merchArray.length() == 0) {
+                        nothingToShow!!.visibility = View.VISIBLE
                     }
-                    merchListAdapter = new MerchListAdapter(merchList,mContext);
-                    merch_recycler.setAdapter(merchListAdapter);
-                    merch_recycler.setNestedScrollingEnabled(false);
-                    progressBar.setVisibility(GONE);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    merchListAdapter = MerchListAdapter(merchList!!, mContext!!)
+                    merch_recycler!!.adapter = merchListAdapter
+                    merch_recycler!!.isNestedScrollingEnabled = false
+                    progressBar!!.visibility = View.GONE
+                } catch (e: JSONException) {
+                    e.printStackTrace()
                 }
-
+            }) {
+                nothingToShow!!.visibility = View.VISIBLE
+                progressBar!!.visibility = View.GONE
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                nothingToShow.setVisibility(View.VISIBLE);
-                progressBar.setVisibility(GONE);
-            }
+            (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
+        }
 
-        });
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
+    companion object {
+        private const val URL_MERCH = Constants.ROOT_URL + "merch_query.php"
     }
-
 }

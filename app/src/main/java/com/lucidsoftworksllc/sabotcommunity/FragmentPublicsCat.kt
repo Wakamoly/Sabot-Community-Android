@@ -1,504 +1,483 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import android.os.Bundle;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
-import android.view.LayoutInflater;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.PopupMenu;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.bumptech.glide.Glide;
-import com.iarcuschin.simpleratingbar.SimpleRatingBar;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import android.app.AlertDialog
+import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.bumptech.glide.Glide
+import com.iarcuschin.simpleratingbar.SimpleRatingBar
+import org.json.JSONArray
+import org.json.JSONException
+import java.util.*
 
-public class FragmentPublicsCat extends Fragment {
-    private static final String TAG = "PublicsCatFragment";
-
-    private static final String Publics_Cat_URL = Constants.ROOT_URL+"publics_cat.php";
-    private static final String Publics_Cat_Bottom_URL = Constants.ROOT_URL+"publics_cat_bottom.php";
-    private static final String FOLLOW_GAME_URL = Constants.ROOT_URL+"publicscat_follow_api.php";
-
-    private RecyclerView recyclerPublicsCatBottom;
-    private PublicsTopicAdapter newsadapter;
-    private List<PublicsTopic_Recycler> publicsRecyclerList;
-    private TextView textViewTvClicks, textViewTvReviews, followersCount, textViewPublicsLow, textViewPublicsName, textViewDescription, publicsProfileTags, publicsPostsCount;
-    private ProgressBar mProgressBar, followProgressCat;
-    private ImageButton imageButtonPurchase;
-    private ImageView publicsClickMenu, imageViewPublicsPic, imageViewPublicsBackPic, imageViewFacebook, imageViewTwitter, imageViewYoutube, imageViewInstagram;
-    private Toolbar toolbar;
-    private Context mContext;
-    private RelativeLayout relLayout2;
-    private SimpleRatingBar gameRating;
-    private LinearLayout publicsRatingContainer, publicsReviewsContainer, buttonLayout, publicsPostsContainer;
-    private Button gameActionBtn, gameActionBtnFollowed, newPublicsButton, followToPostButton, previousPublics, chatRoomButton;
-    private String userID, username, publicsCatID;
-    private EditText statusUpdate;
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View publicsCatRootView = inflater.inflate(R.layout.fragment_publics_cat, container, false);
-
-        publicsReviewsContainer = publicsCatRootView.findViewById(R.id.publicsReviewsContainer);
-        followProgressCat = publicsCatRootView.findViewById(R.id.followProgressCat);
-        followersCount = publicsCatRootView.findViewById(R.id.followersCount);
-        mProgressBar = publicsCatRootView.findViewById(R.id.publicsCatProgressBar);
-        textViewPublicsName = publicsCatRootView.findViewById(R.id.textViewPublicsName);
-        textViewPublicsLow = publicsCatRootView.findViewById(R.id.textViewPublicsLow);
-        imageViewFacebook = publicsCatRootView.findViewById(R.id.profileFacebookPage);
-        imageViewTwitter = publicsCatRootView.findViewById(R.id.profileTwitterPage);
-        imageViewYoutube = publicsCatRootView.findViewById(R.id.profileYoutubePage);
-        imageViewInstagram = publicsCatRootView.findViewById(R.id.profileInstagramPage);
-        imageButtonPurchase = publicsCatRootView.findViewById(R.id.profileBuyBtn);
-        textViewTvClicks = publicsCatRootView.findViewById(R.id.tvClicks);
-        textViewTvReviews = publicsCatRootView.findViewById(R.id.tvReviews);
-        textViewDescription = publicsCatRootView.findViewById(R.id.textViewPublicsDescription);
-        publicsProfileTags = publicsCatRootView.findViewById(R.id.publicsProfileDetails);
-        imageViewPublicsPic = publicsCatRootView.findViewById(R.id.imageViewPublicsPic);
-        imageViewPublicsBackPic = publicsCatRootView.findViewById(R.id.imageViewPublicsBackPic);
-        publicsClickMenu = publicsCatRootView.findViewById(R.id.publicsClickMenu);
-        toolbar = publicsCatRootView.findViewById(R.id.publicsToolBar);
-        relLayout2 = publicsCatRootView.findViewById(R.id.publicsLayout);
-        gameRating = publicsCatRootView.findViewById(R.id.ratingBar);
-        publicsRatingContainer = publicsCatRootView.findViewById(R.id.publicsRatingContainer);
-        gameActionBtn = publicsCatRootView.findViewById(R.id.profileActionBtn);
-        gameActionBtnFollowed = publicsCatRootView.findViewById(R.id.profileActionBtnFollowed);
-        newPublicsButton = publicsCatRootView.findViewById(R.id.newPublicsButton);
-        publicsPostsCount = publicsCatRootView.findViewById(R.id.publicsPostsCount);
-        followToPostButton = publicsCatRootView.findViewById(R.id.followToPostButton);
-        buttonLayout = publicsCatRootView.findViewById(R.id.buttonLayout);
-        previousPublics = publicsCatRootView.findViewById(R.id.previousPublics);
-        chatRoomButton = publicsCatRootView.findViewById(R.id.chatRoomButton);
-        publicsPostsContainer = publicsCatRootView.findViewById(R.id.publicsPostsContainer);
-        mContext = getActivity();
-        userID = SharedPrefManager.getInstance(mContext).getUserID();
-        username = SharedPrefManager.getInstance(mContext).getUsername();
-        publicsRecyclerList = new ArrayList<>();
-        assert getArguments() != null;
-        publicsCatID = getArguments().getString("PublicsId");
-        recyclerPublicsCatBottom = publicsCatRootView.findViewById(R.id.recyclerPublicsTopics);
-        recyclerPublicsCatBottom.setHasFixedSize(true);
-        recyclerPublicsCatBottom.setLayoutManager(new LinearLayoutManager(mContext));
-        loadPublicsCatTop();
-        textViewPublicsLow.requestFocus();
-        return publicsCatRootView;
+class FragmentPublicsCat : Fragment() {
+    private var recyclerPublicsCatBottom: RecyclerView? = null
+    private var newsadapter: PublicsTopicAdapter? = null
+    private var publicsRecyclerList: MutableList<PublicsTopicRecycler>? = null
+    private var textViewTvClicks: TextView? = null
+    private var textViewTvReviews: TextView? = null
+    private var followersCount: TextView? = null
+    private var textViewPublicsLow: TextView? = null
+    private var textViewPublicsName: TextView? = null
+    private var textViewDescription: TextView? = null
+    private var publicsProfileTags: TextView? = null
+    private var publicsPostsCount: TextView? = null
+    private var mProgressBar: ProgressBar? = null
+    private var followProgressCat: ProgressBar? = null
+    private var imageButtonPurchase: ImageButton? = null
+    private var publicsClickMenu: ImageView? = null
+    private var imageViewPublicsPic: ImageView? = null
+    private var imageViewPublicsBackPic: ImageView? = null
+    private var imageViewFacebook: ImageView? = null
+    private var imageViewTwitter: ImageView? = null
+    private var imageViewYoutube: ImageView? = null
+    private var imageViewInstagram: ImageView? = null
+    private var toolbar: Toolbar? = null
+    private var mContext: Context? = null
+    private var relLayout2: RelativeLayout? = null
+    private var gameRating: SimpleRatingBar? = null
+    private var publicsRatingContainer: LinearLayout? = null
+    private var publicsReviewsContainer: LinearLayout? = null
+    private var buttonLayout: LinearLayout? = null
+    private var publicsPostsContainer: LinearLayout? = null
+    private var gameActionBtn: Button? = null
+    private var gameActionBtnFollowed: Button? = null
+    private var newPublicsButton: Button? = null
+    private var followToPostButton: Button? = null
+    private var previousPublics: Button? = null
+    private var chatRoomButton: Button? = null
+    private var userID: String? = null
+    private var username: String? = null
+    private var publicsCatID: String? = null
+    private val statusUpdate: EditText? = null
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val publicsCatRootView = inflater.inflate(R.layout.fragment_publics_cat, container, false)
+        publicsReviewsContainer = publicsCatRootView.findViewById(R.id.publicsReviewsContainer)
+        followProgressCat = publicsCatRootView.findViewById(R.id.followProgressCat)
+        followersCount = publicsCatRootView.findViewById(R.id.followersCount)
+        mProgressBar = publicsCatRootView.findViewById(R.id.publicsCatProgressBar)
+        textViewPublicsName = publicsCatRootView.findViewById(R.id.textViewPublicsName)
+        textViewPublicsLow = publicsCatRootView.findViewById(R.id.textViewPublicsLow)
+        imageViewFacebook = publicsCatRootView.findViewById(R.id.profileFacebookPage)
+        imageViewTwitter = publicsCatRootView.findViewById(R.id.profileTwitterPage)
+        imageViewYoutube = publicsCatRootView.findViewById(R.id.profileYoutubePage)
+        imageViewInstagram = publicsCatRootView.findViewById(R.id.profileInstagramPage)
+        imageButtonPurchase = publicsCatRootView.findViewById(R.id.profileBuyBtn)
+        textViewTvClicks = publicsCatRootView.findViewById(R.id.tvClicks)
+        textViewTvReviews = publicsCatRootView.findViewById(R.id.tvReviews)
+        textViewDescription = publicsCatRootView.findViewById(R.id.textViewPublicsDescription)
+        publicsProfileTags = publicsCatRootView.findViewById(R.id.publicsProfileDetails)
+        imageViewPublicsPic = publicsCatRootView.findViewById(R.id.imageViewPublicsPic)
+        imageViewPublicsBackPic = publicsCatRootView.findViewById(R.id.imageViewPublicsBackPic)
+        publicsClickMenu = publicsCatRootView.findViewById(R.id.publicsClickMenu)
+        toolbar = publicsCatRootView.findViewById(R.id.publicsToolBar)
+        relLayout2 = publicsCatRootView.findViewById(R.id.publicsLayout)
+        gameRating = publicsCatRootView.findViewById(R.id.ratingBar)
+        publicsRatingContainer = publicsCatRootView.findViewById(R.id.publicsRatingContainer)
+        gameActionBtn = publicsCatRootView.findViewById(R.id.profileActionBtn)
+        gameActionBtnFollowed = publicsCatRootView.findViewById(R.id.profileActionBtnFollowed)
+        newPublicsButton = publicsCatRootView.findViewById(R.id.newPublicsButton)
+        publicsPostsCount = publicsCatRootView.findViewById(R.id.publicsPostsCount)
+        followToPostButton = publicsCatRootView.findViewById(R.id.followToPostButton)
+        buttonLayout = publicsCatRootView.findViewById(R.id.buttonLayout)
+        previousPublics = publicsCatRootView.findViewById(R.id.previousPublics)
+        chatRoomButton = publicsCatRootView.findViewById(R.id.chatRoomButton)
+        publicsPostsContainer = publicsCatRootView.findViewById(R.id.publicsPostsContainer)
+        mContext = activity
+        userID = SharedPrefManager.getInstance(mContext!!)!!.userID
+        username = SharedPrefManager.getInstance(mContext!!)!!.username
+        publicsRecyclerList = ArrayList()
+        publicsCatID = requireArguments().getString("PublicsId")
+        recyclerPublicsCatBottom = publicsCatRootView.findViewById(R.id.recyclerPublicsTopics)
+        recyclerPublicsCatBottom?.setHasFixedSize(true)
+        recyclerPublicsCatBottom?.layoutManager = LinearLayoutManager(mContext)
+        loadPublicsCatTop()
+        textViewPublicsLow?.requestFocus()
+        return publicsCatRootView
     }
 
-    private void loadPublicsCatTop(){
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, Publics_Cat_URL+"?userid="+userID+"&username="+username+"&publicsid="+publicsCatID, response -> {
+    private fun loadPublicsCatTop() {
+        val stringRequest = StringRequest(Request.Method.GET, "$Publics_Cat_URL?userid=$userID&username=$username&publicsid=$publicsCatID", { response: String? ->
             try {
-                JSONArray profiletop = new JSONArray(response);
-                JSONObject profiletopObject = profiletop.getJSONObject(0);
-
-                final String id = profiletopObject.getString("id");
-                final String name = profiletopObject.getString("name");
-                String genre = profiletopObject.getString("genre");
-                final String image = profiletopObject.getString("image");
-                final String back_image = profiletopObject.getString("back_image");
-                final String cat_tag = profiletopObject.getString("cat_tag");
-                String cat_description = profiletopObject.getString("cat_description");
-                String search_hits = profiletopObject.getString("search_hits");
-                String ratings = profiletopObject.getString("ratings");
-                String facebook = profiletopObject.getString("facebook");
-                String twitter = profiletopObject.getString("twitter");
-                String youtube = profiletopObject.getString("youtube");
-                String instagram = profiletopObject.getString("instagram");
-                String purchase = profiletopObject.getString("purchase");
-                String steampurchase = profiletopObject.getString("steampurchase");
-                String followers = profiletopObject.getString("followers");
+                val profiletop = JSONArray(response)
+                val profiletopObject = profiletop.getJSONObject(0)
+                val id = profiletopObject.getString("id")
+                val name = profiletopObject.getString("name")
+                val genre = profiletopObject.getString("genre")
+                val image = profiletopObject.getString("image")
+                val backImage = profiletopObject.getString("back_image")
+                val catTag = profiletopObject.getString("cat_tag")
+                val catDescription = profiletopObject.getString("cat_description")
+                val searchHits = profiletopObject.getString("search_hits")
+                val ratings = profiletopObject.getString("ratings")
+                val facebook = profiletopObject.getString("facebook")
+                val twitter = profiletopObject.getString("twitter")
+                val youtube = profiletopObject.getString("youtube")
+                val instagram = profiletopObject.getString("instagram")
+                val purchase = profiletopObject.getString("purchase")
+                val steampurchase = profiletopObject.getString("steampurchase")
+                val followers = profiletopObject.getString("followers")
                 //String count = profiletopObject.getString("count");
-                String average = profiletopObject.getString("average");
-                String publicsposts = profiletopObject.getString("publicsposts");
-                String followed = profiletopObject.getString("followed");
-
-                publicsPostsCount.setText(publicsposts);
-                followersCount.setText(followers);
-                textViewTvReviews.setText(ratings);
-                gameRating.setRating(Float.parseFloat(average));
-                imageViewPublicsPic.setOnClickListener(v -> {
-                    Fragment asf = new PhotoViewFragment();
-                    Bundle args = new Bundle();
-                    args.putString("image", image);
-                    asf.setArguments(args);
-                    FragmentTransaction fragmentTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment_container, asf);
-                    fragmentTransaction.addToBackStack(null);
-                    fragmentTransaction.commit();
-                });
-                imageViewPublicsBackPic.setOnClickListener(v -> {
-                    Fragment asf = new PhotoViewFragment();
-                    Bundle args = new Bundle();
-                    args.putString("image", back_image);
-                    asf.setArguments(args);
-                    FragmentTransaction fragmentTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment_container, asf);
-                    fragmentTransaction.addToBackStack(null);
-                    fragmentTransaction.commit();
-                });
-
-                if(followed.equals("yes")){
-                    gameActionBtnFollowed.setVisibility(View.VISIBLE);
-                    buttonLayout.setVisibility(View.VISIBLE);
-                    loadPublicsCatBottom();
-                } else{
-                    gameActionBtn.setVisibility(View.VISIBLE);
-                    followToPostButton.setVisibility(View.VISIBLE);
+                val average = profiletopObject.getString("average")
+                val publicsposts = profiletopObject.getString("publicsposts")
+                val followed = profiletopObject.getString("followed")
+                publicsPostsCount!!.text = publicsposts
+                followersCount!!.text = followers
+                textViewTvReviews!!.text = ratings
+                gameRating!!.rating = average.toFloat()
+                imageViewPublicsPic!!.setOnClickListener {
+                    val asf: Fragment = PhotoViewFragment()
+                    val args = Bundle()
+                    args.putString("image", image)
+                    asf.arguments = args
+                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                    fragmentTransaction.replace(R.id.fragment_container, asf)
+                    fragmentTransaction.addToBackStack(null)
+                    fragmentTransaction.commit()
                 }
-                int len = genre.length();
-                String[] genreString2 = genre.substring(1,len-1).split(",");
-
-                for (String s : genreString2) {
-                    publicsProfileTags.append(s);
-                    publicsProfileTags.append("\n");
+                imageViewPublicsBackPic!!.setOnClickListener {
+                    val asf: Fragment = PhotoViewFragment()
+                    val args = Bundle()
+                    args.putString("image", backImage)
+                    asf.arguments = args
+                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                    fragmentTransaction.replace(R.id.fragment_container, asf)
+                    fragmentTransaction.addToBackStack(null)
+                    fragmentTransaction.commit()
                 }
-
-                if (facebook.equals("")){
-                    imageViewFacebook.setVisibility(View.GONE);
-                }else{
-                    final String ffacebook = facebook;
-                    imageViewFacebook.setOnClickListener(v -> {
-                        if (mContext instanceof FragmentContainer) {
-                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ffacebook)));
-                        }});
+                if (followed == "yes") {
+                    gameActionBtnFollowed!!.visibility = View.VISIBLE
+                    buttonLayout!!.visibility = View.VISIBLE
+                    loadPublicsCatBottom()
+                } else {
+                    gameActionBtn!!.visibility = View.VISIBLE
+                    followToPostButton!!.visibility = View.VISIBLE
                 }
-                if (instagram.equals("")){
-                    imageViewInstagram.setVisibility(View.GONE);
-                }else{
-                    final String finstagram = instagram;
-                    imageViewInstagram.setOnClickListener(v -> {
-                        if (mContext instanceof FragmentContainer) {
-                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(finstagram)));
-                        }});
+                val len = genre.length
+                val genreString2 = genre.substring(1, len - 1).split(",".toRegex()).toTypedArray()
+                for (s in genreString2) {
+                    publicsProfileTags!!.append(s)
+                    publicsProfileTags!!.append("\n")
                 }
-                if (youtube.equals("")){
-                    imageViewYoutube.setVisibility(View.GONE);
-                }else{
-                    final String fyoutube = youtube;
-                    imageViewYoutube.setOnClickListener(v -> {
-                        if (mContext instanceof FragmentContainer) {
-                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(fyoutube)));
-                        }});
-                }
-                if (twitter.equals("")){
-                    imageViewTwitter.setVisibility(View.GONE);
-                }else{
-                    final String ftwitter = twitter;
-                    imageViewTwitter.setOnClickListener(v -> {
-                        if (mContext instanceof FragmentContainer) {
-                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ftwitter)));
-                        }});
-                }
-
-                if (purchase.equals("")&&steampurchase.equals("")){
-                    imageButtonPurchase.setVisibility(View.GONE);
-                }else{
-
-                    if (purchase.equals("")){
-                        final String fsteampurchase = steampurchase;
-                        imageButtonPurchase.setOnClickListener(v -> {
-                            if (mContext instanceof FragmentContainer) {
-                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(fsteampurchase)));
-                            }});
-                    }else if (steampurchase.equals("")){
-                        final String fpurchase = purchase;
-                        imageButtonPurchase.setOnClickListener(v -> {
-                            if (mContext instanceof FragmentContainer) {
-                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(fpurchase)));
-                            }});
-                    }else {
-                        final String fpurchase = purchase;
-                        final String fsteampurchase = steampurchase;
-                        imageButtonPurchase.setOnClickListener(v -> {
-                            if (mContext instanceof FragmentContainer) {
-                                DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-                                    switch (which) {
-                                        case DialogInterface.BUTTON_POSITIVE:
-                                            if (mContext instanceof FragmentContainer) {
-                                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(fsteampurchase)));
-                                            }
-                                            break;
-                                        case DialogInterface.BUTTON_NEUTRAL:
-                                            break;
-                                        case DialogInterface.BUTTON_NEGATIVE:
-                                            if (mContext instanceof FragmentContainer) {
-                                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(fpurchase)));
-                                            }
-                                            break;
-                                    }
-                                };
-                                AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.AlertDialogStyle);
-                                builder.setMessage(R.string.purchasealterdialog).setPositiveButton(R.string.steam, dialogClickListener)
-                                        .setNegativeButton(R.string.other2, dialogClickListener).setNeutralButton(R.string.back, dialogClickListener).show();
-                            }
-                        });
+                if (facebook == "") {
+                    imageViewFacebook!!.visibility = View.GONE
+                } else {
+                    imageViewFacebook!!.setOnClickListener {
+                        if (mContext is FragmentContainer) {
+                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(facebook)))
+                        }
                     }
                 }
-
-                textViewDescription.setText(cat_description);
-//                  publicsProfileTags.setText(genre2);
-                textViewPublicsLow.setText(String.format("@%s", cat_tag));
-                textViewTvClicks.setText(search_hits);
-                textViewPublicsName.setText(name);
-
-                Glide.with(mContext)
-                        .load(Constants.BASE_URL+ image)
-                        .error(R.mipmap.ic_launcher)
-                        .into(imageViewPublicsPic);
-                Glide.with(mContext)
-                        .load(Constants.BASE_URL+ back_image)
-                        .error(R.drawable.profile_default_cover)
-                        .into(imageViewPublicsBackPic);
-
-                publicsPostsContainer.setOnClickListener(v -> {
-                    PublicsPrevious ldf = new PublicsPrevious();
-                    Bundle args = new Bundle();
-                    args.putString("GameId", id);
-                    args.putString("gamename", name);
-                    ldf.setArguments(args);
-                    ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
-
-                });
-                chatRoomButton.setOnClickListener(v -> {
-                    PublicsChatRoom ldf = new PublicsChatRoom();
-                    Bundle args = new Bundle();
-                    args.putString("game_pic", image);
-                    args.putString("GameId", id);
-                    args.putString("gamename", name);
-                    ldf.setArguments(args);
-                    ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
-                });
-                previousPublics.setOnClickListener(v -> {
-                    PublicsPrevious ldf = new PublicsPrevious();
-                    Bundle args = new Bundle();
-                    args.putString("GameId", id);
-                    args.putString("gamename", name);
-                    ldf.setArguments(args);
-                    ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
-                });
-                publicsReviewsContainer.setOnClickListener(view -> {
-                    GameReviewFragment ldf = new GameReviewFragment();
-                    Bundle args = new Bundle();
-                    args.putString("GameId", id);
-                    args.putString("gamename", name);
-                    args.putString("gametag", cat_tag);
-                    args.putString("game_pic", image);
-                    ldf.setArguments(args);
-                    ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
-                });
-                publicsRatingContainer.setOnClickListener(view -> {
-                    GameReviewFragment ldf = new GameReviewFragment();
-                    Bundle args = new Bundle();
-                    args.putString("GameId", id);
-                    args.putString("gamename", name);
-                    args.putString("gametag", cat_tag);
-                    args.putString("game_pic", image);
-                    ldf.setArguments(args);
-                    ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
-                });
-
-                followToPostButton.setOnClickListener(v -> {
-                    gameActionBtn.setVisibility(View.GONE);
-                    followProgressCat.setVisibility(View.VISIBLE);
-                    StringRequest stringRequest1 =new StringRequest(Request.Method.POST, FOLLOW_GAME_URL, response1 -> {
-                        //TODO: get verified response
-                        gameActionBtnFollowed.setVisibility(View.VISIBLE);
-                        followProgressCat.setVisibility(View.GONE);
-                        buttonLayout.setVisibility(View.VISIBLE);
-                        recyclerPublicsCatBottom.setVisibility(View.VISIBLE);
-                        followToPostButton.setVisibility(View.VISIBLE);
-                        loadPublicsCatBottom();
-                        followToPostButton.setVisibility(View.GONE);
-                    }, error -> Toast.makeText(mContext,"Could not follow, please try again later...",Toast.LENGTH_LONG).show()){
-                        @Override
-                        protected Map<String, String> getParams()  {
-                            Map<String,String> parms= new HashMap<>();
-                            parms.put("game_id",id);
-                            parms.put("game_name",name);
-                            parms.put("method","follow");
-                            parms.put("user_id",userID);
-                            parms.put("username",username);
-                            return parms;
+                if (instagram == "") {
+                    imageViewInstagram!!.visibility = View.GONE
+                } else {
+                    imageViewInstagram!!.setOnClickListener {
+                        if (mContext is FragmentContainer) {
+                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(instagram)))
                         }
-                    };
-                    ((FragmentContainer)mContext).addToRequestQueue(stringRequest1);
-                });
-
-                gameActionBtn.setOnClickListener(view -> {
-                    gameActionBtn.setVisibility(View.GONE);
-                    followProgressCat.setVisibility(View.VISIBLE);
-                    StringRequest stringRequest1 =new StringRequest(Request.Method.POST, FOLLOW_GAME_URL, response12 -> {
-                        //TODO: get verified response
-                        gameActionBtnFollowed.setVisibility(View.VISIBLE);
-                        followProgressCat.setVisibility(View.GONE);
-                        buttonLayout.setVisibility(View.VISIBLE);
-                        recyclerPublicsCatBottom.setVisibility(View.VISIBLE);
-                        followToPostButton.setVisibility(View.VISIBLE);
-                        loadPublicsCatBottom();
-                        followToPostButton.setVisibility(View.GONE);
-                    }, error -> Toast.makeText(mContext,"Could not follow, please try again later...",Toast.LENGTH_LONG).show()){
-                        @Override
-                        protected Map<String, String> getParams()  {
-                            Map<String,String> parms= new HashMap<>();
-                            parms.put("game_id",id);
-                            parms.put("game_name",name);
-                            parms.put("method","follow");
-                            parms.put("user_id",userID);
-                            parms.put("username",username);
-                            return parms;
-                        }
-                    };
-                    ((FragmentContainer)mContext).addToRequestQueue(stringRequest1);
-                });
-
-                gameActionBtnFollowed.setOnClickListener(view -> {
-                    gameActionBtnFollowed.setVisibility(View.GONE);
-                    followProgressCat.setVisibility(View.VISIBLE);
-                    StringRequest stringRequest1 =new StringRequest(Request.Method.POST, FOLLOW_GAME_URL, response13 -> {
-                        //TODO: get verified response
-                        gameActionBtn.setVisibility(View.VISIBLE);
-                        followToPostButton.setVisibility(View.VISIBLE);
-                        followProgressCat.setVisibility(View.GONE);
-                        buttonLayout.setVisibility(View.GONE);
-                        recyclerPublicsCatBottom.setVisibility(View.GONE);
-                    }, error -> Toast.makeText(mContext,"Could not unfollow, please try again later...",Toast.LENGTH_LONG).show()){
-                        @Override
-                        protected Map<String, String> getParams()  {
-                            Map<String,String> parms= new HashMap<>();
-                            parms.put("game_id",id);
-                            parms.put("game_name",name);
-                            parms.put("method","unfollow");
-                            parms.put("user_id",userID);
-                            parms.put("username",username);
-                            return parms;
-                        }
-                    };
-                    ((FragmentContainer)mContext).addToRequestQueue(stringRequest1);
-                });
-                publicsClickMenu.setOnClickListener(view -> {
-                    PopupMenu popup = new PopupMenu(mContext, view);
-                    MenuInflater inflater = popup.getMenuInflater();
-                    inflater.inflate(R.menu.publics_cat_top_menu, popup.getMenu());
-                    popup.setOnMenuItemClickListener(item -> {
-                        if (item.getItemId() == R.id.menuCatReport) {
-                            ReportFragment ldf = new ReportFragment();
-                            Bundle args = new Bundle();
-                            args.putString("context", "game");
-                            args.putString("type", "publics_cat");
-                            args.putString("id", id);
-                            ldf.setArguments(args);
-                            ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
-                        }if (item.getItemId() == R.id.menuCatReview) {
-                            GameReviewFragment ldf = new GameReviewFragment();
-                            Bundle args = new Bundle();
-                            args.putString("GameId", id);
-                            args.putString("gamename", name);
-                            args.putString("gametag", cat_tag);
-                            args.putString("game_pic", image);
-                            ldf.setArguments(args);
-                            ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
-
-                        }if (item.getItemId() == R.id.menuCatNewPublicsTopic) {
-                            NewPublicsTopic ldf = new NewPublicsTopic();
-                            Bundle args = new Bundle();
-                            args.putString("gameid", id);
-                            args.putString("gamename", name);
-                            args.putString("gameimage", image);
-                            ldf.setArguments(args);
-                            ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
-                        }
-                        return true;
-                    });
-                    popup.show();
-                });
-
-                newPublicsButton.setOnClickListener(v -> {
-                    NewPublicsTopic ldf = new NewPublicsTopic();
-                    Bundle args = new Bundle();
-                    args.putString("gameid", id);
-                    args.putString("gamename", name);
-                    args.putString("gameimage", image);
-                    ldf.setArguments(args);
-                    ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
-                });
-                relLayout2.setVisibility(View.VISIBLE);
-                mProgressBar.setVisibility(View.GONE);
-            }
-            catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }, error -> Toast.makeText(mContext, "Network error!", Toast.LENGTH_SHORT).show());
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
-    }
-
-    private void loadPublicsCatBottom(){
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, Publics_Cat_Bottom_URL+"?userid="+userID+"&publicsid="+ publicsCatID, response -> {
-            try {
-                JSONArray profilenews = new JSONArray(response);
-                for(int i = 0; i<profilenews.length(); i++){
-                    JSONObject profilenewsObject = profilenews.getJSONObject(i);
-
-                    String username = profilenewsObject.getString("username");
-                    if (SharedPrefManager.getInstance(mContext).isUserBlocked(username))continue;
-                    String id = profilenewsObject.getString("id");
-                    String numposts = profilenewsObject.getString("numposts");
-                    String subject = profilenewsObject.getString("subject");
-                    String date = profilenewsObject.getString("date");
-                    String cat = profilenewsObject.getString("cat");
-                    String topic_by = profilenewsObject.getString("topic_by");
-                    String type = profilenewsObject.getString("type");
-                    String user_id = profilenewsObject.getString("user_id");
-                    String profile_pic = profilenewsObject.getString("profile_pic");
-                    String nickname = profilenewsObject.getString("nickname");
-                    String event_date = profilenewsObject.getString("event_date");
-                    String zone = profilenewsObject.getString("zone");
-                    String context = profilenewsObject.getString("context");
-                    String num_players = profilenewsObject.getString("num_players");
-                    String num_added = profilenewsObject.getString("num_added");
-                    String gamename = profilenewsObject.getString("gamename");
-
-                    PublicsTopic_Recycler publicsTopicResult = new PublicsTopic_Recycler(id, numposts, subject, date, cat, topic_by, type, user_id, profile_pic, nickname, username, event_date, zone, context, num_players, num_added, gamename);
-                    publicsRecyclerList.add(publicsTopicResult);
+                    }
                 }
-                newsadapter = new PublicsTopicAdapter(mContext, publicsRecyclerList);
-                recyclerPublicsCatBottom.setAdapter(newsadapter);
-                recyclerPublicsCatBottom.setNestedScrollingEnabled(false);
-            } catch (JSONException e) {
-                e.printStackTrace();
+                if (youtube == "") {
+                    imageViewYoutube!!.visibility = View.GONE
+                } else {
+                    imageViewYoutube!!.setOnClickListener {
+                        if (mContext is FragmentContainer) {
+                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(youtube)))
+                        }
+                    }
+                }
+                if (twitter == "") {
+                    imageViewTwitter!!.visibility = View.GONE
+                } else {
+                    imageViewTwitter!!.setOnClickListener {
+                        if (mContext is FragmentContainer) {
+                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(twitter)))
+                        }
+                    }
+                }
+                if (purchase == "" && steampurchase == "") {
+                    imageButtonPurchase!!.visibility = View.GONE
+                } else {
+                    when {
+                        purchase == "" -> {
+                            imageButtonPurchase!!.setOnClickListener {
+                                if (mContext is FragmentContainer) {
+                                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(steampurchase)))
+                                }
+                            }
+                        }
+                        steampurchase == "" -> {
+                            imageButtonPurchase!!.setOnClickListener {
+                                if (mContext is FragmentContainer) {
+                                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(purchase)))
+                                }
+                            }
+                        }
+                        else -> {
+                            imageButtonPurchase!!.setOnClickListener {
+                                if (mContext is FragmentContainer) {
+                                    val dialogClickListener = DialogInterface.OnClickListener { _: DialogInterface?, which: Int ->
+                                        when (which) {
+                                            DialogInterface.BUTTON_POSITIVE -> if (mContext is FragmentContainer) {
+                                                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(steampurchase)))
+                                            }
+                                            DialogInterface.BUTTON_NEUTRAL -> {
+                                            }
+                                            DialogInterface.BUTTON_NEGATIVE -> if (mContext is FragmentContainer) {
+                                                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(purchase)))
+                                            }
+                                        }
+                                    }
+                                    val builder = AlertDialog.Builder(mContext, R.style.AlertDialogStyle)
+                                    builder.setMessage(R.string.purchasealterdialog).setPositiveButton(R.string.steam, dialogClickListener)
+                                            .setNegativeButton(R.string.other2, dialogClickListener).setNeutralButton(R.string.back, dialogClickListener).show()
+                                }
+                            }
+                        }
+                    }
+                }
+                textViewDescription!!.text = catDescription
+                //                  publicsProfileTags.setText(genre2);
+                textViewPublicsLow!!.text = String.format("@%s", catTag)
+                textViewTvClicks!!.text = searchHits
+                textViewPublicsName!!.text = name
+                Glide.with(mContext!!)
+                        .load(Constants.BASE_URL + image)
+                        .error(R.mipmap.ic_launcher)
+                        .into(imageViewPublicsPic!!)
+                Glide.with(mContext!!)
+                        .load(Constants.BASE_URL + backImage)
+                        .error(R.drawable.profile_default_cover)
+                        .into(imageViewPublicsBackPic!!)
+                publicsPostsContainer!!.setOnClickListener {
+                    val ldf = PublicsPrevious()
+                    val args = Bundle()
+                    args.putString("GameId", id)
+                    args.putString("gamename", name)
+                    ldf.arguments = args
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                }
+                chatRoomButton!!.setOnClickListener {
+                    val ldf = PublicsChatRoom()
+                    val args = Bundle()
+                    args.putString("game_pic", image)
+                    args.putString("GameId", id)
+                    args.putString("gamename", name)
+                    ldf.arguments = args
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                }
+                previousPublics!!.setOnClickListener {
+                    val ldf = PublicsPrevious()
+                    val args = Bundle()
+                    args.putString("GameId", id)
+                    args.putString("gamename", name)
+                    ldf.arguments = args
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                }
+                publicsReviewsContainer!!.setOnClickListener {
+                    val ldf = GameReviewFragment()
+                    val args = Bundle()
+                    args.putString("GameId", id)
+                    args.putString("gamename", name)
+                    args.putString("gametag", catTag)
+                    args.putString("game_pic", image)
+                    ldf.arguments = args
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                }
+                publicsRatingContainer!!.setOnClickListener {
+                    val ldf = GameReviewFragment()
+                    val args = Bundle()
+                    args.putString("GameId", id)
+                    args.putString("gamename", name)
+                    args.putString("gametag", catTag)
+                    args.putString("game_pic", image)
+                    ldf.arguments = args
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                }
+                followToPostButton!!.setOnClickListener {
+                    gameActionBtn!!.visibility = View.GONE
+                    followProgressCat!!.visibility = View.VISIBLE
+                    val stringRequest1: StringRequest = object : StringRequest(Method.POST, FOLLOW_GAME_URL, Response.Listener {
+                        //TODO: get verified response
+                        gameActionBtnFollowed!!.visibility = View.VISIBLE
+                        followProgressCat!!.visibility = View.GONE
+                        buttonLayout!!.visibility = View.VISIBLE
+                        recyclerPublicsCatBottom!!.visibility = View.VISIBLE
+                        followToPostButton!!.visibility = View.VISIBLE
+                        loadPublicsCatBottom()
+                        followToPostButton!!.visibility = View.GONE
+                    }, Response.ErrorListener { Toast.makeText(mContext, "Could not follow, please try again later...", Toast.LENGTH_LONG).show() }) {
+                        override fun getParams(): MutableMap<String, String?> {
+                            val params: MutableMap<String, String?> = HashMap()
+                            params["game_id"] = id
+                            params["game_name"] = name
+                            params["method"] = "follow"
+                            params["user_id"] = userID
+                            params["username"] = username
+                            return params
+                        }
+                    }
+                    (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest1)
+                }
+                gameActionBtn!!.setOnClickListener {
+                    gameActionBtn!!.visibility = View.GONE
+                    followProgressCat!!.visibility = View.VISIBLE
+                    val stringRequest1: StringRequest = object : StringRequest(Method.POST, FOLLOW_GAME_URL, Response.Listener {
+                        //TODO: get verified response
+                        gameActionBtnFollowed!!.visibility = View.VISIBLE
+                        followProgressCat!!.visibility = View.GONE
+                        buttonLayout!!.visibility = View.VISIBLE
+                        recyclerPublicsCatBottom!!.visibility = View.VISIBLE
+                        followToPostButton!!.visibility = View.VISIBLE
+                        loadPublicsCatBottom()
+                        followToPostButton!!.visibility = View.GONE
+                    }, Response.ErrorListener { Toast.makeText(mContext, "Could not follow, please try again later...", Toast.LENGTH_LONG).show() }) {
+                        override fun getParams(): MutableMap<String, String?> {
+                            val params: MutableMap<String, String?> = HashMap()
+                            params["game_id"] = id
+                            params["game_name"] = name
+                            params["method"] = "follow"
+                            params["user_id"] = userID
+                            params["username"] = username
+                            return params
+                        }
+                    }
+                    (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest1)
+                }
+                gameActionBtnFollowed!!.setOnClickListener {
+                    gameActionBtnFollowed!!.visibility = View.GONE
+                    followProgressCat!!.visibility = View.VISIBLE
+                    val stringRequest1: StringRequest = object : StringRequest(Method.POST, FOLLOW_GAME_URL, Response.Listener {
+                        //TODO: get verified response
+                        gameActionBtn!!.visibility = View.VISIBLE
+                        followToPostButton!!.visibility = View.VISIBLE
+                        followProgressCat!!.visibility = View.GONE
+                        buttonLayout!!.visibility = View.GONE
+                        recyclerPublicsCatBottom!!.visibility = View.GONE
+                    }, Response.ErrorListener { Toast.makeText(mContext, "Could not unfollow, please try again later...", Toast.LENGTH_LONG).show() }) {
+                        override fun getParams(): MutableMap<String, String?> {
+                            val params: MutableMap<String, String?> = HashMap()
+                            params["game_id"] = id
+                            params["game_name"] = name
+                            params["method"] = "unfollow"
+                            params["user_id"] = userID
+                            params["username"] = username
+                            return params
+                        }
+                    }
+                    (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest1)
+                }
+                publicsClickMenu!!.setOnClickListener { view: View? ->
+                    val popup = PopupMenu(mContext, view)
+                    val inflater = popup.menuInflater
+                    inflater.inflate(R.menu.publics_cat_top_menu, popup.menu)
+                    popup.setOnMenuItemClickListener { item: MenuItem ->
+                        if (item.itemId == R.id.menuCatReport) {
+                            val ldf = ReportFragment()
+                            val args = Bundle()
+                            args.putString("context", "game")
+                            args.putString("type", "publics_cat")
+                            args.putString("id", id)
+                            ldf.arguments = args
+                            (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                        }
+                        if (item.itemId == R.id.menuCatReview) {
+                            val ldf = GameReviewFragment()
+                            val args = Bundle()
+                            args.putString("GameId", id)
+                            args.putString("gamename", name)
+                            args.putString("gametag", catTag)
+                            args.putString("game_pic", image)
+                            ldf.arguments = args
+                            (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                        }
+                        if (item.itemId == R.id.menuCatNewPublicsTopic) {
+                            val ldf = NewPublicsTopic()
+                            val args = Bundle()
+                            args.putString("gameid", id)
+                            args.putString("gamename", name)
+                            args.putString("gameimage", image)
+                            ldf.arguments = args
+                            (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                        }
+                        true
+                    }
+                    popup.show()
+                }
+                newPublicsButton!!.setOnClickListener {
+                    val ldf = NewPublicsTopic()
+                    val args = Bundle()
+                    args.putString("gameid", id)
+                    args.putString("gamename", name)
+                    args.putString("gameimage", image)
+                    ldf.arguments = args
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                }
+                relLayout2!!.visibility = View.VISIBLE
+                mProgressBar!!.visibility = View.GONE
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
-        }, error -> Toast.makeText(mContext, "Network error!", Toast.LENGTH_SHORT).show());
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
+        }) { Toast.makeText(mContext, "Network error!", Toast.LENGTH_SHORT).show() }
+        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
+    private fun loadPublicsCatBottom() {
+        val stringRequest = StringRequest(Request.Method.GET, "$Publics_Cat_Bottom_URL?userid=$userID&publicsid=$publicsCatID", { response: String? ->
+            try {
+                val profilenews = JSONArray(response)
+                for (i in 0 until profilenews.length()) {
+                    val profilenewsObject = profilenews.getJSONObject(i)
+                    val username = profilenewsObject.getString("username")
+                    if (SharedPrefManager.getInstance(mContext!!)!!.isUserBlocked(username)) continue
+                    val id = profilenewsObject.getString("id")
+                    val numposts = profilenewsObject.getString("numposts")
+                    val subject = profilenewsObject.getString("subject")
+                    val date = profilenewsObject.getString("date")
+                    val cat = profilenewsObject.getString("cat")
+                    val topicBy = profilenewsObject.getString("topic_by")
+                    val type = profilenewsObject.getString("type")
+                    val userId = profilenewsObject.getString("user_id")
+                    val profilePic = profilenewsObject.getString("profile_pic")
+                    val nickname = profilenewsObject.getString("nickname")
+                    val eventDate = profilenewsObject.getString("event_date")
+                    val zone = profilenewsObject.getString("zone")
+                    val context = profilenewsObject.getString("context")
+                    val numPlayers = profilenewsObject.getString("num_players")
+                    val numAdded = profilenewsObject.getString("num_added")
+                    val gamename = profilenewsObject.getString("gamename")
+                    val publicsTopicResult = PublicsTopicRecycler(id, numposts, subject, date, cat, topicBy, type, userId, profilePic, nickname, username, eventDate, zone, context, numPlayers, numAdded, gamename)
+                    publicsRecyclerList!!.add(publicsTopicResult)
+                }
+                newsadapter = PublicsTopicAdapter(mContext!!, publicsRecyclerList!!)
+                recyclerPublicsCatBottom!!.adapter = newsadapter
+                recyclerPublicsCatBottom!!.isNestedScrollingEnabled = false
+            } catch (e: JSONException) {
+                e.printStackTrace()
+            }
+        }) { Toast.makeText(mContext, "Network error!", Toast.LENGTH_SHORT).show() }
+        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
+    }
+
+    companion object {
+        private const val TAG = "PublicsCatFragment"
+        private const val Publics_Cat_URL = Constants.ROOT_URL + "publics_cat.php"
+        private const val Publics_Cat_Bottom_URL = Constants.ROOT_URL + "publics_cat_bottom.php"
+        private const val FOLLOW_GAME_URL = Constants.ROOT_URL + "publicscat_follow_api.php"
+    }
 }

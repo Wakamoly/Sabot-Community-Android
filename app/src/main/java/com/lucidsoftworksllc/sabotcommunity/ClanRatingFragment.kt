@@ -57,7 +57,7 @@ class ClanRatingFragment : Fragment() {
     }
 
     private fun submitReview(body: String, added_by: String, clan_id: String?, rating: String, title: String) {
-        val stringRequest: StringRequest = object : StringRequest(Method.POST, New_Review_URL, Response.Listener { response: String? ->
+        val stringRequest: StringRequest = object : StringRequest(Method.POST, New_Review_URL, Response.Listener {
             newReviewProgressBar!!.visibility = View.GONE
             Toast.makeText(mContext, "Review Posted!", Toast.LENGTH_LONG).show()
             requireActivity().supportFragmentManager.popBackStackImmediate()
@@ -115,14 +115,14 @@ class ClanRatingFragment : Fragment() {
 
     Submit Review?
     """.trimIndent())
-                        .setPositiveButton(R.string.yes) { v: View? ->
+                        .setPositiveButton(R.string.yes) {
                             newReviewProgressBar!!.visibility = View.VISIBLE
                             newReviewDetails!!.visibility = View.GONE
                             val body = mFeedback!!.text.toString()
-                            val addedBy = SharedPrefManager.getInstance(mContext).username
+                            val addedBy = SharedPrefManager.getInstance(mContext!!)!!.username
                             val rating = mRatingBar!!.rating.toString()
                             val title = mTitle!!.text.toString()
-                            submitReview(body, addedBy, clanId, rating, title)
+                            submitReview(body, addedBy!!, clanId, rating, title)
                         }
                         .setNegativeButton(R.string.no, null)
                         .show()

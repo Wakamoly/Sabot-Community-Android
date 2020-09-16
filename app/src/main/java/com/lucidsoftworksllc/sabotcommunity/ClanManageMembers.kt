@@ -55,8 +55,8 @@ class ClanManageMembers : Fragment() {
         clanname = requireArguments().getString("Clanname")
         clantag = requireArguments().getString("Clantag")
         mContext = activity
-        userID = SharedPrefManager.getInstance(mContext).userID
-        username = SharedPrefManager.getInstance(mContext).username
+        userID = SharedPrefManager.getInstance(mContext!!)!!.userID
+        username = SharedPrefManager.getInstance(mContext!!)!!.username
         memberRequestsLayout?.visibility = View.VISIBLE
         clanNameTop?.text = clanname
         requestsRecyclerList = ArrayList()
@@ -78,7 +78,7 @@ class ClanManageMembers : Fragment() {
                 for (i in 0 until members.length()) {
                     val membersObject = members.getJSONObject(i)
                     val username = membersObject.getString("username")
-                    if (SharedPrefManager.getInstance(mContext).isUserBlocked(username)) continue
+                    if (SharedPrefManager.getInstance(mContext!!)!!.isUserBlocked(username)) continue
                     val id = membersObject.getString("id")
                     val profilePic = membersObject.getString("profile_pic")
                     val nickname = membersObject.getString("nickname")
@@ -94,7 +94,7 @@ class ClanManageMembers : Fragment() {
                 }
                 linearLayoutManager = LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false)
                 recyclerMembers!!.layoutManager = linearLayoutManager
-                adapter = ClanMembersAdapter(mContext, requestsRecyclerList)
+                adapter = ClanMembersAdapter(mContext!!, requestsRecyclerList!!)
                 recyclerMembers!!.adapter = adapter
             } catch (e: JSONException) {
                 e.printStackTrace()
@@ -110,7 +110,7 @@ class ClanManageMembers : Fragment() {
                 for (i in 0 until members.length()) {
                     val membersObject = members.getJSONObject(i)
                     val username = membersObject.getString("username")
-                    if (SharedPrefManager.getInstance(mContext).isUserBlocked(username)) continue
+                    if (SharedPrefManager.getInstance(mContext!!)!!.isUserBlocked(username)) continue
                     val id = membersObject.getString("id")
                     val profilePic = membersObject.getString("profile_pic")
                     val nickname = membersObject.getString("nickname")
@@ -127,7 +127,7 @@ class ClanManageMembers : Fragment() {
                 }
                 linearLayoutManager = LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false)
                 recyclerMembersJoined!!.layoutManager = linearLayoutManager
-                adapter = ClanMembersAdapter(mContext, membersRecyclerList)
+                adapter = ClanMembersAdapter(mContext!!, membersRecyclerList!!)
                 recyclerMembersJoined!!.adapter = adapter
             } catch (e: JSONException) {
                 e.printStackTrace()

@@ -1,120 +1,110 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import android.app.ProgressDialog
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Request
+import com.android.volley.toolbox.StringRequest
+import com.lucidsoftworksllc.sabotcommunity.Constants.ROOT_URL
+import org.json.JSONException
+import org.json.JSONObject
+import java.util.*
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import java.util.ArrayList;
-import java.util.Objects;
-
-import static com.lucidsoftworksllc.sabotcommunity.Constants.ROOT_URL;
-
-public class MessageRequestsFragment extends Fragment implements MessageRequestsAdapter.AdapterCallback{
-
-    public static final String URL_FETCH_REQUESTS = ROOT_URL + "messages.php/message_requests";
-
-    private String deviceUsername,deviceUserID;
-    private ImageView messagesNew, messagesMenu;
-    private TextView noPosts, messagesText;
-    private ProgressDialog dialog;
-    private RecyclerView recyclerView;
-    private RecyclerView.LayoutManager layoutManager;
-    private RecyclerView.Adapter adapter;
-    private ArrayList<MessageRequestsHelper> requests;
-    private Context mCtx;
-
-    @Override
-    public void onMethodCallback(int position) {
-        requests.remove(position);
-        adapter.notifyDataSetChanged();
+class MessageRequestsFragment : Fragment(), MessageRequestsAdapter.AdapterCallback {
+    private var deviceUsername: String? = null
+    private var deviceUserID: String? = null
+    private var messagesNew: ImageView? = null
+    private var messagesMenu: ImageView? = null
+    private var noPosts: TextView? = null
+    private var messagesText: TextView? = null
+    private var dialog: ProgressDialog? = null
+    private var recyclerView: RecyclerView? = null
+    private var layoutManager: RecyclerView.LayoutManager? = null
+    private var adapter: RecyclerView.Adapter<*>? = null
+    private var requests: ArrayList<MessageRequestsHelper>? = null
+    private var mCtx: Context? = null
+    override fun onMethodCallback(position: Int) {
+        requests!!.removeAt(position)
+        adapter!!.notifyDataSetChanged()
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View convosRootView = inflater.inflate(R.layout.fragment_convos, null);
-        mCtx = getActivity();
-        messagesNew = convosRootView.findViewById(R.id.messagesNew);
-        messagesMenu = convosRootView.findViewById(R.id.messagesMenu);
-        noPosts = convosRootView.findViewById(R.id.noPosts);
-        messagesText = convosRootView.findViewById(R.id.messagesText);
-        messagesText.setText(R.string.message_requests_text);
-        noPosts.setText(R.string.no_message_requests_text);
-        dialog = new ProgressDialog(mCtx);
-        dialog.setMessage("Loading message requests...");
-        dialog.show();
-        recyclerView = convosRootView.findViewById(R.id.chatConvos);
-        recyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(mCtx);
-        recyclerView.setLayoutManager(layoutManager);
-        requests = new ArrayList<>();
-        deviceUsername = SharedPrefManager.getInstance(mCtx).getUsername();
-        deviceUserID = SharedPrefManager.getInstance(mCtx).getUserID();
-
-        messagesMenu.setOnClickListener(v -> {
-            requireActivity().finish();
-            startActivity(new Intent(mCtx, FragmentContainer.class));
-        });
-        messagesNew.setOnClickListener(v -> {
-            NewMessageFragment ldf = new NewMessageFragment();
-            ((FragmentActivity)mCtx).getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit();
-        });
-        fetchConvos();
-        return convosRootView;
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val convosRootView = inflater.inflate(R.layout.fragment_convos, null)
+        mCtx = activity
+        messagesNew = convosRootView.findViewById(R.id.messagesNew)
+        messagesMenu = convosRootView.findViewById(R.id.messagesMenu)
+        noPosts = convosRootView.findViewById(R.id.noPosts)
+        messagesText = convosRootView.findViewById(R.id.messagesText)
+        messagesText?.setText(R.string.message_requests_text)
+        noPosts?.setText(R.string.no_message_requests_text)
+        dialog = ProgressDialog(mCtx)
+        dialog!!.setMessage("Loading message requests...")
+        dialog!!.show()
+        recyclerView = convosRootView.findViewById(R.id.chatConvos)
+        recyclerView?.setHasFixedSize(true)
+        layoutManager = LinearLayoutManager(mCtx)
+        recyclerView?.layoutManager = layoutManager
+        requests = ArrayList()
+        deviceUsername = SharedPrefManager.getInstance(mCtx!!)!!.username
+        deviceUserID = SharedPrefManager.getInstance(mCtx!!)!!.userID
+        messagesMenu?.setOnClickListener {
+            requireActivity().finish()
+            startActivity(Intent(mCtx, FragmentContainer::class.java))
+        }
+        messagesNew?.setOnClickListener {
+            val ldf = NewMessageFragment()
+            (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
+        }
+        fetchConvos()
+        return convosRootView
     }
-    private void fetchConvos() {
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL_FETCH_REQUESTS+"?username="+deviceUsername+"&userid="+deviceUserID,
-                response -> {
+
+    private fun fetchConvos() {
+        val stringRequest = StringRequest(Request.Method.GET, "$URL_FETCH_REQUESTS?username=$deviceUsername&userid=$deviceUserID",
+                { response: String? ->
                     try {
-                        dialog.dismiss();
-                        JSONObject res = new JSONObject(response);
-                        JSONArray thread = res.getJSONArray("messages");
-                        for (int i = 0; i < thread.length(); i++) {
-                            JSONObject obj = thread.getJSONObject(i);
-                            String sent_by = obj.getString("sent_by");
-                            String profile_pic = obj.getString("profile_pic");
-                            String body_split = obj.getString("body_split");
-                            String time_message = obj.getString("time_message");
-                            String latest_profile_pic = obj.getString("latest_profile_pic");
-                            String nickname = obj.getString("nickname");
-                            String id = obj.getString("id");
-                            String user_from = obj.getString("user_from");
-                            String type = obj.getString("type");
-                            String group_id = obj.getString("group_id");
-                            MessageRequestsHelper messageObject = new MessageRequestsHelper(sent_by,body_split,time_message,latest_profile_pic,profile_pic,nickname,id, user_from,type,group_id);
-                            requests.add(messageObject);
+                        dialog!!.dismiss()
+                        val res = JSONObject(response!!)
+                        val thread = res.getJSONArray("messages")
+                        for (i in 0 until thread.length()) {
+                            val obj = thread.getJSONObject(i)
+                            val sentBy = obj.getString("sent_by")
+                            val profilePic = obj.getString("profile_pic")
+                            val bodySplit = obj.getString("body_split")
+                            val timeMessage = obj.getString("time_message")
+                            val latestProfilePic = obj.getString("latest_profile_pic")
+                            val nickname = obj.getString("nickname")
+                            val id = obj.getString("id")
+                            val userFrom = obj.getString("user_from")
+                            val type = obj.getString("type")
+                            val groupId = obj.getString("group_id")
+                            val messageObject = MessageRequestsHelper(sentBy, bodySplit, timeMessage, latestProfilePic, profilePic, nickname, id, userFrom, type, groupId)
+                            requests!!.add(messageObject)
                         }
-                        if(thread.length()==0){
-                            noPosts.setVisibility(View.VISIBLE);
+                        if (thread.length() == 0) {
+                            noPosts!!.visibility = View.VISIBLE
                         }
-                        adapter = new MessageRequestsAdapter(mCtx, requests, MessageRequestsFragment.this);
-                        recyclerView.setAdapter(adapter);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                        adapter = MessageRequestsAdapter(mCtx!!, requests!!, this@MessageRequestsFragment)
+                        recyclerView!!.adapter = adapter
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
                     }
-                },
-                error -> {
-                });
-        ((ChatActivity)mCtx).addToRequestQueue(stringRequest);
+                }
+        ) { }
+        (mCtx as ChatActivity?)!!.addToRequestQueue(stringRequest)
     }
 
+    companion object {
+        const val URL_FETCH_REQUESTS: String = ROOT_URL + "messages.php/message_requests"
+    }
 }

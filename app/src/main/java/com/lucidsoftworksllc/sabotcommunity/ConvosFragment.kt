@@ -46,8 +46,8 @@ class ConvosFragment : Fragment() {
         layoutManager = LinearLayoutManager(mCtx)
         recyclerView?.layoutManager = layoutManager
         messages = ArrayList()
-        deviceUsername = SharedPrefManager.getInstance(mCtx).username
-        deviceUserID = SharedPrefManager.getInstance(mCtx).userID
+        deviceUsername = SharedPrefManager.getInstance(mCtx!!)!!.username
+        deviceUserID = SharedPrefManager.getInstance(mCtx!!)!!.userID
         messagesMenu?.setOnClickListener {
             requireActivity().finish()
             startActivity(Intent(activity, FragmentContainer::class.java))
@@ -88,7 +88,7 @@ class ConvosFragment : Fragment() {
                         if (thread.length() == 0) {
                             noPosts!!.visibility = View.VISIBLE
                         }
-                        adapter = ConvosThreadAdapter(mCtx, messages)
+                        adapter = ConvosThreadAdapter(mCtx!!, messages!!)
                         recyclerView!!.adapter = adapter
                     } catch (e: JSONException) {
                         e.printStackTrace()
@@ -99,6 +99,6 @@ class ConvosFragment : Fragment() {
     }
 
     companion object {
-        val URL_FETCH_CONVOS: String = Constants.ROOT_URL + "messages.php/convos"
+        const val URL_FETCH_CONVOS: String = Constants.ROOT_URL + "messages.php/convos"
     }
 }

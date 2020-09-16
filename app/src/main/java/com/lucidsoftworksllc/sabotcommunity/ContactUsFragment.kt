@@ -54,11 +54,11 @@ class ContactUsFragment : Fragment() {
             product = Build.PRODUCT // Product
             val spinnerText = contactUsSpinner?.selectedItem.toString()
             val body = etDescription?.text.toString()
-            val addedBy = SharedPrefManager.getInstance(mContext).username
+            val addedBy = SharedPrefManager.getInstance(mContext!!)!!.username
             val subject = etSubject?.text.toString()
-            val addedById = SharedPrefManager.getInstance(mContext).userID
+            val addedById = SharedPrefManager.getInstance(mContext!!)!!.userID
             if (body != "" || subject != "") {
-                submitContactRequest(deviceId, version, model, product, spinnerText, body, addedBy, subject, addedById)
+                submitContactRequest(deviceId, version, model, product, spinnerText, body, addedBy!!, subject, addedById!!)
             } else {
                 Toast.makeText(mContext, "Please fill in each field!", Toast.LENGTH_SHORT).show()
             }
@@ -98,7 +98,7 @@ class ContactUsFragment : Fragment() {
                 params["added_by"] = added_by
                 params["subject"] = subject
                 params["added_by_id"] = added_by_id
-                params["email"] = SharedPrefManager.getInstance(mContext).email
+                params["email"] = SharedPrefManager.getInstance(mContext!!)!!.email!!
                 return params
             }
         }

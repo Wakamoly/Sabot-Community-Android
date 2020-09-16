@@ -43,8 +43,8 @@ open class ClanMembersAdapter(private val mCtx: Context, private val membersList
 
     override fun onBindViewHolder(holder: MembersViewHolder, position: Int) {
         val members = membersList[position]
-        val userID = SharedPrefManager.getInstance(mCtx).userID
-        val username = SharedPrefManager.getInstance(mCtx).username
+        val userID = SharedPrefManager.getInstance(mCtx)!!.userID
+        val username = SharedPrefManager.getInstance(mCtx)!!.username
         if (members.userPosition == "request") {
             holder.memberAccept.visibility = View.VISIBLE
         } else if (members.userPosition == "member") {
@@ -63,8 +63,8 @@ open class ClanMembersAdapter(private val mCtx: Context, private val membersList
                     params["username_action"] = members.username
                     params["method"] = "accept"
                     params["request_id"] = members.id
-                    params["user_id"] = userID
-                    params["username"] = username
+                    params["user_id"] = userID!!
+                    params["username"] = username!!
                     params["clan_id"] = members.clanid
                     params["clan_tag"] = members.clantag
                     return params
@@ -82,8 +82,8 @@ open class ClanMembersAdapter(private val mCtx: Context, private val membersList
                     params["username_action"] = members.username
                     params["method"] = "remove"
                     params["request_id"] = members.id
-                    params["user_id"] = userID
-                    params["username"] = username
+                    params["user_id"] = userID!!
+                    params["username"] = username!!
                     params["clan_id"] = members.clanid
                     params["clan_tag"] = members.clantag
                     return params

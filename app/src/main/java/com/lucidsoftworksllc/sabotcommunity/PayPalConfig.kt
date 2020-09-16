@@ -1,7 +1,5 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-public class PayPalConfig {
-
-    public static final String PAYPAL_CLIENT_ID = "AaPHIRFw9Ybcc-_okVFtK18TGeTcmnenw64pbOCMNaA6vGD2PJnidMwlXpBx2udIcVFWscJny-cP28GD";
-
+object PayPalConfig {
+    const val PAYPAL_CLIENT_ID = "AaPHIRFw9Ybcc-_okVFtK18TGeTcmnenw64pbOCMNaA6vGD2PJnidMwlXpBx2udIcVFWscJny-cP28GD"
 }

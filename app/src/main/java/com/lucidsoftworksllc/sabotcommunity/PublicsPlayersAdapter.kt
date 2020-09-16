@@ -1,206 +1,165 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.content.Context;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentActivity;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.content.Context
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.balysv.materialripple.MaterialRippleLayout
+import com.bumptech.glide.Glide
+import com.yarolegovich.lovelydialog.LovelyStandardDialog
+import de.hdodenhof.circleimageview.CircleImageView
+import org.json.JSONException
+import org.json.JSONObject
+import java.util.*
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.balysv.materialripple.MaterialRippleLayout;
-import com.bumptech.glide.Glide;
-import com.yarolegovich.lovelydialog.LovelyStandardDialog;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import de.hdodenhof.circleimageview.CircleImageView;
-
-public class PublicsPlayersAdapter extends RecyclerView.Adapter<PublicsPlayersAdapter.MembersViewHolder> {
-
-    private static final int ITEM = 0;
-    private static final int LOADING = 1;
-    private static final String CLAN_MEMBER_ACTION = Constants.ROOT_URL+"publics_player_action.php";
-    private static final String IS_CONNECTED = Constants.ROOT_URL+"publics_member_accept_is_connected.php";
-    private Context mCtx;
-    private List<Publics_Players_Recycler> membersList;
-
-    public PublicsPlayersAdapter(Context mCtx, List<Publics_Players_Recycler> membersList) {
-        this.mCtx = mCtx;
-        this.membersList = membersList;
-    }
-
-    @NonNull
-    @Override
-    public PublicsPlayersAdapter.MembersViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        PublicsPlayersAdapter.MembersViewHolder holder = null;
-        LayoutInflater inflater = LayoutInflater.from(mCtx);
-        switch (viewType) {
-            case ITEM:
-                holder = getViewHolder(inflater);
-                break;
-            case LOADING:
-                View v2 = inflater.inflate(R.layout.item_progress, parent, false);
-                holder = new LoadingVH(v2);
-                break;
+class PublicsPlayersAdapter(private val mCtx: Context, private val membersList: List<PublicsPlayersRecycler>) : RecyclerView.Adapter<PublicsPlayersAdapter.MembersViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MembersViewHolder {
+        var holder: MembersViewHolder? = null
+        val inflater = LayoutInflater.from(mCtx)
+        when (viewType) {
+            ITEM -> holder = getViewHolder(inflater)
+            LOADING -> {
+                val v2 = inflater.inflate(R.layout.item_progress, parent, false)
+                holder = LoadingVH(v2)
+            }
         }
-        assert holder != null;
-        return holder;
+        return holder!!
     }
 
-    @NonNull
-    private PublicsPlayersAdapter.MembersViewHolder getViewHolder(LayoutInflater inflater) {
-        PublicsPlayersAdapter.MembersViewHolder holder;
-        View v1 = inflater.inflate(R.layout.recycler_member, null);
-        holder = new MembersViewHolder(v1);
-        return holder;
+    private fun getViewHolder(inflater: LayoutInflater): MembersViewHolder {
+        val holder: MembersViewHolder
+        val v1 = inflater.inflate(R.layout.recycler_member, null)
+        holder = MembersViewHolder(v1)
+        return holder
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull final PublicsPlayersAdapter.MembersViewHolder holder, int position) {
-        final Publics_Players_Recycler members = membersList.get(position);
-        final String userID = SharedPrefManager.getInstance(mCtx).getUserID();
-        final String username = SharedPrefManager.getInstance(mCtx).getUsername();
-        if (members.getUserPosition().equals("request")){
-            holder.memberAccept.setVisibility(View.VISIBLE);
-        }else if(members.getUserPosition().equals("member")){
-            holder.memberJoined.setVisibility(View.VISIBLE);
+    override fun onBindViewHolder(holder: MembersViewHolder, position: Int) {
+        val members = membersList[position]
+        val userID = SharedPrefManager.getInstance(mCtx)!!.userID
+        val username = SharedPrefManager.getInstance(mCtx)!!.username
+        if (members.userPosition == "request") {
+            holder.memberAccept.visibility = View.VISIBLE
+        } else if (members.userPosition == "member") {
+            holder.memberJoined.visibility = View.VISIBLE
         }
-        holder.memberAccept.setOnClickListener(view -> {
-            holder.memberAccept.setVisibility(View.GONE);
-            holder.memberActionProgress.setVisibility(View.VISIBLE);
-            StringRequest stringRequest=new StringRequest(Request.Method.POST, IS_CONNECTED, response -> {
+        holder.memberAccept.setOnClickListener {
+            holder.memberAccept.visibility = View.GONE
+            holder.memberActionProgress.visibility = View.VISIBLE
+            val stringRequest: StringRequest = object : StringRequest(Method.POST, IS_CONNECTED, Response.Listener { response: String? ->
                 try {
-                    JSONObject obj = new JSONObject(response);
-                    if(obj.getString("result").equals("success")){
-                        if(!obj.get("isFriend").equals("yes")){
-                            new LovelyStandardDialog(mCtx, LovelyStandardDialog.ButtonLayout.VERTICAL)
+                    val obj = JSONObject(response!!)
+                    if (obj.getString("result") == "success") {
+                        if (obj["isFriend"] != "yes") {
+                            LovelyStandardDialog(mCtx, LovelyStandardDialog.ButtonLayout.VERTICAL)
                                     .setTopColorRes(R.color.green)
                                     .setButtonsColorRes(R.color.green)
                                     .setIcon(R.drawable.ic_friend_add)
                                     .setTitle(R.string.accept_connection_request_publics)
                                     .setMessage(R.string.accept_connection_request_publics_message_owner)
-                                    .setPositiveButton(R.string.yes, v -> acceptMember(members.getUserid(),members.getUsername(),"accept",members.getId(),userID,username,members.getTopicID(),members.getUsername(),holder))
+                                    .setPositiveButton(R.string.yes) { acceptMember(members.userid, members.username, "accept", members.id, userID!!, username!!, members.topicID, members.username, holder) }
                                     .setNegativeButton(R.string.no, null)
-                                    .show();
-                        }else{
-                            acceptMember(members.getUserid(),members.getUsername(),"accept",members.getId(),userID,username,members.getTopicID(),"",holder);
+                                    .show()
+                        } else {
+                            acceptMember(members.userid, members.username, "accept", members.id, userID!!, username!!, members.topicID, "", holder)
                         }
                     } else {
-                        Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show()
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                } catch (e: JSONException) {
+                    e.printStackTrace()
                 }
-            }, error -> Toast.makeText(mCtx,"Could not send request, please try again later...",Toast.LENGTH_LONG).show()){
-                @Override
-                protected Map<String, String> getParams()  {
-                    Map<String,String> parms= new HashMap<>();
-                    parms.put("playerusername",members.getUsername());
-                    parms.put("thisusername",username);
-                    parms.put("thisuserid",userID);
-                    return parms;
+            }, Response.ErrorListener { Toast.makeText(mCtx, "Could not send request, please try again later...", Toast.LENGTH_LONG).show() }) {
+                override fun getParams(): Map<String, String> {
+                    val params: MutableMap<String, String> = HashMap()
+                    params["playerusername"] = members.username
+                    params["thisusername"] = username!!
+                    params["thisuserid"] = userID!!
+                    return params
                 }
-            };
-            ((FragmentContainer)mCtx).addToRequestQueue(stringRequest);
-            holder.memberAccept.setVisibility(View.GONE);
-        });
-        holder.memberJoined.setOnClickListener(view -> {
-            holder.memberJoined.setVisibility(View.GONE);
-            holder.memberActionProgress.setVisibility(View.VISIBLE);
-            acceptMember(members.getUserid(),members.getUsername(),"remove",members.getId(),userID,username,members.getTopicID(),"",holder);
-        });
-        holder.textViewUsername.setText(String.format("@%s", members.getUsername()));
-        holder.textViewNickname.setText(members.getNickname());
-        String profile_pic = members.getProfile_pic().substring(0, members.getProfile_pic().length() - 4)+"_r.JPG";
+            }
+            (mCtx as FragmentContainer).addToRequestQueue(stringRequest)
+            holder.memberAccept.visibility = View.GONE
+        }
+        holder.memberJoined.setOnClickListener {
+            holder.memberJoined.visibility = View.GONE
+            holder.memberActionProgress.visibility = View.VISIBLE
+            acceptMember(members.userid, members.username, "remove", members.id, userID!!, username!!, members.topicID, "", holder)
+        }
+        holder.textViewUsername.text = String.format("@%s", members.username)
+        holder.textViewNickname.text = members.nickname
+        val profilePic = members.profile_pic.substring(0, members.profile_pic.length - 4) + "_r.JPG"
         Glide.with(mCtx)
-                .load(Constants.BASE_URL + profile_pic)
-                .into(holder.imageView);
-        holder.clanMemberLayout.setOnClickListener(v -> {
-            FragmentProfile ldf = new FragmentProfile();
-            Bundle args = new Bundle();
-            args.putString("UserId", members.getUserid());
-            ldf.setArguments(args);
-            ((FragmentActivity) mCtx).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
-        });
+                .load(Constants.BASE_URL + profilePic)
+                .into(holder.imageView)
+        holder.clanMemberLayout.setOnClickListener {
+            val ldf = FragmentProfile()
+            val args = Bundle()
+            args.putString("UserId", members.userid)
+            ldf.arguments = args
+            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+        }
     }
 
-    private void acceptMember(String user_id_action,String username_action,String method,String request_id,String user_id,String username,String topic_id,String add_connection,MembersViewHolder holder){
-        StringRequest stringRequest=new StringRequest(Request.Method.POST, CLAN_MEMBER_ACTION, response -> {
-            JSONObject obj;
+    private fun acceptMember(user_id_action: String, username_action: String, method: String, request_id: String, user_id: String, username: String, topic_id: String, add_connection: String, holder: MembersViewHolder) {
+        val stringRequest: StringRequest = object : StringRequest(Method.POST, CLAN_MEMBER_ACTION, Response.Listener { response: String? ->
+            val obj: JSONObject
             try {
-                obj = new JSONObject(response);
-                if(obj.getString("error").equals("false")) {
-                    holder.resultImage.setVisibility(View.VISIBLE);
-                    holder.memberActionProgress.setVisibility(View.GONE);
-                }else if(obj.getString("error").equals("true")){
-                    Toast.makeText(mCtx,obj.getString("message"),Toast.LENGTH_SHORT).show();
+                obj = JSONObject(response!!)
+                if (obj.getString("error") == "false") {
+                    holder.resultImage.visibility = View.VISIBLE
+                    holder.memberActionProgress.visibility = View.GONE
+                } else if (obj.getString("error") == "true") {
+                    Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_SHORT).show()
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Toast.makeText(mCtx,"Error on accepting!",Toast.LENGTH_SHORT).show();
+            } catch (e: JSONException) {
+                e.printStackTrace()
+                Toast.makeText(mCtx, "Error on accepting!", Toast.LENGTH_SHORT).show()
             }
-        }, error -> Toast.makeText(mCtx,"Error, please try again later...",Toast.LENGTH_LONG).show()){
-            @Override
-            protected Map<String, String> getParams()  {
-                Map<String,String> parms= new HashMap<>();
-                parms.put("user_id_action",user_id_action);
-                parms.put("username_action",username_action);
-                parms.put("method",method);
-                parms.put("request_id",request_id);
-                parms.put("user_id",user_id);
-                parms.put("username",username);
-                parms.put("topic_id",topic_id);
-                parms.put("user_to_connect",add_connection);
-                return parms;
+        }, Response.ErrorListener { Toast.makeText(mCtx, "Error, please try again later...", Toast.LENGTH_LONG).show() }) {
+            override fun getParams(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["user_id_action"] = user_id_action
+                params["username_action"] = username_action
+                params["method"] = method
+                params["request_id"] = request_id
+                params["user_id"] = user_id
+                params["username"] = username
+                params["topic_id"] = topic_id
+                params["user_to_connect"] = add_connection
+                return params
             }
-        };
-        ((FragmentContainer)mCtx).addToRequestQueue(stringRequest);
-    }
-
-    protected static class LoadingVH extends PublicsPlayersAdapter.MembersViewHolder {
-        public LoadingVH(View itemView) {
-            super(itemView);
         }
+        (mCtx as FragmentContainer).addToRequestQueue(stringRequest)
     }
 
-    @Override public int getItemCount() {
-        return membersList.size();
+    private class LoadingVH(itemView: View) : MembersViewHolder(itemView)
+
+    override fun getItemCount(): Int {
+        return membersList.size
     }
 
-    static class MembersViewHolder extends RecyclerView.ViewHolder {
-        CircleImageView imageView;
-        ImageView resultImage;
-        TextView textViewNickname,textViewUsername;
-        ProgressBar memberActionProgress;
-        Button memberJoined,memberAccept;
-        MaterialRippleLayout clanMemberLayout;
-        public MembersViewHolder(@NonNull View itemView) {
-            super(itemView);
-            imageView = itemView.findViewById(R.id.memberImageView);
-            textViewNickname = itemView.findViewById(R.id.textViewNickname);
-            textViewUsername = itemView.findViewById(R.id.textViewUsername);
-            memberActionProgress = itemView.findViewById(R.id.memberActionProgress);
-            memberJoined = itemView.findViewById(R.id.memberJoined);
-            memberAccept = itemView.findViewById(R.id.memberAccept);
-            clanMemberLayout = itemView.findViewById(R.id.clanMemberLayout);
-            resultImage = itemView.findViewById(R.id.resultImage);
-        }
+    open class MembersViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var imageView: CircleImageView = itemView.findViewById(R.id.memberImageView)
+        var resultImage: ImageView = itemView.findViewById(R.id.resultImage)
+        var textViewNickname: TextView = itemView.findViewById(R.id.textViewNickname)
+        var textViewUsername: TextView = itemView.findViewById(R.id.textViewUsername)
+        var memberActionProgress: ProgressBar = itemView.findViewById(R.id.memberActionProgress)
+        var memberJoined: Button = itemView.findViewById(R.id.memberJoined)
+        var memberAccept: Button = itemView.findViewById(R.id.memberAccept)
+        var clanMemberLayout: MaterialRippleLayout = itemView.findViewById(R.id.clanMemberLayout)
+
     }
 
+    companion object {
+        private const val ITEM = 0
+        private const val LOADING = 1
+        private const val CLAN_MEMBER_ACTION = Constants.ROOT_URL + "publics_player_action.php"
+        private const val IS_CONNECTED = Constants.ROOT_URL + "publics_member_accept_is_connected.php"
+    }
 }

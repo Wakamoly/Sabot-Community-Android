@@ -21,9 +21,9 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class GameReviewAdapter extends RecyclerView.Adapter<GameReviewAdapter.GameReviewViewHolder> {
 
     private Context mCtx;
-    private List<GameReview_Recycler> gamereviewList;
+    private List<GameReviewRecycler> gamereviewList;
 
-    public GameReviewAdapter(Context mCtx, List<GameReview_Recycler> gamereviewList) {
+    public GameReviewAdapter(Context mCtx, List<GameReviewRecycler> gamereviewList) {
         this.mCtx = mCtx;
         this.gamereviewList = gamereviewList;
     }
@@ -38,7 +38,7 @@ public class GameReviewAdapter extends RecyclerView.Adapter<GameReviewAdapter.Ga
 
     @Override
     public void onBindViewHolder(@NonNull final GameReviewViewHolder holder, int position) {
-        final GameReview_Recycler gamereviews = gamereviewList.get(position);
+        final GameReviewRecycler gamereviews = gamereviewList.get(position);
         holder.textViewBody.setText(gamereviews.getComments());
         holder.textViewReviewTitle.setText(gamereviews.getTitle());
         holder.textViewAdded_by.setText(gamereviews.getNickname());

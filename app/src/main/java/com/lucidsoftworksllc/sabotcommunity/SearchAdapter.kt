@@ -1,183 +1,167 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.content.Context;
-import android.os.Bundle;
+import android.content.Context
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
+import android.widget.RelativeLayout
+import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Response
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.StringRequest
+import com.bumptech.glide.Glide
+import de.hdodenhof.circleimageview.CircleImageView
+import java.util.*
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentActivity;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.bumptech.glide.Glide;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import de.hdodenhof.circleimageview.CircleImageView;
-
-public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchViewHolder> implements Filterable {
-
-    private static final String NEW_SEARCH_COUNT = Constants.ROOT_URL+"new_search_count.php";
-    private List<User> users;
-    private List<User> usersFull;
-    private Context context;
-    public SearchAdapter(List<User> Search_Recycler, Context context) {
-        this.users = Search_Recycler;
-        this.usersFull = new ArrayList<>(users);
-        this.context = context;
+class SearchAdapter(private val users: MutableList<User>, context: Context) : RecyclerView.Adapter<SearchAdapter.SearchViewHolder>(), Filterable {
+    private var usersFull: Collection<User>? = null
+    private val context: Context
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.layout_user_listitem, parent, false)
+        return SearchViewHolder(view)
     }
 
-    @NonNull
-    @Override
-    public SearchViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_user_listitem, parent, false);
-        return new SearchViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(SearchViewHolder holder, int position) {
-        final User user = users.get(position);
-        holder.nickname.setText(user.getSubname());
-        holder.num_posts.setText(user.getExtra());
-        holder.num_ratings.setText(user.getNumratings());
-        if(user.getImage().contains("/profile_pics/")){
-            String profile_pic = user.getImage().substring(0, user.getImage().length() - 4)+"_r.JPG";
+    override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
+        val user = users[position]
+        holder.nickname.text = user.subname
+        holder.numPosts.text = user.extra
+        holder.numRatings.text = user.numratings
+        if (user.image!!.contains("/profile_pics/")) {
+            val profilePic = user.image.substring(0, user.image.length - 4) + "_r.JPG"
             Glide.with(context)
-                    .load(Constants.BASE_URL + profile_pic)
-                    .into(holder.profile_pic);
-        }else{
+                    .load(Constants.BASE_URL + profilePic)
+                    .into(holder.profilePic)
+        } else {
             Glide.with(context)
-                    .load(Constants.BASE_URL + user.getImage())
-                    .into(holder.profile_pic);
+                    .load(Constants.BASE_URL + user.image)
+                    .into(holder.profilePic)
         }
-        if(user.getType().equals("users")){
-            holder.username.setText(String.format("@%s", user.getName()));
-            holder.username.setTextColor(ContextCompat.getColor(context, R.color.light_blue));
-            if(user.getVerified().equals("yes")) {
-                holder.verified.setVisibility(View.VISIBLE);
-            }else{
-                holder.verified.setImageDrawable(null);
+        if (user.type == "users") {
+            holder.username.text = String.format("@%s", user.name)
+            holder.username.setTextColor(ContextCompat.getColor(context, R.color.light_blue))
+            if (user.verified == "yes") {
+                holder.verified.visibility = View.VISIBLE
+            } else {
+                holder.verified.setImageDrawable(null)
             }
-            if(user.getLast_Online().equals("yes")){
-                holder.online.setVisibility(View.VISIBLE);
-            }else{
-                holder.online.setImageDrawable(null);
+            if (user.last_Online == "yes") {
+                holder.online.visibility = View.VISIBLE
+            } else {
+                holder.online.setImageDrawable(null)
             }
         }
-        if(user.getType().equals("publics_cat")) {
-            holder.tvTotalPosts.setVisibility(View.GONE);
-            holder.username.setText(String.format("@%s", user.getName()));
-            holder.username.setTextColor(ContextCompat.getColor(context, R.color.sponsored));
+        if (user.type == "publics_cat") {
+            holder.tvTotalPosts.visibility = View.GONE
+            holder.username.text = String.format("@%s", user.name)
+            holder.username.setTextColor(ContextCompat.getColor(context, R.color.sponsored))
         }
-        if(user.getType().equals("clans")){
-            holder.tvTotalPosts.setVisibility(View.GONE);
-            holder.username.setText(String.format("[%s]", user.getName()));
-            holder.username.setAllCaps(true);
-            holder.username.setTextColor(ContextCompat.getColor(context, R.color.pin));
+        if (user.type == "clans") {
+            holder.tvTotalPosts.visibility = View.GONE
+            holder.username.text = String.format("[%s]", user.name)
+            holder.username.isAllCaps = true
+            holder.username.setTextColor(ContextCompat.getColor(context, R.color.pin))
         }
-        holder.userListLayout.setOnClickListener(v -> {
-            if (context instanceof FragmentContainer) {
-                if(user.getType().equals("users")) {
-                    FragmentProfile ldf = new FragmentProfile();
-                    Bundle args = new Bundle();
-                    args.putString("UserId", user.getId());
-                    ldf.setArguments(args);
-                    ((FragmentActivity) context).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
+        holder.userListLayout.setOnClickListener {
+            if (context is FragmentContainer) {
+                if (user.type == "users") {
+                    val ldf = FragmentProfile()
+                    val args = Bundle()
+                    args.putString("UserId", user.id)
+                    ldf.arguments = args
+                    (context as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
-                if(user.getType().equals("publics_cat")) {
-                    FragmentPublicsCat ldf = new FragmentPublicsCat();
-                    Bundle args = new Bundle();
-                    args.putString("PublicsId", user.getId());
-                    ldf.setArguments(args);
-                    ((FragmentActivity) context).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
+                if (user.type == "publics_cat") {
+                    val ldf = FragmentPublicsCat()
+                    val args = Bundle()
+                    args.putString("PublicsId", user.id)
+                    ldf.arguments = args
+                    (context as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
-                if(user.getType().equals("clans")) {
-                    ClanFragment ldf = new ClanFragment();
-                    Bundle args = new Bundle();
-                    args.putString("ClanId", user.getId());
-                    ldf.setArguments(args);
-                    ((FragmentActivity) context).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
+                if (user.type == "clans") {
+                    val ldf = ClanFragment()
+                    val args = Bundle()
+                    args.putString("ClanId", user.id)
+                    ldf.arguments = args
+                    (context as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
-                if(!user.getType().equals("users"))newSearchCount(user.getType(), user.getId());
-        }});
-    }
-
-    @Override public int getItemCount() { return users.size(); }
-    @Override public Filter getFilter() {
-        return userFilter;
-    }
-    private Filter userFilter = new Filter() {
-        @Override
-        protected FilterResults performFiltering(CharSequence constraint) {
-             List<User> filteredList = new ArrayList<>();
-             if (constraint == null || constraint.length() == 0) {
-                 filteredList.addAll(usersFull);
-             } else {
-                 String filterPattern = constraint.toString().toLowerCase().trim();
-                 for (User user : usersFull) {
-                     if (user.getName().toLowerCase().contains(filterPattern)) {
-                         filteredList.add(user);
-                     }
-                 }
-             }
-             FilterResults results = new FilterResults();
-             results.values = filteredList;
-             return results;
-        }
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-            users.clear();
-            users.addAll((List) results.values);
-            notifyDataSetChanged();
-        }
-    };
-
-    public static class SearchViewHolder extends RecyclerView.ViewHolder{
-        TextView username,nickname, num_posts, num_ratings;
-        CircleImageView profile_pic, online, verified;
-        RelativeLayout userListLayout, publicsTopicLayout, tvTotalPosts;
-        public SearchViewHolder(View itemView) {
-            super(itemView);
-            username = itemView.findViewById(R.id.Searchusername);
-            nickname = itemView.findViewById(R.id.Searchnickname);
-            num_posts = itemView.findViewById(R.id.textViewNumPublicsPosts);
-            num_ratings = itemView.findViewById(R.id.reviewCount);
-            profile_pic = itemView.findViewById(R.id.profile_image);
-            userListLayout = itemView.findViewById(R.id.userListLayout);
-            publicsTopicLayout = itemView.findViewById(R.id.publicsTopicList);
-            tvTotalPosts = itemView.findViewById(R.id.tvTotalPosts);
-            verified = itemView.findViewById(R.id.verified);
-            online = itemView.findViewById(R.id.online);
-        }
-    }
-
-    public void newSearchCount(final String searchType, final String typeID){
-        StringRequest stringRequest=new StringRequest(Request.Method.POST, NEW_SEARCH_COUNT, response -> {}, error -> {}){
-            @Override
-            protected Map<String, String> getParams()  {
-                Map<String,String> parms= new HashMap<>();
-                parms.put("type",searchType);
-                parms.put("id", typeID);
-                parms.put("user_id",SharedPrefManager.getInstance(context).getUserID());
-                parms.put("username",SharedPrefManager.getInstance(context).getUsername());
-                return parms;
+                if (user.type != "users") newSearchCount(user.type!!, user.id!!)
             }
-        };
-        ((FragmentContainer)context).addToRequestQueue(stringRequest);
+        }
     }
 
+    override fun getItemCount(): Int {
+        return users.size
+    }
+
+    override fun getFilter(): Filter {
+        return userFilter
+    }
+
+    private val userFilter: Filter = object : Filter() {
+        override fun performFiltering(constraint: CharSequence): FilterResults {
+            val filteredList: MutableList<User> = ArrayList()
+            if (constraint.isEmpty()) {
+                filteredList.addAll(usersFull!!)
+            } else {
+                val filterPattern = constraint.toString().toLowerCase(Locale.ROOT).trim { it <= ' ' }
+                for (user in usersFull!!) {
+                    if (user.name!!.toLowerCase(Locale.ROOT).contains(filterPattern)) {
+                        filteredList.add(user)
+                    }
+                }
+            }
+            val results = FilterResults()
+            results.values = filteredList
+            return results
+        }
+
+        override fun publishResults(constraint: CharSequence, results: FilterResults) {
+            users.clear()
+            users.addAll(results.values as Collection<User>)
+            notifyDataSetChanged()
+        }
+    }
+
+    class SearchViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var username: TextView = itemView.findViewById(R.id.Searchusername)
+        var nickname: TextView = itemView.findViewById(R.id.Searchnickname)
+        var numPosts: TextView = itemView.findViewById(R.id.textViewNumPublicsPosts)
+        var numRatings: TextView = itemView.findViewById(R.id.reviewCount)
+        var profilePic: CircleImageView = itemView.findViewById(R.id.profile_image)
+        var online: CircleImageView = itemView.findViewById(R.id.online)
+        var verified: CircleImageView = itemView.findViewById(R.id.verified)
+        var userListLayout: RelativeLayout = itemView.findViewById(R.id.userListLayout)
+//        var publicsTopicLayout: RelativeLayout = itemView.findViewById(R.id.publicsTopicList)
+        var tvTotalPosts: RelativeLayout = itemView.findViewById(R.id.tvTotalPosts)
+
+    }
+
+    private fun newSearchCount(searchType: String, typeID: String) {
+        val stringRequest: StringRequest = object : StringRequest(Method.POST, NEW_SEARCH_COUNT, Response.Listener { }, Response.ErrorListener { }) {
+            override fun getParams(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["type"] = searchType
+                params["id"] = typeID
+                params["user_id"] = SharedPrefManager.getInstance(context)!!.userID!!
+                params["username"] = SharedPrefManager.getInstance(context)!!.username!!
+                return params
+            }
+        }
+        (context as FragmentContainer).addToRequestQueue(stringRequest)
+    }
+
+    companion object {
+        private const val NEW_SEARCH_COUNT = Constants.ROOT_URL + "new_search_count.php"
+    }
+
+    init {
+        usersFull = ArrayList(users)
+        this.context = context
+    }
 }

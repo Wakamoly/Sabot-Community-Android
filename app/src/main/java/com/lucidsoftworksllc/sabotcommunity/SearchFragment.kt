@@ -1,216 +1,198 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.app.SearchManager;
-import android.content.Context;
-import android.os.Bundle;
-import android.os.Handler;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.SearchView;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.app.SearchManager
+import android.content.Context
+import android.os.Bundle
+import android.os.Handler
+import android.view.*
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
+import com.android.volley.Request
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.StringRequest
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.util.*
 
-import com.android.volley.Request;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
-public class SearchFragment extends Fragment {
-
-    private static final String TAG = "SearchFragment";
-    private static final String Publics_URL = Constants.ROOT_URL+"readUsers_api.php";
-
-    private RecyclerView recyclerView;
-    private RecyclerView.LayoutManager layoutManager;
-    private List<User> users;
-    private SearchAdapter adapter;
-    private UserApiInterface apiInterface;
-    private Context mContext;
-    private String userID;
-    private TextView textViewOthersWhoFollow,textViewGameName,textViewNoFollows;
-    private SwipeRefreshLayout searchSwipe;
-    private ProgressBar progressBar;
-    private List<UserListRecycler> userRecyclerList;
-    private List<Search_Recycler> searchRecyclerList;
-    private UserListAdapter popularAdapter;
-    private LinearLayoutManager linearLayoutManager;
-    private RecyclerView recyclerPopular;
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View searchRootView = inflater.inflate(R.layout.fragment_search, null);
-        setHasOptionsMenu(true);
-        textViewGameName = searchRootView.findViewById(R.id.textViewGameName);
-        textViewOthersWhoFollow = searchRootView.findViewById(R.id.textViewOthersWhoFollow);
-        textViewNoFollows = searchRootView.findViewById(R.id.textViewNoFollows);
-        mContext = getActivity();
-        userID = SharedPrefManager.getInstance(mContext).getUserID();
-        androidx.appcompat.widget.Toolbar toolbar = searchRootView.findViewById(R.id.searchToolBar);
-        ((FragmentContainer)mContext).setSupportActionBar(toolbar);
-        userRecyclerList = new ArrayList<>();
-        searchRecyclerList = new ArrayList<>();
-        recyclerPopular = searchRootView.findViewById(R.id.recyclerPopular);
-        recyclerPopular.setHasFixedSize(true);
-        linearLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false);
-        recyclerPopular.setLayoutManager(linearLayoutManager);
-        progressBar = searchRootView.findViewById(R.id.progressBar);
-        searchSwipe = searchRootView.findViewById(R.id.searchSwipe);
-        recyclerView = searchRootView.findViewById(R.id.recyclerSearch);
-        layoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(layoutManager);
-        loadPopular();
-        fetchUser("users", "");
-        searchSwipe.setOnRefreshListener(() -> {
-            Fragment currentFragment = requireActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-            if (currentFragment instanceof SearchFragment) {
-                FragmentTransaction fragTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
-                fragTransaction.detach(currentFragment);
-                fragTransaction.attach(currentFragment);
-                fragTransaction.commit();
+class SearchFragment : Fragment() {
+    private var recyclerView: RecyclerView? = null
+    private var layoutManager: RecyclerView.LayoutManager? = null
+    private var users: List<User?>? = null
+    private var adapter: SearchAdapter? = null
+    private var apiInterface: UserApiInterface? = null
+    private var mContext: Context? = null
+    private var userID: String? = null
+    private var textViewOthersWhoFollow: TextView? = null
+    private var textViewGameName: TextView? = null
+    private var textViewNoFollows: TextView? = null
+    private var searchSwipe: SwipeRefreshLayout? = null
+    private var progressBar: ProgressBar? = null
+    private var userRecyclerList: MutableList<UserListRecycler>? = null
+    private var searchRecyclerList: List<SearchRecycler>? = null
+    private var popularAdapter: UserListAdapter? = null
+    private var linearLayoutManager: LinearLayoutManager? = null
+    private var recyclerPopular: RecyclerView? = null
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val searchRootView = inflater.inflate(R.layout.fragment_search, null)
+        setHasOptionsMenu(true)
+        textViewGameName = searchRootView.findViewById(R.id.textViewGameName)
+        textViewOthersWhoFollow = searchRootView.findViewById(R.id.textViewOthersWhoFollow)
+        textViewNoFollows = searchRootView.findViewById(R.id.textViewNoFollows)
+        mContext = activity
+        userID = SharedPrefManager.getInstance(mContext!!)!!.userID
+        val toolbar: Toolbar = searchRootView.findViewById(R.id.searchToolBar)
+        (mContext as FragmentContainer?)!!.setSupportActionBar(toolbar)
+        userRecyclerList = ArrayList()
+        searchRecyclerList = ArrayList()
+        recyclerPopular = searchRootView.findViewById(R.id.recyclerPopular)
+        recyclerPopular?.setHasFixedSize(true)
+        linearLayoutManager = LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false)
+        recyclerPopular?.layoutManager = linearLayoutManager
+        progressBar = searchRootView.findViewById(R.id.progressBar)
+        searchSwipe = searchRootView.findViewById(R.id.searchSwipe)
+        recyclerView = searchRootView.findViewById(R.id.recyclerSearch)
+        layoutManager = LinearLayoutManager(context)
+        recyclerView?.layoutManager = layoutManager
+        loadPopular()
+        fetchUser("users", "")
+        searchSwipe?.setOnRefreshListener {
+            val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
+            if (currentFragment is SearchFragment) {
+                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                fragTransaction.detach(currentFragment)
+                fragTransaction.attach(currentFragment)
+                fragTransaction.commit()
             }
-        });
-        return searchRootView;
-    }
-
-    public void fetchUser(String type, String key){
-        apiInterface = UsersApiClient.getApiClient().create(UserApiInterface.class);
-        Call<List<User>> call = apiInterface.getUsers(type, key);
-        call.enqueue(new Callback<List<User>>() {
-            @Override
-            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
-                progressBar.setVisibility(View.GONE);
-                users = response.body();
-                adapter = new SearchAdapter(users, mContext);
-                recyclerView.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
-                searchSwipe.setRefreshing(false);
-            }
-            @Override
-            public void onFailure(Call<List<User>> call, Throwable t) {
-                progressBar.setVisibility(View.GONE);
-                searchSwipe.setVisibility(View.INVISIBLE);
-                searchSwipe.setRefreshing(false);
-            }
-        });
-    }
-
-    private void loadPopular(){
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, Publics_URL+"?userid="+userID, (com.android.volley.Response.Listener<String>) response -> {
-            JSONObject obj;
-            try {
-                obj = new JSONObject(response);
-                JSONArray profiles;
-                JSONObject gameinfo = obj.getJSONObject("game");
-                if (obj.getJSONArray("users").length()!=0) {
-                    profiles = obj.getJSONArray("users");
-                    String gamename = gameinfo.getString("game_name");
-                    final String game_id = gameinfo.getString("id");
-                    if (gamename.equals("null")||game_id.isEmpty()){
-                        textViewNoFollows.setVisibility(View.VISIBLE);
-                        textViewGameName.setVisibility(View.GONE);
-                        textViewOthersWhoFollow.setVisibility(View.GONE);
-                    }else{
-                        textViewNoFollows.setVisibility(View.GONE);
-                        textViewGameName.setVisibility(View.VISIBLE);
-                        textViewOthersWhoFollow.setVisibility(View.VISIBLE);
-                        textViewGameName.setText(gamename);
-                        textViewGameName.setOnClickListener((View.OnClickListener) v -> {
-                            FragmentPublicsCat ldf = new FragmentPublicsCat();
-                            Bundle args = new Bundle();
-                            args.putString("PublicsId", game_id);
-                            ldf.setArguments(args);
-                            requireActivity().getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit();
-                        });
-                        for (int i = 0; i < profiles.length(); i++) {
-                            JSONObject profilenewsObject = profiles.getJSONObject(i);
-                            String username = profilenewsObject.getString("username");
-                            if (SharedPrefManager.getInstance(mContext).isUserBlocked(username))
-                                continue;
-                            String id = profilenewsObject.getString("id");
-                            String user_id = profilenewsObject.getString("user_id");
-                            String profile_pic = profilenewsObject.getString("profile_pic");
-                            String nickname = profilenewsObject.getString("nickname");
-                            String verified = profilenewsObject.getString("verified");
-                            String online = profilenewsObject.getString("online");
-                            String desc = profilenewsObject.getString("desc");
-                            UserListRecycler publicsTopicResult = new UserListRecycler(id, user_id, profile_pic, nickname, username, verified, online, desc);
-                            userRecyclerList.add(publicsTopicResult);
-                        }
-                        popularAdapter = new UserListAdapter(userRecyclerList, mContext);
-                        recyclerPopular.setAdapter(popularAdapter);
-                        progressBar.setVisibility(View.GONE);
-                    }
-                }else{
-                    textViewNoFollows.setVisibility(View.VISIBLE);
-                    textViewGameName.setVisibility(View.GONE);
-                    textViewOthersWhoFollow.setVisibility(View.GONE);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }, (com.android.volley.Response.ErrorListener) error -> Toast.makeText(mContext, "Network Error!", Toast.LENGTH_SHORT).show());
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.search, menu);
-        final SearchManager searchManager = (SearchManager) mContext.getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.searchView).getActionView();
-        if (searchManager != null) {
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(requireActivity().getComponentName()));
         }
-        searchView.setSubmitButtonEnabled(true);
-        searchView.setIconifiedByDefault(false);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                fetchUser("users", query);
-                if (!(query).isEmpty()) {
-                    searchSwipe.setVisibility(View.VISIBLE);
-                } else {
-                    searchSwipe.setVisibility(View.INVISIBLE);
-                }
-                return false;
-            }
-            @Override
-            public boolean onQueryTextChange(final String newText) {
-                final Handler handler = new Handler();
-                handler.postDelayed(() -> {
-                    fetchUser("users", newText);
-                    if (!(newText).isEmpty()) {
-                        searchSwipe.setVisibility(View.VISIBLE);
-                    } else {
-                        searchSwipe.setVisibility(View.INVISIBLE);
-                    }
-                }, 100);
-                return false;
-            }
-        });
-        super.onCreateOptionsMenu(menu, inflater);
+        return searchRootView
     }
 
+    fun fetchUser(type: String?, key: String?) {
+        apiInterface = UsersApiClient.apiClient!!.create(UserApiInterface::class.java)
+        val call = apiInterface?.getUsers(type, key)
+        call!!.enqueue(object : Callback<List<User?>?> {
+            override fun onResponse(call: Call<List<User?>?>, response: Response<List<User?>?>) {
+                progressBar!!.visibility = View.GONE
+                users = response.body()
+                adapter = SearchAdapter(users!! as MutableList<User>, mContext!!)
+                recyclerView!!.adapter = adapter
+                adapter!!.notifyDataSetChanged()
+                searchSwipe!!.isRefreshing = false
+            }
+
+            override fun onFailure(call: Call<List<User?>?>, t: Throwable) {
+                progressBar!!.visibility = View.GONE
+                searchSwipe!!.visibility = View.INVISIBLE
+                searchSwipe!!.isRefreshing = false
+            }
+        })
+    }
+
+    private fun loadPopular() {
+        val stringRequest = StringRequest(Request.Method.GET, "$Publics_URL?userid=$userID", { response: String? ->
+            val obj: JSONObject
+            try {
+                obj = JSONObject(response!!)
+                val profiles: JSONArray
+                val gameinfo = obj.getJSONObject("game")
+                if (obj.getJSONArray("users").length() != 0) {
+                    profiles = obj.getJSONArray("users")
+                    val gamename = gameinfo.getString("game_name")
+                    val gameId = gameinfo.getString("id")
+                    if (gamename == "null" || gameId.isEmpty()) {
+                        textViewNoFollows!!.visibility = View.VISIBLE
+                        textViewGameName!!.visibility = View.GONE
+                        textViewOthersWhoFollow!!.visibility = View.GONE
+                    } else {
+                        textViewNoFollows!!.visibility = View.GONE
+                        textViewGameName!!.visibility = View.VISIBLE
+                        textViewOthersWhoFollow!!.visibility = View.VISIBLE
+                        textViewGameName!!.text = gamename
+                        textViewGameName!!.setOnClickListener {
+                            val ldf = FragmentPublicsCat()
+                            val args = Bundle()
+                            args.putString("PublicsId", gameId)
+                            ldf.arguments = args
+                            requireActivity().supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                        }
+                        for (i in 0 until profiles.length()) {
+                            val profilenewsObject = profiles.getJSONObject(i)
+                            val username = profilenewsObject.getString("username")
+                            if (SharedPrefManager.getInstance(mContext!!)!!.isUserBlocked(username)) continue
+                            val id = profilenewsObject.getString("id")
+                            val userId = profilenewsObject.getString("user_id")
+                            val profilePic = profilenewsObject.getString("profile_pic")
+                            val nickname = profilenewsObject.getString("nickname")
+                            val verified = profilenewsObject.getString("verified")
+                            val online = profilenewsObject.getString("online")
+                            val desc = profilenewsObject.getString("desc")
+                            val publicsTopicResult = UserListRecycler(id, userId, profilePic, nickname, username, verified, online, desc)
+                            userRecyclerList!!.add(publicsTopicResult)
+                        }
+                        popularAdapter = UserListAdapter(userRecyclerList!!, mContext!!)
+                        recyclerPopular!!.adapter = popularAdapter
+                        progressBar!!.visibility = View.GONE
+                    }
+                } else {
+                    textViewNoFollows!!.visibility = View.VISIBLE
+                    textViewGameName!!.visibility = View.GONE
+                    textViewOthersWhoFollow!!.visibility = View.GONE
+                }
+            } catch (e: JSONException) {
+                e.printStackTrace()
+            }
+        }, { Toast.makeText(mContext, "Network Error!", Toast.LENGTH_SHORT).show() })
+        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.search, menu)
+        val searchManager = mContext!!.getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        val searchView = menu.findItem(R.id.searchView).actionView as SearchView
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
+        searchView.isSubmitButtonEnabled = true
+        searchView.setIconifiedByDefault(false)
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                fetchUser("users", query)
+                if (query.isNotEmpty()) {
+                    searchSwipe!!.visibility = View.VISIBLE
+                } else {
+                    searchSwipe!!.visibility = View.INVISIBLE
+                }
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                val handler = Handler()
+                handler.postDelayed({
+                    fetchUser("users", newText)
+                    if (newText.isNotEmpty()) {
+                        searchSwipe!!.visibility = View.VISIBLE
+                    } else {
+                        searchSwipe!!.visibility = View.INVISIBLE
+                    }
+                }, 100)
+                return false
+            }
+        })
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    companion object {
+        private const val TAG = "SearchFragment"
+        private const val Publics_URL = Constants.ROOT_URL + "readUsers_api.php"
+    }
 }

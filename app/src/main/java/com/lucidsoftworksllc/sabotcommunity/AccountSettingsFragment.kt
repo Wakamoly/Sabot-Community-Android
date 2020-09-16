@@ -104,8 +104,8 @@ class AccountSettingsFragment : Fragment() {
         //websiteInputET = editProfileRootView.findViewById(R.id.websiteInputET);
         mCtx = activity
         progressDialog = ProgressDialog(mCtx)
-        userID = SharedPrefManager.getInstance(mCtx).userID
-        username = SharedPrefManager.getInstance(mCtx).username
+        userID = SharedPrefManager.getInstance(mCtx!!)!!.userID
+        username = SharedPrefManager.getInstance(mCtx!!)!!.username
         currentTag = ""
         closeAccount?.setOnClickListener {
             val dialogClickListener = DialogInterface.OnClickListener { _: DialogInterface?, which: Int ->
@@ -133,7 +133,7 @@ class AccountSettingsFragment : Fragment() {
             val crossplatformcb = dialogView.findViewById<CheckBox>(R.id.crossplatform)
             val othercb = dialogView.findViewById<CheckBox>(R.id.other)
             try {
-                val notiPlatformsData = JSONArray(SharedPrefManager.getInstance(mCtx).notiPlatforms)
+                val notiPlatformsData = JSONArray(SharedPrefManager.getInstance(mCtx!!)!!.notiPlatforms)
                 val objectName = arrayOfNulls<String>(notiPlatformsData.length())
                 for (i in 0 until notiPlatformsData.length()) {
                     objectName[i] = notiPlatformsData.getString(i)
@@ -204,13 +204,13 @@ class AccountSettingsFragment : Fragment() {
                         if (othercb.isChecked) {
                             platformListSave.add("Other")
                         }
-                        SharedPrefManager.getInstance(mCtx).notiPlatforms = platformListSave.toString()
+                        SharedPrefManager.getInstance(mCtx!!)?.notiPlatforms = platformListSave.toString()
                         dialog.dismiss()
                     }
                     .show()
         }
-        frequencySpinner?.setSelection(getIndex(frequencySpinner, SharedPrefManager.getInstance(mCtx).notificationFrequency))
-        lastNotiText?.text = SharedPrefManager.getInstance(mCtx).lastNoti
+        frequencySpinner?.setSelection(getIndex(frequencySpinner, SharedPrefManager.getInstance(mCtx!!)!!.notificationFrequency!!))
+        lastNotiText?.text = SharedPrefManager.getInstance(mCtx!!)!!.lastNoti
         saveChanges?.setOnClickListener { saveChangesClick("toProfile") }
         backArrow?.setOnClickListener { requireActivity().supportFragmentManager.popBackStackImmediate() }
         setProfilePhotoButton?.setOnClickListener {
@@ -262,8 +262,8 @@ class AccountSettingsFragment : Fragment() {
                 frequencySpinner!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
                         newFrequency = frequencySpinner!!.selectedItem.toString()
-                        SharedPrefManager.getInstance(mCtx).notificationFrequency = newFrequency
-                        Toast.makeText(mCtx, "Publics notification frequency changed to " + SharedPrefManager.getInstance(mCtx).notificationFrequency + "!", Toast.LENGTH_SHORT).show()
+                        SharedPrefManager.getInstance(mCtx!!)!!.notificationFrequency = newFrequency
+                        Toast.makeText(mCtx, "Publics notification frequency changed to " + SharedPrefManager.getInstance(mCtx!!)!!.notificationFrequency + "!", Toast.LENGTH_SHORT).show()
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -324,7 +324,7 @@ class AccountSettingsFragment : Fragment() {
         val email = textViewEmail!!.text.toString().trim { it <= ' ' }
         val bio = textViewDescription!!.text.toString().trim { it <= ' ' }
         val nickname = textViewNickname!!.text.toString().trim { it <= ' ' }
-        val username = SharedPrefManager.getInstance(mCtx).username
+        val username = SharedPrefManager.getInstance(mCtx!!)!!.username
         val spinnertext = clanTagSpinner!!.selectedItem.toString()
         val finalspinnertext: String
         finalspinnertext = if (spinnertext != "None" && spinnertext != "null" && spinnertext.isNotEmpty()) {
@@ -387,7 +387,7 @@ class AccountSettingsFragment : Fragment() {
                     }) {
                 override fun getParams(): Map<String, String> {
                     val params: MutableMap<String, String> = HashMap()
-                    params["username"] = username
+                    params["username"] = username!!
                     params["nickname"] = nickname
                     params["email"] = email
                     params["bio"] = bio
@@ -409,7 +409,7 @@ class AccountSettingsFragment : Fragment() {
                     return params
                 }
             }
-            RequestHandler.getInstance(mCtx).addToRequestQueue(stringRequest)
+            RequestHandler.getInstance(mCtx!!)!!.addToRequestQueue(stringRequest)
         }
     }
 
@@ -464,7 +464,7 @@ class AccountSettingsFragment : Fragment() {
                         val jsonObject = JSONObject(response!!)
                         if (jsonObject.getString("error") == "false") {
                             Toast.makeText(mCtx, R.string.user_closed, Toast.LENGTH_SHORT).show()
-                            SharedPrefManager.getInstance(mCtx).logout()
+                            SharedPrefManager.getInstance(mCtx!!)!!.logout()
                             val toLogin = Intent(mCtx, LoginActivity::class.java)
                             toLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                             requireActivity().finish()
@@ -484,11 +484,11 @@ class AccountSettingsFragment : Fragment() {
                 val params: MutableMap<String, String> = HashMap()
                 params["username"] = username!!
                 params["user_id"] = userID!!
-                params["noti_token"] = SharedPrefManager.getInstance(mCtx).fcmToken
+                params["noti_token"] = SharedPrefManager.getInstance(mCtx!!)!!.fCMToken!!
                 return params
             }
         }
-        RequestHandler.getInstance(mCtx).addToRequestQueue(stringRequest)
+        RequestHandler.getInstance(mCtx!!)!!.addToRequestQueue(stringRequest)
     }
 
     private fun getIndex(spinner: Spinner?, myString: String): Int {

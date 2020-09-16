@@ -1,39 +1,41 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.content.Context;
+import android.content.Context
+import com.android.volley.Request
+import com.android.volley.RequestQueue
+import com.android.volley.toolbox.Volley
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
+class RequestHandler private constructor(private var mCtx: Context) {
+    private var mRequestQueue: RequestQueue?
 
-public class RequestHandler {
-    private static RequestHandler mInstance;
-    private RequestQueue mRequestQueue;
-    private static Context mCtx;
-
-    private RequestHandler(Context context) {
-        mCtx = context;
-        mRequestQueue = getRequestQueue();
-    }
-
-    public static synchronized RequestHandler getInstance(Context context) {
-        if (mInstance == null) {
-            mInstance = new RequestHandler(context);
+    // getApplicationContext() is key, it keeps you from leaking the
+    // Activity or BroadcastReceiver if someone passes tone in.
+    private val requestQueue: RequestQueue?
+        get() {
+            if (mRequestQueue == null) {
+                // getApplicationContext() is key, it keeps you from leaking the
+                // Activity or BroadcastReceiver if someone passes tone in.
+                mRequestQueue = Volley.newRequestQueue(mCtx.applicationContext)
+            }
+            return mRequestQueue
         }
-        return mInstance;
+
+    fun <T> addToRequestQueue(req: Request<T>?) {
+        requestQueue!!.add(req)
     }
 
-    public RequestQueue getRequestQueue() {
-        if (mRequestQueue == null) {
-            // getApplicationContext() is key, it keeps you from leaking the
-            // Activity or BroadcastReceiver if someone passes tone in.
-            mRequestQueue = Volley.newRequestQueue(mCtx.getApplicationContext());
+    companion object {
+        private var mInstance: RequestHandler? = null
+        @Synchronized
+        fun getInstance(context: Context): RequestHandler? {
+            if (mInstance == null) {
+                mInstance = RequestHandler(context)
+            }
+            return mInstance
         }
-        return mRequestQueue;
     }
 
-    public <T> void addToRequestQueue(Request<T> req) {
-        getRequestQueue().add(req);
+    init {
+        mRequestQueue = requestQueue
     }
-
 }

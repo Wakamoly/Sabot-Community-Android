@@ -43,15 +43,15 @@ class ClansListFragment : Fragment() {
         recyclerView = clansRootView.findViewById(R.id.recyclerClans)
         clansMenu = clansRootView.findViewById(R.id.clansMenu)
         mContext = activity
-        deviceUserID = SharedPrefManager.getInstance(mContext).userID
-        deviceUsername = SharedPrefManager.getInstance(mContext).username
+        deviceUserID = SharedPrefManager.getInstance(mContext!!)!!.userID
+        deviceUsername = SharedPrefManager.getInstance(mContext!!)!!.username
         clans = ArrayList()
         recyclerView?.setHasFixedSize(true)
         recyclerView?.layoutManager = LinearLayoutManager(mContext)
         dialog = ProgressDialog(mContext)
         dialog!!.setMessage("Loading joined clans...")
         dialog!!.show()
-        adapter = JoinedClansAdapter(mContext, clans)
+        adapter = JoinedClansAdapter(mContext!!, clans!!)
         recyclerView?.adapter = adapter
         clansMenu?.setOnClickListener { view: View? ->
             val popup = PopupMenu(mContext, view)

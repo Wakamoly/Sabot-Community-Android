@@ -29,7 +29,7 @@ class ConvosThreadAdapter(private val mCtx: Context, private val convosList: Lis
         val inflater = LayoutInflater.from(mCtx)
         val view = inflater.inflate(R.layout.recycler_userslist_messages, null)
         val holder = ViewHolder(view)
-        deviceUsername = SharedPrefManager.getInstance(mCtx).username
+        deviceUsername = SharedPrefManager.getInstance(mCtx)!!.username
         return holder
     }
 
@@ -37,7 +37,7 @@ class ConvosThreadAdapter(private val mCtx: Context, private val convosList: Lis
         val convos = convosList[position]
         if (convos.type == "user") {
             holder.convoUsername.text = String.format("@%s", convos.sent_by)
-            holder.convoUsername.setTextColor(mCtx.resources.getColor(android.R.color.secondary_text_dark))
+            holder.convoUsername.setTextColor(ContextCompat.getColor(mCtx, android.R.color.secondary_text_dark))
             holder.convoBodyPreview.text = convos.body_split
             if (convos.body_split.contains("Them: ")) {
                 holder.convoBodyPreview.setTypeface(null, Typeface.BOLD)

@@ -1,257 +1,219 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.content.Context;
-import android.content.Intent;
+import android.content.Context
+import android.content.Intent
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.balysv.materialripple.MaterialRippleLayout
+import com.bumptech.glide.Glide
+import com.yarolegovich.lovelydialog.LovelyCustomDialog
+import com.yarolegovich.lovelydialog.LovelyStandardDialog
+import de.hdodenhof.circleimageview.CircleImageView
+import org.json.JSONException
+import org.json.JSONObject
+import java.util.*
 
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
+class MessageUserListAdapter(private val users: List<MessageUserListRecycler>, private val context: Context, private val mAdapterCallback: AdapterCallback) : RecyclerView.Adapter<MessageUserListAdapter.UserListHolder>() {
+    private var deviceusername: String? = null
+    private var deviceuserid: String? = null
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.balysv.materialripple.MaterialRippleLayout;
-import com.bumptech.glide.Glide;
-import com.yarolegovich.lovelydialog.LovelyCustomDialog;
-import com.yarolegovich.lovelydialog.LovelyStandardDialog;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import de.hdodenhof.circleimageview.CircleImageView;
-
-public class MessageUserListAdapter extends RecyclerView.Adapter<MessageUserListAdapter.UserListHolder> {
-
-    private List<MessageUserListRecycler> users;
-    private Context context;
-    private String deviceusername,deviceuserid;
-    private static final String MANAGE_USER = Constants.ROOT_URL+"messages.php/manage_user";
-    private static final String REMOVE_USER = Constants.ROOT_URL+"messages.php/remove_user";
-    private AdapterCallback mAdapterCallback;
-
-    public MessageUserListAdapter(List<MessageUserListRecycler> UserListRecycler, Context context, AdapterCallback callback) {
-        this.users = UserListRecycler;
-        this.context = context;
-        this.mAdapterCallback = callback;
+    interface AdapterCallback {
+        fun onMethodCallback()
     }
 
-    public interface AdapterCallback {
-        void onMethodCallback();
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserListHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.recycler_message_user_list, parent, false)
+        deviceusername = SharedPrefManager.getInstance(context)!!.username
+        deviceuserid = SharedPrefManager.getInstance(context)!!.userID
+        return UserListHolder(view)
     }
 
-    @NonNull
-    @Override
-    public UserListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_message_user_list, parent, false);
-        deviceusername = SharedPrefManager.getInstance(context).getUsername();
-        deviceuserid = SharedPrefManager.getInstance(context).getUserID();
-        return new UserListHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(UserListHolder holder, int position) {
-        final MessageUserListRecycler user = users.get(position);
-
-        holder.nickname.setText(user.getNickname());
-        holder.username.setText(String.format("@%s", user.getUsername()));
-        holder.user_desc.setText(user.getDesc());
-        holder.userListLayout.setOnClickListener(v -> context.startActivity(new Intent(context, FragmentContainer.class).putExtra("user_to_id", user.getUser_id())));
-        if (user.getOnline().equals("yes")){
-            holder.online.setVisibility(View.VISIBLE);
-        }else{
-            holder.online.setVisibility(View.GONE);
+    override fun onBindViewHolder(holder: UserListHolder, position: Int) {
+        val user = users[position]
+        holder.nickname.text = user.nickname
+        holder.username.text = String.format("@%s", user.username)
+        holder.userDesc.text = user.desc
+        holder.userListLayout.setOnClickListener { context.startActivity(Intent(context, FragmentContainer::class.java).putExtra("user_to_id", user.user_id)) }
+        if (user.online == "yes") {
+            holder.online.visibility = View.VISIBLE
+        } else {
+            holder.online.visibility = View.GONE
         }
-        if (user.getVerified().equals("yes")){
-            holder.verified.setVisibility(View.VISIBLE);
-        }else{
-            holder.verified.setVisibility(View.GONE);
+        if (user.verified == "yes") {
+            holder.verified.visibility = View.VISIBLE
+        } else {
+            holder.verified.visibility = View.GONE
         }
-        if (user.getOwner().equals(deviceusername)){
-            holder.remove_user_btn.setVisibility(View.VISIBLE);
-            holder.manage_user.setVisibility(View.VISIBLE);
-            holder.manage_user.setOnClickListener(v -> manageUser(user.getUsername(),user.getPosition(),user.getGroupID()));
-            holder.remove_user_btn.setOnClickListener(v -> removeUser(user.getUsername(),user.getPosition(),user.getGroupID()));
-        }else{
-            holder.manage_user.setVisibility(View.GONE);
-            if (user.getCanRemove().equals("yes")){
-                if (!user.getPosition().equals("owner")&&!user.getPosition().equals("admin")){
-                    holder.remove_user_btn.setVisibility(View.VISIBLE);
-                    holder.remove_user_btn.setOnClickListener(v -> removeUser(user.getUsername(),user.getPosition(),user.getGroupID()));
-                }else {
-                    holder.remove_user_btn.setVisibility(View.GONE);
+        if (user.owner == deviceusername) {
+            holder.removeUserBtn.visibility = View.VISIBLE
+            holder.manageUser.visibility = View.VISIBLE
+            holder.manageUser.setOnClickListener { manageUser(user.username, user.position, user.groupID) }
+            holder.removeUserBtn.setOnClickListener { removeUser(user.username, user.position, user.groupID) }
+        } else {
+            holder.manageUser.visibility = View.GONE
+            if (user.canRemove == "yes") {
+                if (user.position != "owner" && user.position != "admin") {
+                    holder.removeUserBtn.visibility = View.VISIBLE
+                    holder.removeUserBtn.setOnClickListener { removeUser(user.username, user.position, user.groupID) }
+                } else {
+                    holder.removeUserBtn.visibility = View.GONE
                 }
-            }else{
-                holder.remove_user_btn.setVisibility(View.GONE);
+            } else {
+                holder.removeUserBtn.visibility = View.GONE
             }
         }
-        if (user.getPosition().equals("owner")){
-            holder.remove_user_btn.setVisibility(View.GONE);
-            holder.manage_user.setVisibility(View.GONE);
+        if (user.position == "owner") {
+            holder.removeUserBtn.visibility = View.GONE
+            holder.manageUser.visibility = View.GONE
         }
-        String profile_pic = user.getProfile_pic().substring(0, user.getProfile_pic().length() - 4)+"_r.JPG";
+        val profilePic = user.profile_pic.substring(0, user.profile_pic.length - 4) + "_r.JPG"
         Glide.with(context)
-                .load(Constants.BASE_URL + profile_pic)
-                .into(holder.profile_pic);
+                .load(Constants.BASE_URL + profilePic)
+                .into(holder.profilePic)
     }
 
-    private void removeUser(String username, String position, String group_id){
-        new LovelyStandardDialog(context, LovelyStandardDialog.ButtonLayout.VERTICAL)
+    private fun removeUser(username: String, position: String, group_id: String) {
+        LovelyStandardDialog(context, LovelyStandardDialog.ButtonLayout.VERTICAL)
                 .setTopColorRes(R.color.green)
                 .setButtonsColorRes(R.color.green)
                 .setIcon(R.drawable.ic_action_remove)
-                .setTitle("Remove "+"@"+username+"?")
-                .setPositiveButton(R.string.yes, v -> {
-                    StringRequest stringRequest=new StringRequest(Request.Method.POST, REMOVE_USER, response -> {
+                .setTitle("Remove @$username?")
+                .setPositiveButton(R.string.yes) {
+                    val stringRequest: StringRequest = object : StringRequest(Method.POST, REMOVE_USER, Response.Listener { response: String? ->
                         try {
-                            JSONObject res = new JSONObject(response);
-                            String error = res.getString("error");
-                            if (error.equals("false")){
-                                String newPositionResult = res.getString("position");
-                                Toast.makeText(context,newPositionResult,Toast.LENGTH_SHORT).show();
-                                mAdapterCallback.onMethodCallback();
-                            }else{
-                                Toast.makeText(context,"Error, please try again later... #1",Toast.LENGTH_LONG).show();
+                            val res = JSONObject(response!!)
+                            val error = res.getString("error")
+                            if (error == "false") {
+                                val newPositionResult = res.getString("position")
+                                Toast.makeText(context, newPositionResult, Toast.LENGTH_SHORT).show()
+                                mAdapterCallback.onMethodCallback()
+                            } else {
+                                Toast.makeText(context, "Error, please try again later... #1", Toast.LENGTH_LONG).show()
                             }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        } catch (e: JSONException) {
+                            e.printStackTrace()
                         }
-                    }, error -> Toast.makeText(context,"Error, please try again later... #2",Toast.LENGTH_LONG).show()){
-                        @Override
-                        protected Map<String, String> getParams()  {
-                            Map<String,String> parms= new HashMap<>();
-                            parms.put("deviceuser",deviceusername);
-                            parms.put("deviceuserid",deviceuserid);
-                            parms.put("group_id",group_id);
-                            parms.put("current_position",position);
-                            parms.put("username",username);
-                            return parms;
+                    }, Response.ErrorListener { Toast.makeText(context, "Error, please try again later... #2", Toast.LENGTH_LONG).show() }) {
+                        override fun getParams(): MutableMap<String, String?> {
+                            val params: MutableMap<String, String?> = HashMap()
+                            params["deviceuser"] = deviceusername
+                            params["deviceuserid"] = deviceuserid
+                            params["group_id"] = group_id
+                            params["current_position"] = position
+                            params["username"] = username
+                            return params
                         }
-                    };
-                    ((ChatActivity)context).addToRequestQueue(stringRequest);
-                })
+                    }
+                    (context as ChatActivity).addToRequestQueue(stringRequest)
+                }
                 .setNegativeButton(R.string.no, null)
-                .show();
+                .show()
     }
 
-    private void manageUser(String username, String position, String group_id){
-        if (!username.equals("")&&!position.equals("")){
-            LayoutInflater li = LayoutInflater.from(context);
-            View dialog_view = li.inflate(R.layout.dialog_message_manage_user, null);
-            Button manageSaveBtn = dialog_view.findViewById(R.id.manageSaveBtn);
-            ProgressBar manageSaveProgress = dialog_view.findViewById(R.id.manageSaveProgress);
-            CheckBox adminBox = dialog_view.findViewById(R.id.adminBox);
-            CheckBox userBox = dialog_view.findViewById(R.id.userBox);
-            if (position.equals("admin")){
-                adminBox.setChecked(true);
-            }else if (position.equals("user")){
-                userBox.setChecked(true);
+    private fun manageUser(username: String, position: String, group_id: String) {
+        if (username != "" && position != "") {
+            val li = LayoutInflater.from(context)
+            val dialogView = li.inflate(R.layout.dialog_message_manage_user, null)
+            val manageSaveBtn = dialogView.findViewById<Button>(R.id.manageSaveBtn)
+            val manageSaveProgress = dialogView.findViewById<ProgressBar>(R.id.manageSaveProgress)
+            val adminBox = dialogView.findViewById<CheckBox>(R.id.adminBox)
+            val userBox = dialogView.findViewById<CheckBox>(R.id.userBox)
+            if (position == "admin") {
+                adminBox.isChecked = true
+            } else if (position == "user") {
+                userBox.isChecked = true
             }
-            adminBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (adminBox.isChecked()){
-                    userBox.setChecked(false);
+            adminBox.setOnCheckedChangeListener { _: CompoundButton?, _: Boolean ->
+                if (adminBox.isChecked) {
+                    userBox.isChecked = false
                 }
-            });
-            userBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if(userBox.isChecked()){
-                    adminBox.setChecked(false);
+            }
+            userBox.setOnCheckedChangeListener { _: CompoundButton?, _: Boolean ->
+                if (userBox.isChecked) {
+                    adminBox.isChecked = false
                 }
-            });
-            final LovelyCustomDialog dialog = new LovelyCustomDialog(context);
-            dialog.setView(dialog_view)
+            }
+            val dialog = LovelyCustomDialog(context)
+            dialog.setView(dialogView)
                     .setTopColorRes(R.color.green)
                     .setTitle(R.string.messages_manage_user)
                     .setIcon(R.drawable.ic_person_black_24dp)
-                    .setListener(R.id.manageSaveBtn, v -> {
-                        manageSaveBtn.setVisibility(View.GONE);
-                        manageSaveProgress.setVisibility(View.VISIBLE);
-                        String newPermission;
-                        if (userBox.isChecked()&&!adminBox.isChecked()){
-                            newPermission = "user";
-                        }else if (!userBox.isChecked()&&adminBox.isChecked()){
-                            newPermission = "admin";
-                        }else{
-                            manageSaveBtn.setVisibility(View.VISIBLE);
-                            manageSaveProgress.setVisibility(View.GONE);
-                            Toast.makeText(context,"Please check 1 box!",Toast.LENGTH_SHORT).show();
-                            return;
+                    .setListener(R.id.manageSaveBtn) {
+                        manageSaveBtn.visibility = View.GONE
+                        manageSaveProgress.visibility = View.VISIBLE
+                        val newPermission: String
+                        if (userBox.isChecked && !adminBox.isChecked) {
+                            newPermission = "user"
+                        } else if (!userBox.isChecked && adminBox.isChecked) {
+                            newPermission = "admin"
+                        } else {
+                            manageSaveBtn.visibility = View.VISIBLE
+                            manageSaveProgress.visibility = View.GONE
+                            Toast.makeText(context, "Please check 1 box!", Toast.LENGTH_SHORT).show()
+                            return@setListener
                         }
-                        StringRequest stringRequest=new StringRequest(Request.Method.POST, MANAGE_USER, response -> {
+                        val stringRequest: StringRequest = object : StringRequest(Method.POST, MANAGE_USER, Response.Listener { response: String? ->
                             try {
-                                JSONObject res = new JSONObject(response);
-                                String error = res.getString("error");
-                                if (error.equals("false")){
-                                    String newPositionResult = res.getString("position");
-                                    Toast.makeText(context,newPositionResult,Toast.LENGTH_SHORT).show();
-                                    dialog.dismiss();
-                                    mAdapterCallback.onMethodCallback();
+                                val res = JSONObject(response!!)
+                                val error = res.getString("error")
+                                if (error == "false") {
+                                    val newPositionResult = res.getString("position")
+                                    Toast.makeText(context, newPositionResult, Toast.LENGTH_SHORT).show()
+                                    dialog.dismiss()
+                                    mAdapterCallback.onMethodCallback()
                                 }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+                            } catch (e: JSONException) {
+                                e.printStackTrace()
                             }
-                        }, error -> {
-                            manageSaveBtn.setVisibility(View.VISIBLE);
-                            manageSaveProgress.setVisibility(View.GONE);
-                            Toast.makeText(context,"Error, please try again later...",Toast.LENGTH_LONG).show();
-                        }){
-                            @Override
-                            protected Map<String, String> getParams()  {
-                                Map<String,String> parms= new HashMap<>();
-                                parms.put("deviceuser",deviceusername);
-                                parms.put("deviceuserid",deviceuserid);
-                                parms.put("group_id",group_id);
-                                parms.put("current_position",position);
-                                parms.put("new_position",newPermission);
-                                parms.put("username",username);
-                                return parms;
+                        }, Response.ErrorListener {
+                            manageSaveBtn.visibility = View.VISIBLE
+                            manageSaveProgress.visibility = View.GONE
+                            Toast.makeText(context, "Error, please try again later...", Toast.LENGTH_LONG).show()
+                        }) {
+                            override fun getParams(): MutableMap<String, String?> {
+                                val params: MutableMap<String, String?> = HashMap()
+                                params["deviceuser"] = deviceusername
+                                params["deviceuserid"] = deviceuserid
+                                params["group_id"] = group_id
+                                params["current_position"] = position
+                                params["new_position"] = newPermission
+                                params["username"] = username
+                                return params
                             }
-                        };
-                        ((ChatActivity)context).addToRequestQueue(stringRequest);
-                        dialog.dismiss();
-
-                    })
-                    .show();
-        }else{
-            Toast.makeText(context, "An error occured! (#3)", Toast.LENGTH_SHORT).show();
+                        }
+                        (context as ChatActivity).addToRequestQueue(stringRequest)
+                        dialog.dismiss()
+                    }
+                    .show()
+        } else {
+            Toast.makeText(context, "An error occured! (#3)", Toast.LENGTH_SHORT).show()
         }
     }
 
-    @Override
-    public int getItemCount() {
-        return users.size();
+    override fun getItemCount(): Int {
+        return users.size
     }
 
-    public static class UserListHolder extends RecyclerView.ViewHolder{
-        TextView username,nickname,user_desc;
-        CircleImageView profile_pic, online, verified;
-        MaterialRippleLayout userListLayout;
-        Button remove_user_btn,manage_user;
+    class UserListHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var username: TextView = itemView.findViewById(R.id.username)
+        var nickname: TextView = itemView.findViewById(R.id.nickname)
+        var userDesc: TextView = itemView.findViewById(R.id.user_desc)
+        var profilePic: CircleImageView = itemView.findViewById(R.id.profile_image)
+        var online: CircleImageView = itemView.findViewById(R.id.online)
+        var verified: CircleImageView = itemView.findViewById(R.id.verified)
+        var userListLayout: MaterialRippleLayout = itemView.findViewById(R.id.userListLayout)
+        var removeUserBtn: Button = itemView.findViewById(R.id.remove_user_btn)
+        var manageUser: Button = itemView.findViewById(R.id.manage_user)
 
-        public UserListHolder(View itemView) {
-            super(itemView);
-            username = itemView.findViewById(R.id.username);
-            nickname = itemView.findViewById(R.id.nickname);
-            profile_pic = itemView.findViewById(R.id.profile_image);
-            userListLayout = itemView.findViewById(R.id.userListLayout);
-            verified = itemView.findViewById(R.id.verified);
-            online = itemView.findViewById(R.id.online);
-            user_desc = itemView.findViewById(R.id.user_desc);
-            remove_user_btn = itemView.findViewById(R.id.remove_user_btn);
-            manage_user = itemView.findViewById(R.id.manage_user);
-        }
     }
 
+    companion object {
+        private const val MANAGE_USER = Constants.ROOT_URL + "messages.php/manage_user"
+        private const val REMOVE_USER = Constants.ROOT_URL + "messages.php/remove_user"
+    }
 }

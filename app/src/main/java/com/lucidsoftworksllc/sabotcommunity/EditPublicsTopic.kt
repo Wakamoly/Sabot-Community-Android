@@ -58,8 +58,8 @@ class EditPublicsTopic : Fragment() {
         submitDetails = newPublicsRootView.findViewById(R.id.submitDetails)
         newTopicImage = newPublicsRootView.findViewById(R.id.newTopicImage)
         spinnerProgress = newPublicsRootView.findViewById(R.id.spinnerProgress)
-        userID = SharedPrefManager.getInstance(mContext).userID
-        username = SharedPrefManager.getInstance(mContext).username
+        userID = SharedPrefManager.getInstance(mContext!!)!!.userID
+        username = SharedPrefManager.getInstance(mContext!!)!!.username
         gamename = requireArguments().getString("gamename")
         gameimage = requireArguments().getString("gameimage")
         gameid = requireArguments().getString("gameid")
@@ -177,7 +177,7 @@ class EditPublicsTopic : Fragment() {
                                 }
                             }
                             for (i in platformArrayList!!.indices) {
-                                platforms.add(platformArrayList!![i].platform)
+                                platforms.add(platformArrayList!![i].platform!!)
                             }
                             platforms.add("Other")
                             val spinnerArrayAdapter = ArrayAdapter(mContext!!, R.layout.spinner_item, platforms)

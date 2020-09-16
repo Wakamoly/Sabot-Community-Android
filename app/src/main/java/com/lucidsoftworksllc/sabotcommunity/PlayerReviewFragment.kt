@@ -1,212 +1,209 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.content.Context;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.core.view.ViewCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.bumptech.glide.Glide;
-import com.iarcuschin.simpleratingbar.SimpleRatingBar;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import de.hdodenhof.circleimageview.CircleImageView;
+import android.content.Context
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import androidx.core.view.ViewCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Request
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.StringRequest
+import com.bumptech.glide.Glide
+import com.iarcuschin.simpleratingbar.SimpleRatingBar
+import de.hdodenhof.circleimageview.CircleImageView
+import org.json.JSONArray
+import org.json.JSONException
+import java.util.*
 
-public class PlayerReviewFragment extends Fragment {
+class PlayerReviewFragment : Fragment() {
+    private var tvratingsandreviews: TextView? = null
+    private var tvInteger: TextView? = null
+    private var usernameReviewed: TextView? = null
+    private var nicknameReviewed: TextView? = null
+    private var numReviews: TextView? = null
+    private var tvTotalReviews: TextView? = null
+    private var noReviews: TextView? = null
+    private var profileOnlineIcon: ImageView? = null
+    private var verifiedIcon: CircleImageView? = null
+    private var profileImageReviewed: CircleImageView? = null
+    private var mContext: Context? = null
+    private var userID: String? = null
+    private var userProfileID: String? = null
+    private var username: String? = null
+    private var nickname: String? = null
+    private var verified: String? = null
+    private var profilePic: String? = null
+    private var allFriendArray: String? = null
+    private var lastOnline: String? = null
+    private var playerReviewCenter: RelativeLayout? = null
+    private var playerReviewRecyclerLayout: RelativeLayout? = null
+    private var reviews5: ProgressBar? = null
+    private var reviews4: ProgressBar? = null
+    private var reviews3: ProgressBar? = null
+    private var reviews2: ProgressBar? = null
+    private var reviews1: ProgressBar? = null
+    private var playerReviewProgress: ProgressBar? = null
+    private var reviewStarRating: SimpleRatingBar? = null
+    private var playerreviewsView: RecyclerView? = null
+    private var playerreviewRecyclerList: MutableList<PlayerReviewRecycler>? = null
+    private var reviewButton: Button? = null
+    private var connectToReview: Button? = null
+    private var reviewAdapter: PlayerReviewAdapter? = null
 
-    private TextView tvratingsandreviews, tvInteger, usernameReviewed, nicknameReviewed, numReviews, tvTotalReviews, noReviews;
-    private ImageView profileOnlineIcon;
-    private CircleImageView verifiedIcon, profileImageReviewed;
-    private Context mContext;
-    private String userID, userProfileID,username,nickname,verified,profile_pic,all_friend_array,last_online;
-    private RelativeLayout player_review_center, player_review_recycler_layout;
-    private ProgressBar reviews5, reviews4, reviews3, reviews2, reviews1, player_review_progress;
-    private SimpleRatingBar reviewStarRating;
-    private RecyclerView playerreviewsView;
-    private List<PlayerReview_Recycler> playerreviewRecyclerList;
-    private Button reviewButton, connectToReview;
-    private PlayerReviewAdapter reviewAdapter;
-    private static final String Player_Reviewed_TOP_URL = Constants.ROOT_URL+"playerreviewsTopGet_api.php";
-    private static final String Player_Reviewed_URL = Constants.ROOT_URL+"playerreviewsGet_api.php";
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View playerReviewRootView = inflater.inflate(R.layout.fragment_player_review, null);
-
-        connectToReview = playerReviewRootView.findViewById(R.id.connectToReview);
-        noReviews = playerReviewRootView.findViewById(R.id.noReviews);
-        tvratingsandreviews = playerReviewRootView.findViewById(R.id.tvratingsandreviews);
-        profileOnlineIcon = playerReviewRootView.findViewById(R.id.profileOnlineIcon);
-        verifiedIcon = playerReviewRootView.findViewById(R.id.verifiedIcon);
-        usernameReviewed = playerReviewRootView.findViewById(R.id.usernameReviewed);
-        nicknameReviewed = playerReviewRootView.findViewById(R.id.nicknameReviewed);
-        profileImageReviewed = playerReviewRootView.findViewById(R.id.profileImageReviewed);
-        player_review_progress = playerReviewRootView.findViewById(R.id.player_review_progress);
-        player_review_recycler_layout = playerReviewRootView.findViewById(R.id.player_review_recycler_layout);
-        player_review_center = playerReviewRootView.findViewById(R.id.player_review_center);
-        tvTotalReviews = playerReviewRootView.findViewById(R.id.tvTotalReviews);
-        numReviews = playerReviewRootView.findViewById(R.id.numReviews);
-        reviewButton = playerReviewRootView.findViewById(R.id.reviewButton);
-        tvInteger = playerReviewRootView.findViewById(R.id.tvInteger);
-        reviews5 = playerReviewRootView.findViewById(R.id.reviews5);
-        reviews4 = playerReviewRootView.findViewById(R.id.reviews4);
-        reviews3 = playerReviewRootView.findViewById(R.id.reviews3);
-        reviews2 = playerReviewRootView.findViewById(R.id.reviews2);
-        reviews1 = playerReviewRootView.findViewById(R.id.reviews1);
-        reviewStarRating = playerReviewRootView.findViewById(R.id.reviewStarRating);
-        playerreviewRecyclerList = new ArrayList<>();
-
-        assert getArguments() != null;
-        username = getArguments().getString("username");
-        nickname = getArguments().getString("nickname");
-        verified = getArguments().getString("verified");
-        profile_pic = getArguments().getString("profile_pic");
-        all_friend_array = getArguments().getString("all_friend_array");
-        last_online = getArguments().getString("last_online");
-        playerreviewsView = playerReviewRootView.findViewById(R.id.recyclerPlayerReviews);
-        mContext = getActivity();
-        playerreviewsView.setHasFixedSize(true);
-        playerreviewsView.setLayoutManager(new LinearLayoutManager(mContext));
-        userID = SharedPrefManager.getInstance(mContext).getUserID();
-        loadReviewsTop();
-        loadReviews();
-        tvratingsandreviews.requestFocus();
-        return playerReviewRootView;
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val playerReviewRootView = inflater.inflate(R.layout.fragment_player_review, null)
+        connectToReview = playerReviewRootView.findViewById(R.id.connectToReview)
+        noReviews = playerReviewRootView.findViewById(R.id.noReviews)
+        tvratingsandreviews = playerReviewRootView.findViewById(R.id.tvratingsandreviews)
+        profileOnlineIcon = playerReviewRootView.findViewById(R.id.profileOnlineIcon)
+        verifiedIcon = playerReviewRootView.findViewById(R.id.verifiedIcon)
+        usernameReviewed = playerReviewRootView.findViewById(R.id.usernameReviewed)
+        nicknameReviewed = playerReviewRootView.findViewById(R.id.nicknameReviewed)
+        profileImageReviewed = playerReviewRootView.findViewById(R.id.profileImageReviewed)
+        playerReviewProgress = playerReviewRootView.findViewById(R.id.player_review_progress)
+        playerReviewRecyclerLayout = playerReviewRootView.findViewById(R.id.player_review_recycler_layout)
+        playerReviewCenter = playerReviewRootView.findViewById(R.id.player_review_center)
+        tvTotalReviews = playerReviewRootView.findViewById(R.id.tvTotalReviews)
+        numReviews = playerReviewRootView.findViewById(R.id.numReviews)
+        reviewButton = playerReviewRootView.findViewById(R.id.reviewButton)
+        tvInteger = playerReviewRootView.findViewById(R.id.tvInteger)
+        reviews5 = playerReviewRootView.findViewById(R.id.reviews5)
+        reviews4 = playerReviewRootView.findViewById(R.id.reviews4)
+        reviews3 = playerReviewRootView.findViewById(R.id.reviews3)
+        reviews2 = playerReviewRootView.findViewById(R.id.reviews2)
+        reviews1 = playerReviewRootView.findViewById(R.id.reviews1)
+        reviewStarRating = playerReviewRootView.findViewById(R.id.reviewStarRating)
+        playerreviewRecyclerList = ArrayList()
+        username = requireArguments().getString("username")
+        nickname = requireArguments().getString("nickname")
+        verified = requireArguments().getString("verified")
+        profilePic = requireArguments().getString("profile_pic")
+        allFriendArray = requireArguments().getString("all_friend_array")
+        lastOnline = requireArguments().getString("last_online")
+        playerreviewsView = playerReviewRootView.findViewById(R.id.recyclerPlayerReviews)
+        mContext = activity
+        playerreviewsView?.setHasFixedSize(true)
+        playerreviewsView?.layoutManager = LinearLayoutManager(mContext)
+        userID = SharedPrefManager.getInstance(mContext!!)!!.userID
+        loadReviewsTop()
+        loadReviews()
+        tvratingsandreviews?.requestFocus()
+        return playerReviewRootView
     }
 
-    private void loadReviewsTop(){
-        if((getArguments())!=null) {
-            userProfileID = getArguments().getString("UserId");
+    private fun loadReviewsTop() {
+        userProfileID = if (arguments != null) {
+            requireArguments().getString("UserId")
         } else {
-            userProfileID = userID;
+            userID
         }
-        if(last_online.equals("yes")){
-            profileOnlineIcon.setVisibility(View.VISIBLE);
+        if (lastOnline == "yes") {
+            profileOnlineIcon!!.visibility = View.VISIBLE
         }
-        if(verified.equals("yes")){
-            verifiedIcon.setVisibility(View.VISIBLE);
+        if (verified == "yes") {
+            verifiedIcon!!.visibility = View.VISIBLE
         }
-        reviewButton.setOnClickListener(v -> {
-            PlayerRatingFragment ldf = new PlayerRatingFragment();
-            Bundle args = new Bundle();
-            args.putString("UserId", userProfileID);
-            args.putString("username", username);
-            args.putString("nickname", nickname);
-            args.putString("verified", verified);
-            args.putString("profile_pic", profile_pic);
-            args.putString("last_online", last_online);
-            ldf.setArguments(args);
-            ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
-        });
-
-        usernameReviewed.setText(String.format("@%s", username));
-        nicknameReviewed.setText(nickname);
-        Glide.with(mContext)
-                .load(Constants.BASE_URL+ profile_pic)
+        reviewButton!!.setOnClickListener {
+            val ldf = PlayerRatingFragment()
+            val args = Bundle()
+            args.putString("UserId", userProfileID)
+            args.putString("username", username)
+            args.putString("nickname", nickname)
+            args.putString("verified", verified)
+            args.putString("profile_pic", profilePic)
+            args.putString("last_online", lastOnline)
+            ldf.arguments = args
+            (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+        }
+        usernameReviewed!!.text = String.format("@%s", username)
+        nicknameReviewed!!.text = nickname
+        Glide.with(mContext!!)
+                .load(Constants.BASE_URL + profilePic)
                 .error(R.mipmap.ic_launcher)
-                .into(profileImageReviewed);
-
-        final StringRequest stringRequest = new StringRequest(Request.Method.GET, Player_Reviewed_TOP_URL+"?userid="+userID+"&userQuery="+username, response -> {
+                .into(profileImageReviewed!!)
+        val stringRequest = StringRequest(Request.Method.GET, "$Player_Reviewed_TOP_URL?userid=$userID&userQuery=$username", { response: String? ->
             try {
-                JSONArray profiletop = new JSONArray(response);
-                JSONObject profiletopObject = profiletop.getJSONObject(0);
-
-                int count = profiletopObject.getInt("count");
-                String average = profiletopObject.getString("average");
-                int fivestarratings = profiletopObject.getInt("fivestarratings");
-                int fourstarratings = profiletopObject.getInt("fourstarratings");
-                int threestarratings = profiletopObject.getInt("threestarratings");
-                int twostarratings = profiletopObject.getInt("twostarratings");
-                int onestarratings = profiletopObject.getInt("onestarratings");
-
-                reviews5.setMax(count);
-                reviews5.setProgress(fivestarratings);
-                reviews4.setMax(count);
-                reviews4.setProgress(fourstarratings);
-                reviews3.setMax(count);
-                reviews3.setProgress(threestarratings);
-                reviews2.setMax(count);
-                reviews2.setProgress(twostarratings);
-                reviews1.setMax(count);
-                reviews1.setProgress(onestarratings);
-
-                reviewStarRating.setRating(Float.parseFloat(average));
-                tvInteger.setText(average);
-                numReviews.setText(String.valueOf(count));
-                if (count == 1){
-                    tvTotalReviews.setText(getString(R.string.review_text));
+                val profiletop = JSONArray(response)
+                val profiletopObject = profiletop.getJSONObject(0)
+                val count = profiletopObject.getInt("count")
+                val average = profiletopObject.getString("average")
+                val fivestarratings = profiletopObject.getInt("fivestarratings")
+                val fourstarratings = profiletopObject.getInt("fourstarratings")
+                val threestarratings = profiletopObject.getInt("threestarratings")
+                val twostarratings = profiletopObject.getInt("twostarratings")
+                val onestarratings = profiletopObject.getInt("onestarratings")
+                reviews5!!.max = count
+                reviews5!!.progress = fivestarratings
+                reviews4!!.max = count
+                reviews4!!.progress = fourstarratings
+                reviews3!!.max = count
+                reviews3!!.progress = threestarratings
+                reviews2!!.max = count
+                reviews2!!.progress = twostarratings
+                reviews1!!.max = count
+                reviews1!!.progress = onestarratings
+                reviewStarRating!!.rating = average.toFloat()
+                tvInteger!!.text = average
+                numReviews!!.text = count.toString()
+                if (count == 1) {
+                    tvTotalReviews!!.text = getString(R.string.review_text)
                 }
-                player_review_progress.setVisibility(View.GONE);
-                player_review_center.setVisibility(View.VISIBLE);
-                player_review_recycler_layout.setVisibility(View.VISIBLE);
-                String[] array = all_friend_array.split(",");
-                if(Arrays.asList(array).contains(SharedPrefManager.getInstance(mContext).getUsername())){
-                    reviewButton.setVisibility(View.VISIBLE);
-                } else if(!userProfileID.equals(userID)) {
-                    connectToReview.setVisibility(View.VISIBLE);
+                playerReviewProgress!!.visibility = View.GONE
+                playerReviewCenter!!.visibility = View.VISIBLE
+                playerReviewRecyclerLayout!!.visibility = View.VISIBLE
+                val array = allFriendArray!!.split(",".toRegex()).toTypedArray()
+                if (listOf(*array).contains(SharedPrefManager.getInstance(mContext!!)!!.username)) {
+                    reviewButton!!.visibility = View.VISIBLE
+                } else if (userProfileID != userID) {
+                    connectToReview!!.visibility = View.VISIBLE
                 }
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
-            catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        }, error -> Toast.makeText(mContext, "Network Error!", Toast.LENGTH_SHORT).show());
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
+        }) { Toast.makeText(mContext, "Network Error!", Toast.LENGTH_SHORT).show() }
+        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
-    private void loadReviews(){
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, Player_Reviewed_URL+"?userid="+userID+"&userQuery="+username, response -> {
+    private fun loadReviews() {
+        val stringRequest = StringRequest(Request.Method.GET, "$Player_Reviewed_URL?userid=$userID&userQuery=$username", { response: String? ->
             try {
-                JSONArray profilenews = new JSONArray(response);
-                for(int i = 0; i<profilenews.length(); i++){
-                    JSONObject profilenewsObject = profilenews.getJSONObject(i);
-
-                    String ratingnumber = profilenewsObject.getString("ratingnumber");
-                    String title = profilenewsObject.getString("title");
-                    String comments = profilenewsObject.getString("comments");
-                    String reply = profilenewsObject.getString("reply");
-                    String time = profilenewsObject.getString("time");
-                    String profile_pic = profilenewsObject.getString("profile_pic");
-                    String nickname = profilenewsObject.getString("nickname");
-                    String user_id = profilenewsObject.getString("userid");
-
-                    PlayerReview_Recycler profilenewsResult = new PlayerReview_Recycler(ratingnumber, title, comments, reply, time, profile_pic, nickname, user_id);
-                    playerreviewRecyclerList.add(profilenewsResult);
+                val profilenews = JSONArray(response)
+                for (i in 0 until profilenews.length()) {
+                    val profilenewsObject = profilenews.getJSONObject(i)
+                    val ratingnumber = profilenewsObject.getString("ratingnumber")
+                    val title = profilenewsObject.getString("title")
+                    val comments = profilenewsObject.getString("comments")
+                    val reply = profilenewsObject.getString("reply")
+                    val time = profilenewsObject.getString("time")
+                    val profilePic1 = profilenewsObject.getString("profile_pic")
+                    val nickname = profilenewsObject.getString("nickname")
+                    val userId = profilenewsObject.getString("userid")
+                    val profilenewsResult = PlayerReviewRecycler(ratingnumber, title, comments, reply, time, profilePic1, nickname, userId)
+                    playerreviewRecyclerList!!.add(profilenewsResult)
                 }
-                if(profilenews.length() == 0){
-                    noReviews.setVisibility(View.VISIBLE);
+                if (profilenews.length() == 0) {
+                    noReviews!!.visibility = View.VISIBLE
                 }
-                reviewAdapter = new PlayerReviewAdapter(mContext, playerreviewRecyclerList);
-                playerreviewsView.setAdapter(reviewAdapter);
-                ViewCompat.setNestedScrollingEnabled(playerreviewsView, false);
-                nicknameReviewed.setFocusable(true);
-                nicknameReviewed.setFocusableInTouchMode(true);
-            } catch (JSONException e) {
-                e.printStackTrace();
+                reviewAdapter = PlayerReviewAdapter(mContext!!, playerreviewRecyclerList!!)
+                playerreviewsView!!.adapter = reviewAdapter
+                ViewCompat.setNestedScrollingEnabled(playerreviewsView!!, false)
+                nicknameReviewed!!.isFocusable = true
+                nicknameReviewed!!.isFocusableInTouchMode = true
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
-        }, error -> Toast.makeText(mContext, "Network Error!", Toast.LENGTH_SHORT).show());
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
+        }) { Toast.makeText(mContext, "Network Error!", Toast.LENGTH_SHORT).show() }
+        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
+    companion object {
+        private const val Player_Reviewed_TOP_URL = Constants.ROOT_URL + "playerreviewsTopGet_api.php"
+        private const val Player_Reviewed_URL = Constants.ROOT_URL + "playerreviewsGet_api.php"
+    }
 }

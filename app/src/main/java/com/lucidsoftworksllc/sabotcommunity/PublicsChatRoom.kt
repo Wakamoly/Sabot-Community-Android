@@ -1,407 +1,358 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.KeyguardManager;
-import android.content.Context;
-import android.os.Bundle;
-import android.os.Handler;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import android.app.Activity
+import android.app.ActivityManager
+import android.app.ActivityManager.RunningAppProcessInfo
+import android.app.KeyguardManager
+import android.content.Context
+import android.os.Bundle
+import android.os.Handler
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import android.widget.*
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.StringRequest
+import com.bumptech.glide.Glide
+import com.lucidsoftworksllc.sabotcommunity.Constants.ROOT_URL
+import com.yarolegovich.lovelydialog.LovelyStandardDialog
+import org.json.JSONException
+import org.json.JSONObject
+import java.util.*
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.bumptech.glide.Glide;
-import com.yarolegovich.lovelydialog.LovelyStandardDialog;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
-import static android.view.View.GONE;
-import static com.lucidsoftworksllc.sabotcommunity.Constants.ROOT_URL;
-
-public class PublicsChatRoom extends Fragment {
-
-    private Context mCtx;
-    private String thisUserID, thisUsername, gameID, gamename, gameimage, thisNickname, thisProfile_pic, last_id, isChatRoomFollowed;
-    private TextView gameName, lastReply;
-    private ImageView sendButton, chatroomGameImage, backMessageButton, userMessageMenu, img_send_disabled, chatroomFollowBtn;
-    private EditText messageEditText;
-    private LinearLayout cannotRespondLayout, chatroomTopLayout;
-    private LinearLayoutManager layoutManager;
-    private ProgressBar chatroomFollowProg;
-    public static final String URL_FETCH_MESSAGES = ROOT_URL + "chatrooms.php/messages";
-    public static final String URL_SEND_MESSAGE = ROOT_URL + "chatrooms.php/send";
-    public static final String URL_NOTI_FOLLOW = ROOT_URL + "chatrooms.php/noti";
-    private static final String URL_USER_INFO = Constants.ROOT_URL + "chatrooms.php/game";
-    private static final String URL_FETCH_MESSAGES_FROM_ID = Constants.ROOT_URL + "chatrooms.php/messagesFromID";
-
-    private ArrayList<ChatroomMessagesHelper> messages;
-    private RecyclerView messagesRecyclerView;
-    private ChatroomMessagesAdapter adapter;
-    private ProgressBar messageProgress, sendProgress;
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View messageRootView = inflater.inflate(R.layout.fragment_chatroom, null);
-
-        messageEditText = messageRootView.findViewById(R.id.et_message);
-        messageProgress = messageRootView.findViewById(R.id.messageProgress);
-        sendButton = messageRootView.findViewById(R.id.img_send);
-        backMessageButton = messageRootView.findViewById(R.id.backMessageButton);
-        sendProgress = messageRootView.findViewById(R.id.sendProgress);
-        cannotRespondLayout = messageRootView.findViewById(R.id.cannotRespondLayout);
-        gameName = messageRootView.findViewById(R.id.gameName);
-        lastReply = messageRootView.findViewById(R.id.lastReply);
-        chatroomGameImage = messageRootView.findViewById(R.id.chatroomGameImage);
-        chatroomTopLayout = messageRootView.findViewById(R.id.chatroomTopLayout);
-        userMessageMenu = messageRootView.findViewById(R.id.userMessageMenu);
-        img_send_disabled = messageRootView.findViewById(R.id.img_send_disabled);
-        chatroomFollowBtn = messageRootView.findViewById(R.id.chatroomFollowBtn);
-        chatroomFollowProg = messageRootView.findViewById(R.id.chatroomFollowProg);
-        mCtx = getActivity();
-        messagesRecyclerView = messageRootView.findViewById(R.id.recycler_chat_list);
-        messagesRecyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(mCtx);
+class PublicsChatRoom : Fragment() {
+    private var mCtx: Context? = null
+    private var thisUserID: String? = null
+    private var thisUsername: String? = null
+    private var gameID: String? = null
+    private val gamename: String? = null
+    private val gameimage: String? = null
+    private var thisNickname: String? = null
+    private var thisprofilePic: String? = null
+    private var lastId: String? = null
+    private var isChatRoomFollowed: String? = null
+    private var gameName: TextView? = null
+    private var lastReply: TextView? = null
+    private var sendButton: ImageView? = null
+    private var chatroomGameImage: ImageView? = null
+    private var backMessageButton: ImageView? = null
+    private var userMessageMenu: ImageView? = null
+    private var imgSendDisabled: ImageView? = null
+    private var chatroomFollowBtn: ImageView? = null
+    private var messageEditText: EditText? = null
+    private var cannotRespondLayout: LinearLayout? = null
+    private var chatroomTopLayout: LinearLayout? = null
+    private var layoutManager: LinearLayoutManager? = null
+    private var chatroomFollowProg: ProgressBar? = null
+    private var messages: ArrayList<ChatroomMessagesHelper>? = null
+    private var messagesRecyclerView: RecyclerView? = null
+    private var adapter: ChatroomMessagesAdapter? = null
+    private var messageProgress: ProgressBar? = null
+    private var sendProgress: ProgressBar? = null
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val messageRootView = inflater.inflate(R.layout.fragment_chatroom, null)
+        messageEditText = messageRootView.findViewById(R.id.et_message)
+        messageProgress = messageRootView.findViewById(R.id.messageProgress)
+        sendButton = messageRootView.findViewById(R.id.img_send)
+        backMessageButton = messageRootView.findViewById(R.id.backMessageButton)
+        sendProgress = messageRootView.findViewById(R.id.sendProgress)
+        cannotRespondLayout = messageRootView.findViewById(R.id.cannotRespondLayout)
+        gameName = messageRootView.findViewById(R.id.gameName)
+        lastReply = messageRootView.findViewById(R.id.lastReply)
+        chatroomGameImage = messageRootView.findViewById(R.id.chatroomGameImage)
+        chatroomTopLayout = messageRootView.findViewById(R.id.chatroomTopLayout)
+        userMessageMenu = messageRootView.findViewById(R.id.userMessageMenu)
+        imgSendDisabled = messageRootView.findViewById(R.id.img_send_disabled)
+        chatroomFollowBtn = messageRootView.findViewById(R.id.chatroomFollowBtn)
+        chatroomFollowProg = messageRootView.findViewById(R.id.chatroomFollowProg)
+        mCtx = activity
+        messagesRecyclerView = messageRootView.findViewById(R.id.recycler_chat_list)
+        messagesRecyclerView?.setHasFixedSize(true)
+        layoutManager = LinearLayoutManager(mCtx)
         //layoutManager.setReverseLayout(true); FIX THIS
         //layoutManager.setStackFromEnd(true);  AND THIS TOO
-        messagesRecyclerView.setLayoutManager(layoutManager);
-
-        //TODO: FIX THESE v
-        assert getArguments() != null;
-        gameID = getArguments().getString("GameId");
-        thisUserID = SharedPrefManager.getInstance(mCtx).getUserID();
-        thisUsername = SharedPrefManager.getInstance(mCtx).getUsername();
-        thisNickname = SharedPrefManager.getInstance(mCtx).getNickname();
-        thisProfile_pic = SharedPrefManager.getInstance(mCtx).getProfilePic();
-        messages = new ArrayList<>();
-        backMessageButton.setOnClickListener(v -> requireActivity().getSupportFragmentManager().popBackStackImmediate());
-        loadGameInfo();
-        getMessages();
-        return messageRootView;
+        messagesRecyclerView?.layoutManager = layoutManager
+        gameID = requireArguments().getString("GameId")
+        thisUserID = SharedPrefManager.getInstance(mCtx!!)!!.userID
+        thisUsername = SharedPrefManager.getInstance(mCtx!!)!!.username
+        thisNickname = SharedPrefManager.getInstance(mCtx!!)!!.nickname
+        thisprofilePic = SharedPrefManager.getInstance(mCtx!!)!!.profilePic
+        messages = ArrayList()
+        backMessageButton?.setOnClickListener { requireActivity().supportFragmentManager.popBackStackImmediate() }
+        loadGameInfo()
+        getMessages()
+        return messageRootView
     }
 
-    public void getMessages() {
-        Thread messagesIDThread = new Thread(){//create thread
-            @Override
-            public void run() {
-                StringRequest stringRequest = new StringRequest(Request.Method.GET, URL_FETCH_MESSAGES+"?this_user="+thisUsername+"&gameid="+gameID+"&userid="+thisUserID,
-                        response -> {
+    private fun getMessages() {
+        val messagesIDThread: Thread = object : Thread() {
+            //create thread
+            override fun run() {
+                val stringRequest = StringRequest(Request.Method.GET, "$URL_FETCH_MESSAGES?this_user=$thisUsername&gameid=$gameID&userid=$thisUserID",
+                        { response: String? ->
                             try {
-                                JSONObject res = new JSONObject(response);
-                                String isUserFollow = res.getString("isUserFollow");
-                                if (isUserFollow.equals("no")){
-                                    isChatRoomFollowed = "no";
-                                }else{
-                                    isChatRoomFollowed = "yes";
+                                val res = JSONObject(response!!)
+                                val isUserFollow = res.getString("isUserFollow")
+                                isChatRoomFollowed = if (isUserFollow == "no") {
+                                    "no"
+                                } else {
+                                    "yes"
                                 }
-                                chatroomFollowBtn.setOnClickListener(v -> promptNoti());
-                                JSONArray thread = res.getJSONArray("messages");
-                                for (int i = 0; i < thread.length(); i++) {
-                                    JSONObject obj = thread.getJSONObject(i);
-                                    String id = obj.getString("id");
-                                    String message = obj.getString("message");
-                                    String username = obj.getString("username");
-                                    String time_message = obj.getString("time_message");
-                                    String nickname = obj.getString("nickname");
-                                    String profile_pic = obj.getString("profile_pic");
-                                    String last_online = obj.getString("last_online");
-                                    String user_level = obj.getString("user_level");
-                                    String verified = obj.getString("verified");
-                                    String userid = obj.getString("userid");
-                                    ChatroomMessagesHelper messageObject = new ChatroomMessagesHelper(id,message,username,time_message,nickname,profile_pic,last_online,user_level,verified, userid);
-                                    messages.add(messageObject);
-                                    last_id = id;
+                                chatroomFollowBtn!!.setOnClickListener { promptNoti() }
+                                val thread = res.getJSONArray("messages")
+                                for (i in 0 until thread.length()) {
+                                    val obj = thread.getJSONObject(i)
+                                    val id = obj.getString("id")
+                                    val message = obj.getString("message")
+                                    val username = obj.getString("username")
+                                    val timeMessage = obj.getString("time_message")
+                                    val nickname = obj.getString("nickname")
+                                    val profilePic = obj.getString("profile_pic")
+                                    val lastOnline = obj.getString("last_online")
+                                    val userLevel = obj.getString("user_level")
+                                    val verified = obj.getString("verified")
+                                    val userid = obj.getString("userid")
+                                    val messageObject = ChatroomMessagesHelper(id, message, username, timeMessage, nickname, profilePic, lastOnline, userLevel, verified, userid)
+                                    messages!!.add(messageObject)
+                                    lastId = id
                                 }
-                                newChats();
-                                messageProgress.setVisibility(View.GONE);
-                                messagesRecyclerView.setVisibility(View.VISIBLE);
-                                adapter = new ChatroomMessagesAdapter(mCtx, messages, thisUsername);
-                                messagesRecyclerView.setAdapter(adapter);
-                                scrollToBottomNow();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+                                newChats()
+                                messageProgress!!.visibility = View.GONE
+                                messagesRecyclerView!!.visibility = View.VISIBLE
+                                adapter = ChatroomMessagesAdapter(mCtx!!, messages!!, thisUsername!!)
+                                messagesRecyclerView!!.adapter = adapter
+                                scrollToBottomNow()
+                            } catch (e: JSONException) {
+                                e.printStackTrace()
                             }
-                        },
-                        error -> {
-                        });
-                ((FragmentContainer)mCtx).addToRequestQueue(stringRequest);
+                        }
+                ) { }
+                (mCtx as FragmentContainer?)!!.addToRequestQueue(stringRequest)
             }
-        };
-        messagesIDThread.start(); // start thread
+        }
+        messagesIDThread.start() // start thread
     }
 
-    private void promptNoti(){
-        if (isChatRoomFollowed.equals("yes")){
-            new LovelyStandardDialog(mCtx, LovelyStandardDialog.ButtonLayout.VERTICAL)
+    private fun promptNoti() {
+        if (isChatRoomFollowed == "yes") {
+            LovelyStandardDialog(mCtx, LovelyStandardDialog.ButtonLayout.VERTICAL)
                     .setTopColorRes(R.color.green)
                     .setButtonsColorRes(R.color.green)
                     .setIcon(R.drawable.notify_reply)
-                    .setTitle("Remove chatroom push notifications for "+gamename+"?")
-                    .setPositiveButton(R.string.yes, v -> {
-                        chatroomFollowProg.setVisibility(View.VISIBLE);
-                        userChatroomNoti("unfollow");
-                    })
+                    .setTitle("Remove chatroom push notifications for $gamename?")
+                    .setPositiveButton(R.string.yes) {
+                        chatroomFollowProg!!.visibility = View.VISIBLE
+                        userChatroomNoti("unfollow")
+                    }
                     .setNegativeButton(R.string.no, null)
-                    .show();
-        }else if (isChatRoomFollowed.equals("no")){
-            new LovelyStandardDialog(mCtx, LovelyStandardDialog.ButtonLayout.VERTICAL)
+                    .show()
+        } else if (isChatRoomFollowed == "no") {
+            LovelyStandardDialog(mCtx, LovelyStandardDialog.ButtonLayout.VERTICAL)
                     .setTopColorRes(R.color.green)
                     .setButtonsColorRes(R.color.green)
                     .setIcon(R.drawable.notify_reply)
-                    .setTitle("Receive chatroom push notifications for "+gamename+"?")
+                    .setTitle("Receive chatroom push notifications for $gamename?")
                     .setMessage("Warning: it may get annoying once this feature becomes more popular!")
-                    .setPositiveButton(R.string.yes, v -> {
-                        chatroomFollowProg.setVisibility(View.VISIBLE);
-                        userChatroomNoti("follow");
-                    })
+                    .setPositiveButton(R.string.yes) {
+                        chatroomFollowProg!!.visibility = View.VISIBLE
+                        userChatroomNoti("follow")
+                    }
                     .setNegativeButton(R.string.no, null)
-                    .show();
+                    .show()
         }
     }
 
-    public void getMessagesFromID() {
-        Thread messagesIDThread = new Thread(){//create thread
-            @Override
-            public void run() {
-                StringRequest stringRequest = new StringRequest(Request.Method.GET, URL_FETCH_MESSAGES_FROM_ID+"?this_user="+thisUsername+"&gameid="+gameID+"&userid="+thisUserID+"&start_id="+last_id,
-                        response -> {
-                            try {
-                                JSONObject res = new JSONObject(response);
-                                JSONArray thread = res.getJSONArray("messages");
-                                for (int i = 0; i < thread.length(); i++) {
-                                    JSONObject obj = thread.getJSONObject(i);
-                                    String id = obj.getString("id");
-                                    String message = obj.getString("message");
-                                    String username = obj.getString("username");
-                                    String time_message = obj.getString("time_message");
-                                    String nickname = obj.getString("nickname");
-                                    String profile_pic = obj.getString("profile_pic");
-                                    String last_online = obj.getString("last_online");
-                                    String user_level = obj.getString("user_level");
-                                    String verified = obj.getString("verified");
-                                    String userid = obj.getString("userid");
-                                    processMessage(id,message,username,time_message,nickname,profile_pic,last_online,user_level,verified, userid);
-                                    last_id = id;
-                                    lastReply.setText(time_message);
+    //create thread
+    // start thread
+    private val messagesFromID: Unit
+        get() {
+            val messagesIDThread: Thread = object : Thread() {
+                //create thread
+                override fun run() {
+                    val stringRequest = StringRequest(Request.Method.GET, "$URL_FETCH_MESSAGES_FROM_ID?this_user=$thisUsername&gameid=$gameID&userid=$thisUserID&start_id=$lastId",
+                            { response: String? ->
+                                try {
+                                    val res = JSONObject(response!!)
+                                    val thread = res.getJSONArray("messages")
+                                    for (i in 0 until thread.length()) {
+                                        val obj = thread.getJSONObject(i)
+                                        val id = obj.getString("id")
+                                        val message = obj.getString("message")
+                                        val username = obj.getString("username")
+                                        val timeMessage = obj.getString("time_message")
+                                        val nickname = obj.getString("nickname")
+                                        val profilePic = obj.getString("profile_pic")
+                                        val lastOnline = obj.getString("last_online")
+                                        val userLevel = obj.getString("user_level")
+                                        val verified = obj.getString("verified")
+                                        val userid = obj.getString("userid")
+                                        processMessage(id, message, username, timeMessage, nickname, profilePic, lastOnline, userLevel, verified, userid)
+                                        lastId = id
+                                        lastReply!!.text = timeMessage
+                                    }
+                                    newChats()
+                                } catch (e: JSONException) {
+                                    e.printStackTrace()
                                 }
-                                newChats();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
                             }
-                        },
-                        error -> {
-                        });
-                ((FragmentContainer)mCtx).addToRequestQueue(stringRequest);
+                    ) { }
+                    (mCtx as FragmentContainer?)!!.addToRequestQueue(stringRequest)
+                }
             }
-        };
-        messagesIDThread.start(); // start thread
+            messagesIDThread.start() // start thread
+        }
+
+    private fun processMessage(id: String, message: String, username: String, time_message: String, nickname: String, profile_pic: String, last_online: String, user_level: String, verified: String, userid: String) {
+        val m = ChatroomMessagesHelper(id, message, username, time_message, nickname, profile_pic, last_online, user_level, verified, userid)
+        messages!!.add(m)
+        scrollToBottom()
     }
 
-    private void processMessage(String id, String message, String username, String time_message, String nickname, String profile_pic, String last_online, String user_level, String verified, String userid) {
-        ChatroomMessagesHelper m = new ChatroomMessagesHelper(id, message, username, time_message, nickname, profile_pic, last_online, user_level, verified, userid);
-        messages.add(m);
-        scrollToBottom();
-    }
-
-    private void sendMessage(final String gameID, final String message) {
-        sendButton.setVisibility(GONE);
-        sendProgress.setVisibility(View.VISIBLE);
-        if (message.equalsIgnoreCase(""))
-            return;
-        messageEditText.setText("");
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_SEND_MESSAGE,
-                response -> {
+    private fun sendMessage(gameID: String?, message: String) {
+        sendButton!!.visibility = View.GONE
+        sendProgress!!.visibility = View.VISIBLE
+        if (message.equals("", ignoreCase = true)) return
+        messageEditText!!.setText("")
+        val stringRequest: StringRequest = object : StringRequest(Method.POST, URL_SEND_MESSAGE,
+                Response.Listener { response: String? ->
                     try {
-                        JSONObject jsonObject = new JSONObject(response);
-                        if (jsonObject.getString("error").equals("false")) {
-                            ChatroomMessagesHelper m = new ChatroomMessagesHelper(null, message, thisUsername, "Just now", thisNickname, thisProfile_pic, "yes", "0", "no", thisUserID);
-                            messages.add(m);
-                            adapter.notifyDataSetChanged();
-                            scrollToBottom();
+                        val jsonObject = JSONObject(response!!)
+                        if (jsonObject.getString("error") == "false") {
+                            val m = ChatroomMessagesHelper(null.toString(), message, thisUsername!!, "Just now", thisNickname!!, thisprofilePic!!, "yes", "0", "no", thisUserID!!)
+                            messages!!.add(m)
+                            adapter!!.notifyDataSetChanged()
+                            scrollToBottom()
                         } else {
-                            Toast.makeText(mCtx, jsonObject.getString("message"), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mCtx, jsonObject.getString("message"), Toast.LENGTH_SHORT).show()
                         }
-                        sendButton.setVisibility(View.VISIBLE);
-                        sendProgress.setVisibility(GONE);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                        sendButton!!.visibility = View.VISIBLE
+                        sendProgress!!.visibility = View.GONE
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
                     }
                 },
-                error -> {}) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("gameid", gameID);
-                params.put("message", message);
-                params.put("user_from", thisUsername);
-                return params;
+                Response.ErrorListener { }) {
+            override fun getParams(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["gameid"] = gameID!!
+                params["message"] = message
+                params["user_from"] = thisUsername!!
+                return params
             }
-        };
-        ((FragmentContainer)mCtx).addToRequestQueue(stringRequest);
+        }
+        (mCtx as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
-    private void loadGameInfo() {
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL_USER_INFO + "?gameid=" + gameID + "&deviceuser=" + thisUsername + "&deviceuserid=" + thisUserID, response -> {
+    private fun loadGameInfo() {
+        val stringRequest = StringRequest(Request.Method.GET, "$URL_USER_INFO?gameid=$gameID&deviceuser=$thisUsername&deviceuserid=$thisUserID", { response: String? ->
             try {
-                JSONObject res = new JSONObject(response);
-                JSONArray thread = res.getJSONArray("messages");
-                JSONObject messageObject = thread.getJSONObject(0);
-
-                String last_reply_text = messageObject.getString("last_reply_text");
-                String gamename = messageObject.getString("gamename");
-                String cat_image = messageObject.getString("image");
-                gameName.setText(gamename);
-                Glide.with(mCtx)
-                        .load(Constants.BASE_URL + cat_image)
-                        .into(chatroomGameImage);
-                lastReply.setText(last_reply_text);
-                sendButton.setOnClickListener(view -> {
-                    String body = messageEditText.getText().toString().trim();
-                    if (!(messageEditText.getText().toString()).isEmpty()) {
-                        sendMessage(gameID, body);
-                        hideKeyboardFrom(mCtx, view);
+                val res = JSONObject(response!!)
+                val thread = res.getJSONArray("messages")
+                val messageObject = thread.getJSONObject(0)
+                val lastReplyText = messageObject.getString("last_reply_text")
+                val gamename = messageObject.getString("gamename")
+                val catImage = messageObject.getString("image")
+                gameName!!.text = gamename
+                Glide.with(mCtx!!)
+                        .load(Constants.BASE_URL + catImage)
+                        .into(chatroomGameImage!!)
+                lastReply!!.text = lastReplyText
+                sendButton!!.setOnClickListener { view: View ->
+                    val body = messageEditText!!.text.toString().trim { it <= ' ' }
+                    if (messageEditText!!.text.toString().isNotEmpty()) {
+                        sendMessage(gameID, body)
+                        hideKeyboardFrom(mCtx, view)
                     } else {
-                        Toast.makeText(mCtx, "You must enter text before submitting!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(mCtx, "You must enter text before submitting!", Toast.LENGTH_LONG).show()
                     }
-                });
-                userMessageMenu.setOnClickListener(view -> {
-                    //TODO: Set up menu
-                    /*PopupMenu popup = new PopupMenu(mCtx, view);
-                    MenuInflater inflater = popup.getMenuInflater();
-                    inflater.inflate(R.menu.message_top_menu, popup.getMenu());
-
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item) {
-                            if (item.getItemId() == R.id.menuPlayerReport) {
-                                ReportFragment ldf = new ReportFragment();
-                                Bundle args = new Bundle();
-                                args.putString("context", "message");
-                                args.putString("type", "user");
-                                args.putString("id", user_to_id);
-                                ldf.setArguments(args);
-                                //Inflate the fragment
-                                ((FragmentActivity) mCtx).getSupportFragmentManager().beginTransaction().replace(R.id.chat_fragment_container, ldf).addToBackStack(null).commit();
-                            }
-                            if (item.getItemId() == R.id.menuPlayerBlock) {
-                                SharedPrefManager.getInstance(mCtx).block_user(user_to);
-                                Fragment currentFragment = getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-                                if (currentFragment instanceof MessageFragment) {
-                                    FragmentTransaction fragTransaction = (getActivity()).getSupportFragmentManager().beginTransaction();
-                                    fragTransaction.detach(currentFragment);
-                                    fragTransaction.attach(currentFragment);
-                                    fragTransaction.commit();
-                                }
-                            }
-                            return true;
-                        }
-                    });
-                    popup.show();*/
-                });
-                    /*
+                }
+                userMessageMenu!!.setOnClickListener { }
+                /*
                     if user is banned from chat
                     cannotRespondLayout.setVisibility(View.VISIBLE);
                     userMessageMenu.setVisibility(GONE);*/
-
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
-        }, error -> {});
-        ((FragmentContainer)mCtx).addToRequestQueue(stringRequest);
+        }) { }
+        (mCtx as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
-    private void userChatroomNoti(String method){
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_NOTI_FOLLOW,
-                response -> {
+    private fun userChatroomNoti(method: String) {
+        val stringRequest: StringRequest = object : StringRequest(Method.POST, URL_NOTI_FOLLOW,
+                Response.Listener { response: String? ->
                     try {
-                        JSONObject jsonObject = new JSONObject(response);
-                        Toast.makeText(mCtx, jsonObject.getString("message"), Toast.LENGTH_SHORT).show();
-                        chatroomFollowProg.setVisibility(GONE);
-                        if (method.equals("follow")){
-                            isChatRoomFollowed="yes";
-                        }else if (method.equals("unfollow")){
-                            isChatRoomFollowed="no";
+                        val jsonObject = JSONObject(response!!)
+                        Toast.makeText(mCtx, jsonObject.getString("message"), Toast.LENGTH_SHORT).show()
+                        chatroomFollowProg!!.visibility = View.GONE
+                        if (method == "follow") {
+                            isChatRoomFollowed = "yes"
+                        } else if (method == "unfollow") {
+                            isChatRoomFollowed = "no"
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
                     }
                 },
-                error -> {}) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("gameid", gameID);
-                params.put("gamename", gamename);
-                params.put("method", method);
-                params.put("username", thisUsername);
-                params.put("userid", thisUserID);
-                return params;
+                Response.ErrorListener { }) {
+            override fun getParams(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["gameid"] = gameID!!
+                params["gamename"] = gamename!!
+                params["method"] = method
+                params["username"] = thisUsername!!
+                params["userid"] = thisUserID!!
+                return params
             }
-        };
-        ((FragmentContainer)mCtx).addToRequestQueue(stringRequest);
+        }
+        (mCtx as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
-    public void scrollToBottom() {
-        adapter.notifyDataSetChanged();
-        if (adapter.getItemCount() > 1)
-            Objects.requireNonNull(messagesRecyclerView.getLayoutManager()).smoothScrollToPosition(messagesRecyclerView, null, adapter.getItemCount() - 1);
+    fun scrollToBottom() {
+        adapter!!.notifyDataSetChanged()
+        if (adapter!!.itemCount > 1) Objects.requireNonNull(messagesRecyclerView!!.layoutManager!!).smoothScrollToPosition(messagesRecyclerView, null, adapter!!.itemCount - 1)
     }
 
-    private void scrollToBottomNow() {
-        adapter.notifyDataSetChanged();
-        if (adapter.getItemCount() > 1)
-            Objects.requireNonNull(messagesRecyclerView.getLayoutManager()).scrollToPosition(adapter.getItemCount() - 1);
+    private fun scrollToBottomNow() {
+        adapter!!.notifyDataSetChanged()
+        if (adapter!!.itemCount > 1) Objects.requireNonNull(messagesRecyclerView!!.layoutManager!!).scrollToPosition(adapter!!.itemCount - 1)
     }
 
-    public static void hideKeyboardFrom(Context context, View view) {
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-
-    public void newChats(){
-        if (!shouldGetNotification(mCtx)){
-            Handler chatHandler=new Handler();
-            Runnable runnableCode = this::getMessagesFromID;
-            chatHandler.postDelayed(runnableCode, 5000);
-        }else{
-            Handler chatHandler=new Handler();
-            Runnable runnableCode = this::newChats;
-            chatHandler.postDelayed(runnableCode, 10000);
+    fun newChats() {
+        if (!shouldGetNotification(mCtx)) {
+            val chatHandler = Handler()
+            val runnableCode = Runnable { messagesFromID }
+            chatHandler.postDelayed(runnableCode, 5000)
+        } else {
+            val chatHandler = Handler()
+            val runnableCode = Runnable { newChats() }
+            chatHandler.postDelayed(runnableCode, 10000)
         }
     }
 
-    static boolean shouldGetNotification(Context context) {
-        ActivityManager.RunningAppProcessInfo myProcess = new ActivityManager.RunningAppProcessInfo();
-        ActivityManager.getMyMemoryState(myProcess);
-        if (myProcess.importance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND)
-            return true;
-        KeyguardManager km = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
-        return km.inKeyguardRestrictedInputMode();
-    }
+    companion object {
+        const val URL_FETCH_MESSAGES: String = ROOT_URL + "chatrooms.php/messages"
+        const val URL_SEND_MESSAGE: String = ROOT_URL + "chatrooms.php/send"
+        const val URL_NOTI_FOLLOW: String = ROOT_URL + "chatrooms.php/noti"
+        private const val URL_USER_INFO = ROOT_URL + "chatrooms.php/game"
+        private const val URL_FETCH_MESSAGES_FROM_ID = ROOT_URL + "chatrooms.php/messagesFromID"
+        fun hideKeyboardFrom(context: Context?, view: View) {
+            val imm = context!!.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(view.windowToken, 0)
+        }
 
+        fun shouldGetNotification(context: Context?): Boolean {
+            val myProcess = RunningAppProcessInfo()
+            ActivityManager.getMyMemoryState(myProcess)
+            if (myProcess.importance != RunningAppProcessInfo.IMPORTANCE_FOREGROUND) return true
+            val km = context!!.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+            return km.inKeyguardRestrictedInputMode()
+        }
+    }
 }

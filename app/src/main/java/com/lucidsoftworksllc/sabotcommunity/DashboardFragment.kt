@@ -18,12 +18,10 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import com.android.volley.Request
 import com.android.volley.Response
-import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.StringRequest
 import com.google.android.material.tabs.TabLayout
@@ -77,17 +75,18 @@ class DashboardFragment : Fragment() {
 
     //private AdView adView;
     private var clicked: String? = null
-    private var dashboardfeedRecyclerList: MutableList<Profilenews_Recycler>? = null
+    private var dashboardfeedRecyclerList: MutableList<ProfilenewsRecycler>? = null
     private var dashboardfeedadapter: ProfilenewsAdapter? = null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val dashboardRootView = inflater.inflate(R.layout.fragment_dashboard, null)
+        mContext = activity
         dashProgressBar = dashboardRootView.findViewById(R.id.dashProgressBar)
         sliderboi = dashboardRootView.findViewById(R.id.sliderboi)
         relLayoutDash2 = dashboardRootView.findViewById(R.id.relLayoutDash2)
         followingPostsButton = dashboardRootView.findViewById(R.id.followingPostsButton)
         allPostsButton = dashboardRootView.findViewById(R.id.allPostsButton)
-        userID = SharedPrefManager.getInstance(mContext).userID
-        username = SharedPrefManager.getInstance(mContext).username
+        userID = SharedPrefManager.getInstance(mContext!!)!!.userID
+        username = SharedPrefManager.getInstance(mContext!!)!!.username
         val dashboardfeedView: RecyclerView = dashboardRootView.findViewById(R.id.dashboardfeedView)
         dashboardRefreshLayout = dashboardRootView.findViewById(R.id.dashSwipe)
         dashboardMenu = dashboardRootView.findViewById(R.id.dashboardMenu)
@@ -108,12 +107,11 @@ class DashboardFragment : Fragment() {
         newsTextView2 = dashboardRootView.findViewById(R.id.newsTextView2)
         dashScroll = dashboardRootView.findViewById(R.id.dashScroll)
         //adView = dashboardRootView.findViewById(R.id.adView);
-        mContext = activity
         dashboardfeedRecyclerList = ArrayList()
         //dashboardfeedView.setHasFixedSize(true);
         dashboardfeedView.layoutManager = LinearLayoutManager(mContext)
         ViewCompat.setNestedScrollingEnabled(dashboardfeedView, false)
-        dashboardfeedadapter = ProfilenewsAdapter(mContext, dashboardfeedRecyclerList)
+        dashboardfeedadapter = ProfilenewsAdapter(mContext!!, dashboardfeedRecyclerList)
         dashboardfeedView.adapter = dashboardfeedadapter
         dashScroll?.viewTreeObserver?.addOnScrollChangedListener {
             if (dashScroll?.getChildAt(0)?.bottom!! <= dashScroll?.height!! + dashScroll?.scrollY!!) {
@@ -137,7 +135,7 @@ class DashboardFragment : Fragment() {
         dashboardToMessages?.setOnClickListener { startActivity(Intent(mContext, ChatActivity::class.java)) }
         followingPostsButton?.setOnClickListener { postsQueryButtonClicked(followingPostsButton) }
         allPostsButton?.setOnClickListener { postsQueryButtonClicked(allPostsButton) }
-        filter = SharedPrefManager.getInstance(mContext).currentPublics
+        filter = SharedPrefManager.getInstance(mContext!!)!!.currentPublics
         usersOnline()
         sendRequest()
         postsQueryButtonClicked(followingPostsButton)
@@ -153,13 +151,13 @@ class DashboardFragment : Fragment() {
             dashboardRefreshLayout?.isRefreshing = false
             sliderboi?.requestFocus()
         }
-        viewPagerAdapter = DashViewPagerAdapter(sliderImg, mContext)
+        viewPagerAdapter = DashViewPagerAdapter(sliderImg!!, mContext!!)
         viewPager?.adapter = viewPagerAdapter
         viewPager?.addOnPageChangeListener(object : OnPageChangeListener {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
             override fun onPageSelected(position: Int) {
                 val adID = sliderImg!![position]!!.sliderAdID
-                adViewed(adID)
+                adViewed(adID!!)
             }
 
             override fun onPageScrollStateChanged(state: Int) {
@@ -180,9 +178,9 @@ class DashboardFragment : Fragment() {
                     .setTopColorRes(R.color.colorPrimary)
                     .setTitle(R.string.platform_filter)
                     .setIcon(drawable.icons8_workstation_48)
-                    .setMessage(resources.getString(R.string.selected_platform) + " " + SharedPrefManager.getInstance(mContext).currentPublics)
+                    .setMessage(resources.getString(R.string.selected_platform) + " " + SharedPrefManager.getInstance(mContext!!)!!.currentPublics)
                     .setItems(items) { _: Int, item: String? ->
-                        SharedPrefManager.getInstance(mContext).currentPublics = item
+                        SharedPrefManager.getInstance(mContext!!)!!.currentPublics = item
                         setPlatformImage(item)
                         filter = item
                         currentPublicsProgress?.visibility = View.VISIBLE
@@ -217,8 +215,8 @@ class DashboardFragment : Fragment() {
                     val parms: MutableMap<String, String> = HashMap()
                     parms["id"] = adID
                     parms["method"] = "view"
-                    parms["user_id"] = SharedPrefManager.getInstance(mContext).userID
-                    parms["username"] = SharedPrefManager.getInstance(mContext).username
+                    parms["user_id"] = SharedPrefManager.getInstance(mContext!!)!!.userID!!
+                    parms["username"] = SharedPrefManager.getInstance(mContext!!)!!.username!!
                     return parms
                 }
             }
@@ -325,7 +323,7 @@ class DashboardFragment : Fragment() {
                                 }
                                 currentPublicsList!!.add(currentPublics)
                             }
-                            val currentPublicsAdapter = DashCurrentPublicsAdapter(currentPublicsList, mContext)
+                            val currentPublicsAdapter = DashCurrentPublicsAdapter(currentPublicsList!!, mContext!!)
                             currentPublicsVP!!.adapter = currentPublicsAdapter
                             currentPublicsProgress!!.visibility = View.GONE
                             noCurrentPublics!!.visibility = View.GONE
@@ -335,7 +333,7 @@ class DashboardFragment : Fragment() {
                             }
                         }
                     }) { }
-                    DashSliderRequest.getInstance(mContext).addToRequestQueue(jsonArrayRequest)
+                    DashSliderRequest.getInstance(mContext!!)?.addToRequestQueue(jsonArrayRequest)
                 }
             }
             getCurrentPublicsThread.start() // start thread
@@ -361,12 +359,12 @@ class DashboardFragment : Fragment() {
                             e.printStackTrace()
                         }
                         sliderImg!!.add(sliderUtils)
-                        adViewed(sliderImg!![0]!!.sliderAdID)
+                        adViewed(sliderImg!![0]!!.sliderAdID!!)
                         viewPagerAdapter!!.notifyDataSetChanged()
                     }
                     currentPublics
                 }) { }
-                DashSliderRequest.getInstance(mContext).addToRequestQueue(jsonArrayRequest)
+                DashSliderRequest.getInstance(mContext!!)!!.addToRequestQueue(jsonArrayRequest)
             }
         }
         sendRequestThread.start()
@@ -376,14 +374,14 @@ class DashboardFragment : Fragment() {
         val loadDashboardFeedThread: Thread = object : Thread() {
             //create thread
             override fun run() {
-                val items = ArrayList<Profilenews_Recycler>()
+                val items = ArrayList<ProfilenewsRecycler>()
                 val stringRequest: StringRequest = object : StringRequest(Method.POST, DashboardFeed_URL, Response.Listener { response: String? ->
                     try {
                         val dashboardfeed = JSONArray(response)
                         for (i in 0 until dashboardfeed.length()) {
                             val dashboardfeedObject = dashboardfeed.getJSONObject(i)
                             val addedBy = dashboardfeedObject.getString("added_by")
-                            if (SharedPrefManager.getInstance(mContext).isUserBlocked(addedBy)) continue
+                            if (SharedPrefManager.getInstance(mContext!!)!!.isUserBlocked(addedBy)) continue
                             val id = dashboardfeedObject.getInt("id")
                             val type = dashboardfeedObject.getString("type")
                             val likes = dashboardfeedObject.getString("likes")
@@ -403,7 +401,7 @@ class DashboardFragment : Fragment() {
                             val likedbyuserYes = dashboardfeedObject.getString("likedbyuseryes")
                             val form = dashboardfeedObject.getString("form")
                             val edited = dashboardfeedObject.getString("edited")
-                            val dashboardfeedResult = Profilenews_Recycler(id, type, likes, body, addedBy, userTo, dateAdded, userClosed, deleted, image, userId, profilePic, verified, online, nickname, username, commentcount, likedbyuserYes, form, edited)
+                            val dashboardfeedResult = ProfilenewsRecycler(id, type, likes, body, addedBy, userTo, dateAdded, userClosed, deleted, image, userId, profilePic, verified, online, nickname, username, commentcount, likedbyuserYes, form, edited)
                             items.add(dashboardfeedResult)
                         }
                         if (dashboardfeed.length() == 0) {

@@ -1,16 +1,13 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import java.util.List;
+import retrofit2.Call
+import retrofit2.http.GET
+import retrofit2.http.Query
 
-import retrofit2.Call;
-import retrofit2.http.GET;
-import retrofit2.http.Query;
-
-public interface UserApiInterface {
-
+interface UserApiInterface {
     @GET("getUsers_api.php")
-    Call<List<User>> getUsers(
-            @Query("item_type") String item_type,
-            @Query("key") String keyword
-    );
+    fun getUsers(
+            @Query("item_type") item_type: String?,
+            @Query("key") keyword: String?
+    ): Call<List<User?>?>?
 }

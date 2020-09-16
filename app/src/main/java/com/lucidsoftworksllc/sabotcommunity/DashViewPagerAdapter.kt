@@ -13,13 +13,12 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.android.volley.Response
-import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.Target
 import java.util.*
 
-class DashViewPagerAdapter(private val sliderImg: List<SliderUtilsDash>, private val context: Context) : PagerAdapter() {
+class DashViewPagerAdapter(private val sliderImg: ArrayList<SliderUtilsDash?>, private val context: Context) : PagerAdapter() {
     private var layoutInflater: LayoutInflater? = null
     override fun getCount(): Int {
         return sliderImg.size
@@ -36,7 +35,7 @@ class DashViewPagerAdapter(private val sliderImg: List<SliderUtilsDash>, private
         val imageView = view.findViewById<ImageView>(R.id.sliderImageView)
         val textViewTitle = view.findViewById<TextView>(R.id.textViewSliderTitle)
         val textViewDescription = view.findViewById<TextView>(R.id.textViewSliderDesc)
-        val finalBackImage = utils.sliderImageUrl
+        val finalBackImage = utils?.sliderImageUrl
         /*if (utils.getSliderImageUrl().contains(".jpg")){
             finalBackImage = finalBackImage.substring(0, utils.getSliderImageUrl().length() - 4)+"_r.jpg";
         }else if (utils.getSliderImageUrl().contains(".png")){
@@ -49,14 +48,14 @@ class DashViewPagerAdapter(private val sliderImg: List<SliderUtilsDash>, private
                 .override(Target.SIZE_ORIGINAL)
                 .into(imageView)
         view.setOnClickListener {
-            if (utils.sliderType == "public") {
+            if (utils?.sliderType == "public") {
                 val ldf = FragmentPublicsCat()
                 val args = Bundle()
                 args.putString("PublicsId", utils.sliderID)
                 ldf.arguments = args
                 (context as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
             }
-            if (utils.sliderType == "fragment") {
+            if (utils?.sliderType == "fragment") {
                 if (utils.sliderTag == "merch") {
                     val ldf = MerchFragment()
                     val args = Bundle()
@@ -64,10 +63,10 @@ class DashViewPagerAdapter(private val sliderImg: List<SliderUtilsDash>, private
                     (context as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
             }
-            if (utils.sliderType == "url") {
+            if (utils?.sliderType == "url") {
                 (context as? FragmentContainer)?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(utils.sliderTag)))
             }
-            utils.sliderAdID?.let { it1 -> newAdClick(it1) }
+            utils?.sliderAdID?.let { it1 -> newAdClick(it1) }
         }
         val vp = container as ViewPager
         vp.addView(view, 0)
@@ -83,8 +82,9 @@ class DashViewPagerAdapter(private val sliderImg: List<SliderUtilsDash>, private
         }
         sb.deleteCharAt(sb.length() - 1);
 
-        textViewGenre.setText(sb);*/textViewDescription.text = utils.sliderDescription
-        textViewTitle.text = utils.sliderTitle
+        textViewGenre.setText(sb);*/
+        textViewDescription.text = utils?.sliderDescription
+        textViewTitle.text = utils?.sliderTitle
         return view
     }
 
@@ -95,14 +95,14 @@ class DashViewPagerAdapter(private val sliderImg: List<SliderUtilsDash>, private
     }
 
     private fun newAdClick(adID: String) {
-        val stringRequest: StringRequest = object : StringRequest(Method.POST, URL_CLICKED, Response.Listener { response: String? -> }, Response.ErrorListener { error: VolleyError? -> }) {
+        val stringRequest: StringRequest = object : StringRequest(Method.POST, URL_CLICKED, Response.Listener { }, Response.ErrorListener { }) {
             override fun getParams(): Map<String, String> {
-                val parms: MutableMap<String, String> = HashMap()
-                parms["id"] = adID
-                parms["method"] = "click"
-                parms["user_id"] = SharedPrefManager.getInstance(context).userID
-                parms["username"] = SharedPrefManager.getInstance(context).username
-                return parms
+                val params: MutableMap<String, String> = HashMap()
+                params["id"] = adID
+                params["method"] = "click"
+                params["user_id"] = SharedPrefManager.getInstance(context)!!.userID!!
+                params["username"] = SharedPrefManager.getInstance(context)!!.username!!
+                return params
             }
         }
         (context as FragmentContainer).addToRequestQueue(stringRequest)

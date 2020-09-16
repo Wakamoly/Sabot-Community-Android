@@ -17,7 +17,6 @@ import androidx.fragment.app.Fragment
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.RequestQueue
 import com.android.volley.Response
-import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
@@ -75,9 +74,9 @@ class ChatActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         setContentView(R.layout.chat_fragment_container)
         navView = findViewById(R.id.chat_nav_view)
         navView!!.setOnNavigationItemSelectedListener(this)
-        deviceUsername = SharedPrefManager.getInstance(this).username
-        deviceUserID = SharedPrefManager.getInstance(this).userID
-        if (!SharedPrefManager.getInstance(this).isLoggedIn) {
+        deviceUsername = SharedPrefManager.getInstance(this)!!.username
+        deviceUserID = SharedPrefManager.getInstance(this)!!.userID
+        if (!SharedPrefManager.getInstance(this)!!.isLoggedIn) {
             finish()
             startActivity(Intent(this, LoginActivity::class.java))
         }
@@ -172,7 +171,7 @@ class ChatActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                                     Toast.LENGTH_LONG).show()
                             val toLogin = Intent(applicationContext, LoginActivity::class.java)
                             toLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                            SharedPrefManager.getInstance(this@ChatActivity).logout()
+                            SharedPrefManager.getInstance(this@ChatActivity)!!.logout()
                             finish()
                             startActivity(toLogin)
                         } else {
@@ -182,11 +181,11 @@ class ChatActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                     } catch (e: JSONException) {
                         e.printStackTrace()
                     }
-                }, Response.ErrorListener { error: VolleyError? -> Toast.makeText(applicationContext, "Could not get messages, please try again later...", Toast.LENGTH_LONG).show() }) {
+                }, Response.ErrorListener { Toast.makeText(applicationContext, "Could not get messages, please try again later...", Toast.LENGTH_LONG).show() }) {
                     override fun getParams(): Map<String, String> {
-                        val parms: MutableMap<String, String> = HashMap()
-                        parms["username"] = deviceUsername!!
-                        return parms
+                        val params: MutableMap<String, String> = HashMap()
+                        params["username"] = deviceUsername!!
+                        return params
                     }
                 }
                 addToRequestQueue(stringRequest)

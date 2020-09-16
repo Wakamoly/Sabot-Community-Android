@@ -1,240 +1,192 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.content.Context;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import android.content.Context
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Response
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.StringRequest
+import com.yarolegovich.lovelydialog.LovelyChoiceDialog
+import org.json.JSONArray
+import org.json.JSONException
+import java.util.*
 
-import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.PopupMenu;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.yarolegovich.lovelydialog.LovelyChoiceDialog;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static com.lucidsoftworksllc.sabotcommunity.PaginationOnScroll.PAGE_SIZE;
-import static com.lucidsoftworksllc.sabotcommunity.PaginationOnScroll.PAGE_START;
-
-public class PublicsFragment extends Fragment {
-    private static final String Publics_URL = Constants.ROOT_URL+"publics_api.php";
-    private ProgressBar mProgressBar;
-    private int currentPage = PAGE_START;
-    private boolean isLastPage = false;
-    private int pageSize = PAGE_SIZE;
-    private boolean isLoading = false;
-
-    private PublicsAdapter adapter;
-    private LinearLayoutManager publicsViewManager;
-    private List<Publics_Recycler> publicsRecyclerList;
-    private ImageView publicsPlatformFilter,publicsNewGame;
-    private String filter, username, sortBy;
-    private Context mContext;
-    private LinearLayout sortByButton;
-    private TextView sortByText;
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View publicsRootView = inflater.inflate(R.layout.fragment_publics, null);
-        mProgressBar = publicsRootView.findViewById(R.id.progressBar);
-        RecyclerView publicsView = publicsRootView.findViewById(R.id.recyclerPublics);
-        publicsPlatformFilter = publicsRootView.findViewById(R.id.publicsPlatformFilter);
-        sortByButton = publicsRootView.findViewById(R.id.sortByButton);
-        sortByText = publicsRootView.findViewById(R.id.sortByText);
-        publicsNewGame = publicsRootView.findViewById(R.id.publicsNewGame);
-        mContext = getActivity();
-        username = SharedPrefManager.getInstance(mContext).getUsername();
-        filter = SharedPrefManager.getInstance(mContext).getCurrentPublics();
-        sortBy = SharedPrefManager.getInstance(mContext).getPublicsSortBy();
-        setPlatformImage(filter);
-        sortByText.setText(sortBy);
-        publicsPlatformFilter.setOnClickListener(v -> {
-            String[] items = getResources().getStringArray(R.array.platform_array_w_all);
-            new LovelyChoiceDialog(mContext)
+class PublicsFragment : Fragment() {
+    private var mProgressBar: ProgressBar? = null
+    private var currentPage = PaginationOnScroll.PAGE_START
+    private var isLastPage = false
+    private val pageSize = PaginationOnScroll.PAGE_SIZE
+    private var isLoading = false
+    private var adapter: PublicsAdapter? = null
+    private var publicsViewManager: LinearLayoutManager? = null
+    private var publicsRecyclerList: MutableList<PublicsRecycler>? = null
+    private var publicsPlatformFilter: ImageView? = null
+    private var publicsNewGame: ImageView? = null
+    private var filter: String? = null
+    private var username: String? = null
+    private var sortBy: String? = null
+    private var mContext: Context? = null
+    private var sortByButton: LinearLayout? = null
+    private var sortByText: TextView? = null
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val publicsRootView = inflater.inflate(R.layout.fragment_publics, null)
+        mProgressBar = publicsRootView.findViewById(R.id.progressBar)
+        val publicsView: RecyclerView = publicsRootView.findViewById(R.id.recyclerPublics)
+        publicsPlatformFilter = publicsRootView.findViewById(R.id.publicsPlatformFilter)
+        sortByButton = publicsRootView.findViewById(R.id.sortByButton)
+        sortByText = publicsRootView.findViewById(R.id.sortByText)
+        publicsNewGame = publicsRootView.findViewById(R.id.publicsNewGame)
+        mContext = activity
+        username = SharedPrefManager.getInstance(mContext!!)!!.username
+        filter = SharedPrefManager.getInstance(mContext!!)!!.currentPublics
+        sortBy = SharedPrefManager.getInstance(mContext!!)!!.publicsSortBy
+        setPlatformImage(filter)
+        sortByText?.text = sortBy
+        publicsPlatformFilter?.setOnClickListener {
+            val items = resources.getStringArray(R.array.platform_array_w_all)
+            LovelyChoiceDialog(mContext)
                     .setTopColorRes(R.color.colorPrimary)
                     .setTitle(R.string.platform_filter)
                     .setIcon(R.drawable.icons8_workstation_48)
-                    .setMessage(getResources().getString(R.string.selected_platform)+" "+filter)
-                    .setItems(items, (position, item) -> {
-                        SharedPrefManager.getInstance(mContext).setCurrentPublics(item);
-                        setPlatformImage(item);
-                        filter = item;
-                        mProgressBar.setVisibility(View.VISIBLE);
-                        publicsRecyclerList.clear();
-                        currentPage = PAGE_START;
-                        isLastPage = false;
-                        isLoading = false;
-                        loadPublics(1);
-                    })
-                    .show();
-        });
-        sortByButton.setOnClickListener(v -> {
-            PopupMenu popup = new PopupMenu(mContext, v);
-            String[] sortByArray = getResources().getStringArray(R.array.publics_sort_by);
-            for (String s : sortByArray) {
-                popup.getMenu().add(s);
+                    .setMessage(resources.getString(R.string.selected_platform) + " " + filter)
+                    .setItems(items) { _: Int, item: String? ->
+                        SharedPrefManager.getInstance(mContext!!)!!.currentPublics = item
+                        setPlatformImage(item)
+                        filter = item
+                        mProgressBar?.visibility = View.VISIBLE
+                        publicsRecyclerList!!.clear()
+                        currentPage = PaginationOnScroll.PAGE_START
+                        isLastPage = false
+                        isLoading = false
+                        loadPublics(1)
+                    }
+                    .show()
+        }
+        sortByButton?.setOnClickListener { v: View? ->
+            val popup = PopupMenu(mContext, v)
+            val sortByArray = resources.getStringArray(R.array.publics_sort_by)
+            for (s in sortByArray) {
+                popup.menu.add(s)
             }
-            popup.setOnMenuItemClickListener(item -> {
-                SharedPrefManager.getInstance(mContext).setPublicsSortBy(item.toString());
-                mProgressBar.setVisibility(View.VISIBLE);
-                publicsRecyclerList.clear();
-                currentPage = PAGE_START;
-                isLastPage = false;
-                isLoading = false;
-                sortBy = item.toString();
-                sortByText.setText(item.toString());
-                loadPublics(1);
-                return true;
-            });
-            popup.show();
-        });
-
-        publicsNewGame.setOnClickListener(v -> {
-            ContactUsFragment ldf = new ContactUsFragment();
-            Bundle args = new Bundle();
-            args.putString("newpublics", "Add game: ");
-            ldf.setArguments(args);
-            ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit();
-        });
-        mProgressBar.setVisibility(View.VISIBLE);
-        publicsView.setHasFixedSize(true);
-        publicsViewManager = new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false);
-        publicsView.setLayoutManager(publicsViewManager);
-        publicsRecyclerList = new ArrayList<>();
-        adapter = new PublicsAdapter(mContext,publicsRecyclerList);
-        publicsView.setAdapter(adapter);
-        loadPublics(currentPage);
-        publicsView.addOnScrollListener(new PaginationOnScroll(publicsViewManager) {
-            @Override
-            protected void loadMoreItems() {
-                isLoading = true;
-                currentPage++;
-                loadPublics(currentPage);
+            popup.setOnMenuItemClickListener { item: MenuItem ->
+                SharedPrefManager.getInstance(mContext!!)!!.publicsSortBy = item.toString()
+                mProgressBar?.visibility = View.VISIBLE
+                publicsRecyclerList!!.clear()
+                currentPage = PaginationOnScroll.PAGE_START
+                isLastPage = false
+                isLoading = false
+                sortBy = item.toString()
+                sortByText?.text = item.toString()
+                loadPublics(1)
+                true
             }
-            @Override public boolean isLastPage() {
-                return isLastPage;
+            popup.show()
+        }
+        publicsNewGame?.setOnClickListener {
+            val ldf = ContactUsFragment()
+            val args = Bundle()
+            args.putString("newpublics", "Add game: ")
+            ldf.arguments = args
+            (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+        }
+        mProgressBar?.visibility = View.VISIBLE
+        publicsView.setHasFixedSize(true)
+        publicsViewManager = LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false)
+        publicsView.layoutManager = publicsViewManager
+        publicsRecyclerList = ArrayList()
+        adapter = PublicsAdapter(mContext!!, publicsRecyclerList)
+        publicsView.adapter = adapter
+        loadPublics(currentPage)
+        publicsView.addOnScrollListener(object : PaginationOnScroll(publicsViewManager!!) {
+            override fun loadMoreItems() {
+                isLoading = true
+                currentPage++
+                loadPublics(currentPage)
             }
-            @Override public boolean isLoading() {
-                return isLoading;
-            }
-        });
-
-        return publicsRootView;
+            override var isLastPage: Boolean = false
+            override var isLoading: Boolean = false
+        })
+        return publicsRootView
     }
 
-    private void loadPublics(int page){
-        Thread thisThread = new Thread(){//create thread
-            @Override
-            public void run() {
-                final ArrayList<Publics_Recycler> items = new ArrayList<>();
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, Publics_URL,
-                        response -> {
+    private fun loadPublics(page: Int) {
+        val thisThread: Thread = object : Thread() {
+            //create thread
+            override fun run() {
+                val items = ArrayList<PublicsRecycler>()
+                val stringRequest: StringRequest = object : StringRequest(Method.POST, Publics_URL,
+                        Response.Listener { response: String? ->
                             try {
-                                JSONArray publics = new JSONArray(response);
-                                for(int i = 0; i<publics.length(); i++){
-                                    JSONObject publicsObject = publics.getJSONObject(i);
-                                    Publics_Recycler publics_recycler = new Publics_Recycler();
-
-                                    publics_recycler.setId(publicsObject.getString("id"));
-                                    publics_recycler.setTag(publicsObject.getString("tag"));
-                                    publics_recycler.setTitle(publicsObject.getString("title"));
-                                    publics_recycler.setGenre(publicsObject.getString("genre"));
-                                    publics_recycler.setImage(publicsObject.getString("image"));
-                                    publics_recycler.setNumratings(publicsObject.getString("numratings"));
-                                    publics_recycler.setAvgrating(publicsObject.getString("avgrating"));
-                                    publics_recycler.setPostcount(publicsObject.getString("postcount"));
-                                    publics_recycler.setFollowed(publicsObject.getString("followed"));
-                                    items.add(publics_recycler);
+                                val publics = JSONArray(response)
+                                for (i in 0 until publics.length()) {
+                                    val publicsObject = publics.getJSONObject(i)
+                                    val publicsRecycler = PublicsRecycler()
+                                    publicsRecycler.id = publicsObject.getString("id")
+                                    publicsRecycler.tag = publicsObject.getString("tag")
+                                    publicsRecycler.title = publicsObject.getString("title")
+                                    publicsRecycler.genre = publicsObject.getString("genre")
+                                    publicsRecycler.image = publicsObject.getString("image")
+                                    publicsRecycler.numratings = publicsObject.getString("numratings")
+                                    publicsRecycler.avgrating = publicsObject.getString("avgrating")
+                                    publicsRecycler.postcount = publicsObject.getString("postcount")
+                                    publicsRecycler.followed = publicsObject.getString("followed")
+                                    items.add(publicsRecycler)
                                 }
-                                if (currentPage != PAGE_START) adapter.removeLoading();
-                                mProgressBar.setVisibility(View.GONE);
-                                adapter.addItems(items);
+                                if (currentPage != PaginationOnScroll.PAGE_START) adapter!!.removeLoading()
+                                mProgressBar!!.visibility = View.GONE
+                                adapter!!.addItems(items)
                                 // check whether is last page or not
                                 if (publics.length() == pageSize) {
-                                    adapter.addLoading();
+                                    adapter!!.addLoading()
                                 } else {
-                                    isLastPage = true;
+                                    isLastPage = true
                                     //adapter.removeLoading();
                                 }
-                                isLoading = false;
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+                                isLoading = false
+                            } catch (e: JSONException) {
+                                e.printStackTrace()
                             }
                         },
-                        error -> {}) {
-                    @Override
-                    protected Map<String, String> getParams() {
-                        Map<String, String> params = new HashMap<>();
-                        params.put("page", String.valueOf(page));
-                        params.put("items", String.valueOf(pageSize));
-                        params.put("filter", filter);
-                        params.put("username", username);
-                        params.put("sort", sortBy);
-                        return params;
+                        Response.ErrorListener { }) {
+                    override fun getParams(): Map<String, String> {
+                        val params: MutableMap<String, String> = HashMap()
+                        params["page"] = page.toString()
+                        params["items"] = pageSize.toString()
+                        params["filter"] = filter!!
+                        params["username"] = username!!
+                        params["sort"] = sortBy!!
+                        return params
                     }
-                };
-                ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
+                }
+                (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
             }
-        };
-        thisThread.start(); // start thread
+        }
+        thisThread.start() // start thread
     }
 
-    private void setPlatformImage(String item){
-        switch (item) {
-            case "Xbox":
-                publicsPlatformFilter.setImageResource(R.drawable.icons8_xbox_50);
-                break;
-            case "PlayStation":
-                publicsPlatformFilter.setImageResource(R.drawable.icons8_playstation_50);
-                break;
-            case "Steam":
-                publicsPlatformFilter.setImageResource(R.drawable.icons8_steam_48);
-                break;
-            case "PC":
-                publicsPlatformFilter.setImageResource(R.drawable.icons8_workstation_48);
-                break;
-            case "Mobile":
-                publicsPlatformFilter.setImageResource(R.drawable.icons8_mobile_48);
-                break;
-            case "Switch":
-                publicsPlatformFilter.setImageResource(R.drawable.icons8_nintendo_switch_48);
-                break;
-            case "Cross-Platform":
-                publicsPlatformFilter.setImageResource(R.drawable.icons8_collect_40);
-                break;
-            case "Other":
-                publicsPlatformFilter.setImageResource(R.drawable.icons8_question_mark_64);
-                break;
-            default:
-                publicsPlatformFilter.setImageResource(R.drawable.ic_ellipses);
-                break;
+    private fun setPlatformImage(item: String?) {
+        when (item) {
+            "Xbox" -> publicsPlatformFilter!!.setImageResource(R.drawable.icons8_xbox_50)
+            "PlayStation" -> publicsPlatformFilter!!.setImageResource(R.drawable.icons8_playstation_50)
+            "Steam" -> publicsPlatformFilter!!.setImageResource(R.drawable.icons8_steam_48)
+            "PC" -> publicsPlatformFilter!!.setImageResource(R.drawable.icons8_workstation_48)
+            "Mobile" -> publicsPlatformFilter!!.setImageResource(R.drawable.icons8_mobile_48)
+            "Switch" -> publicsPlatformFilter!!.setImageResource(R.drawable.icons8_nintendo_switch_48)
+            "Cross-Platform" -> publicsPlatformFilter!!.setImageResource(R.drawable.icons8_collect_40)
+            "Other" -> publicsPlatformFilter!!.setImageResource(R.drawable.icons8_question_mark_64)
+            else -> publicsPlatformFilter!!.setImageResource(R.drawable.ic_ellipses)
         }
     }
 
-
+    companion object {
+        private const val Publics_URL = Constants.ROOT_URL + "publics_api.php"
+    }
 }

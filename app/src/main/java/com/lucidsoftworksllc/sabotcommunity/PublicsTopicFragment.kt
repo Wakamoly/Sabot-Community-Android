@@ -1,591 +1,555 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.os.Bundle;
-import android.os.Handler;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextUtils;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.MenuInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.PopupMenu;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.app.Activity
+import android.app.AlertDialog
+import android.content.Context
+import android.content.DialogInterface
+import android.os.Bundle
+import android.os.Handler
+import android.text.Editable
+import android.text.TextUtils
+import android.text.TextWatcher
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import android.widget.*
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.StringRequest
+import com.balysv.materialripple.MaterialRippleLayout
+import com.bumptech.glide.Glide
+import com.lucidsoftworksllc.sabotcommunity.R.drawable
+import com.yarolegovich.lovelydialog.LovelyStandardDialog
+import de.hdodenhof.circleimageview.CircleImageView
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
+import java.util.*
 
-import com.android.volley.Request;
-import com.android.volley.toolbox.StringRequest;
-import com.balysv.materialripple.MaterialRippleLayout;
-import com.bumptech.glide.Glide;
-import com.yarolegovich.lovelydialog.LovelyStandardDialog;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import de.hdodenhof.circleimageview.CircleImageView;
-
-import static android.view.View.GONE;
-import static com.lucidsoftworksllc.sabotcommunity.R.drawable.details_button;
-import static com.lucidsoftworksllc.sabotcommunity.R.drawable.grey_button;
-import static com.lucidsoftworksllc.sabotcommunity.R.drawable.red_button;
-
-public class PublicsTopicFragment extends Fragment {
-
-    private static final String PublicsTopicTop_URL = Constants.ROOT_URL+"publicsTopicTop_api.php";
-    private static final String PublicsTopic_URL = Constants.ROOT_URL+"publicsTopic_api.php";
-    private static final String LEAVE_TOPIC = Constants.ROOT_URL+"publics_leave_topic.php";
-    private static final String JOIN_TOPIC = Constants.ROOT_URL+"publics_join_topic.php";
-    private static final String JOIN_TOPIC_NON_CONNECTION = Constants.ROOT_URL+"publics_join_topic_non_connection.php";
-    private static final String JOIN_TOPIC_NEW_CONNECTION = Constants.ROOT_URL+"publics_join_topic_new_connection.php";
-    private static final String IS_CONNECTED = Constants.ROOT_URL+"publics_join_topic_is_connected.php";
-    private static final String GET_REQUESTS = Constants.ROOT_URL+"publics_get_requests.php";
-    private static final String PUBLICS_POST_SUBMIT = Constants.ROOT_URL+"publics_comment_submit.php";
-    private static final String PUBLICS_DELETE = Constants.ROOT_URL+"publics_topic_delete.php";
-    private static final String VOTE_URL = Constants.ROOT_URL+"publics_topic_vote.php";
-    private ProgressBar mProgressBar, requestProgressBar, voteProgress;
-    private String userID, publicsID, deviceusername;
-    private TextView topicTitle,clantag,publicsPostTitle, publicsPostsNickname_top, publicsPostsUsername_top, publicsPostBody_top, publicsPostsDateTime_top, tvWhen, numPlayersNeeded, numPlayersAdded, textViewNumPublicsPoints_top;
-    private CircleImageView publicsPostsProfile_image_top, online, verified;
-    private LinearLayout whenLayout, topicLayout, postDeletedScreenContent, nicknameLayout,playingNowLayout;
-    private Context mContext;
-    private MaterialRippleLayout submitComment;
-    private ImageView publicsImageView, platformType, publicsPostsUpvoteWhite_top, publicsPostsDownvoteWhite, publicsPostsUpvoteGreen_top, publicsPostsDownvoteRed_top, publicsTopicMenu;
-    private Button noRequests,joinRequests,requestToJoin,requestedToJoin,topicJoined,deleteTopic,topicMembers,topicEdit,newComment;
-    private EditText commentEditText;
-    private RelativeLayout newCommentLayout;
-    private RecyclerView publicsView;
-    private PublicsPostAdapter adapter;
-    private SwipeRefreshLayout publicsSwipe;
-    private List<PublicsPost_Recycler> publicsPostList;
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View publicsRootView = inflater.inflate(R.layout.fragment_publics_topic, null);
-        mProgressBar = publicsRootView.findViewById(R.id.topicProgressBar);
-        publicsPostTitle = publicsRootView.findViewById(R.id.publicsPostTitle);
-        publicsPostsNickname_top = publicsRootView.findViewById(R.id.publicsPostsNickname_top);
-        publicsPostsUsername_top = publicsRootView.findViewById(R.id.publicsPostsUsername_top);
-        publicsPostBody_top = publicsRootView.findViewById(R.id.publicsPostBody_top);
-        publicsPostsDateTime_top = publicsRootView.findViewById(R.id.publicsPostsDateTime_top);
-        publicsPostsProfile_image_top = publicsRootView.findViewById(R.id.publicsPostsProfile_image_top);
-        numPlayersNeeded = publicsRootView.findViewById(R.id.numPlayersNeeded);
-        numPlayersAdded = publicsRootView.findViewById(R.id.numPlayersAdded);
-        topicLayout = publicsRootView.findViewById(R.id.topicLayout);
-        tvWhen = publicsRootView.findViewById(R.id.tvWhen);
-        whenLayout = publicsRootView.findViewById(R.id.whenLayout);
-        platformType = publicsRootView.findViewById(R.id.platformType);
-        noRequests = publicsRootView.findViewById(R.id.noRequests);
-        joinRequests = publicsRootView.findViewById(R.id.joinRequests);
-        requestToJoin = publicsRootView.findViewById(R.id.requestToJoin);
-        requestedToJoin = publicsRootView.findViewById(R.id.requestedToJoin);
-        topicJoined = publicsRootView.findViewById(R.id.topicJoined);
-        textViewNumPublicsPoints_top = publicsRootView.findViewById(R.id.textViewNumPublicsPoints_top);
-        requestProgressBar = publicsRootView.findViewById(R.id.requestProgressBar);
-        submitComment = publicsRootView.findViewById(R.id.submitComment);
-        commentEditText = publicsRootView.findViewById(R.id.commentEditText);
-        publicsPostsDownvoteRed_top = publicsRootView.findViewById(R.id.publicsPostsDownvoteRed_top);
-        publicsPostsUpvoteGreen_top = publicsRootView.findViewById(R.id.publicsPostsUpvoteGreen_top);
-        publicsPostsDownvoteWhite = publicsRootView.findViewById(R.id.publicsPostsDownvoteWhite);
-        publicsPostsUpvoteWhite_top = publicsRootView.findViewById(R.id.publicsPostsUpvoteWhite_top);
-        voteProgress = publicsRootView.findViewById(R.id.voteProgress);
-        deleteTopic = publicsRootView.findViewById(R.id.deleteTopic);
-        postDeletedScreenContent = publicsRootView.findViewById(R.id.postDeletedScreenContent);
-        newCommentLayout = publicsRootView.findViewById(R.id.newCommentLayout);
-        publicsTopicMenu = publicsRootView.findViewById(R.id.publicsTopicMenu);
-        publicsImageView = publicsRootView.findViewById(R.id.publicsImageView);
-        nicknameLayout = publicsRootView.findViewById(R.id.nicknameLayout);
-        clantag = publicsRootView.findViewById(R.id.clantag);
-        topicMembers = publicsRootView.findViewById(R.id.topicMembers);
-        online = publicsRootView.findViewById(R.id.online);
-        verified = publicsRootView.findViewById(R.id.verified);
-        topicTitle = publicsRootView.findViewById(R.id.topicTitle);
-        topicEdit = publicsRootView.findViewById(R.id.topicEdit);
-        newComment = publicsRootView.findViewById(R.id.newComment);
-        playingNowLayout = publicsRootView.findViewById(R.id.playingNowLayout);
-        mContext = getActivity();
-        userID = SharedPrefManager.getInstance(mContext).getUserID();
-        deviceusername = SharedPrefManager.getInstance(mContext).getUsername();
-        assert getArguments() != null;
-        publicsID = getArguments().getString("PublicsId");
-        publicsPostList = new ArrayList<>();
-        publicsView = publicsRootView.findViewById(R.id.recyclerPublicsTopic);
-        publicsView.setHasFixedSize(true);
-        publicsView.setLayoutManager(new LinearLayoutManager(mContext));
-        loadPublicsTopicTop();
-        loadPublicsTopic();
-        publicsSwipe = publicsRootView.findViewById(R.id.publicsPostsSwipe);
-        publicsSwipe.setOnRefreshListener(() -> {
-            Fragment currentFragment = requireActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-            if (currentFragment instanceof PublicsTopicFragment) {
-                FragmentTransaction fragTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
-                fragTransaction.detach(currentFragment);
-                fragTransaction.attach(currentFragment);
-                fragTransaction.commit();
+class PublicsTopicFragment : Fragment() {
+    private var mProgressBar: ProgressBar? = null
+    private var requestProgressBar: ProgressBar? = null
+    private var voteProgress: ProgressBar? = null
+    private var userID: String? = null
+    private var publicsID: String? = null
+    private var deviceusername: String? = null
+    private var topicTitle: TextView? = null
+    private var clantag: TextView? = null
+    private var publicsPostTitle: TextView? = null
+    private var publicspostsnicknameTop: TextView? = null
+    private var publicspostsusernameTop: TextView? = null
+    private var publicspostbodyTop: TextView? = null
+    private var publicspostsdatetimeTop: TextView? = null
+    private var tvWhen: TextView? = null
+    private var numPlayersNeeded: TextView? = null
+    private var numPlayersAdded: TextView? = null
+    private var textviewnumpublicspointsTop: TextView? = null
+    private var publicspostsprofileImageTop: CircleImageView? = null
+    private var online: CircleImageView? = null
+    private var verified: CircleImageView? = null
+    private var whenLayout: LinearLayout? = null
+    private var topicLayout: LinearLayout? = null
+    private var postDeletedScreenContent: LinearLayout? = null
+    private var nicknameLayout: LinearLayout? = null
+    private var playingNowLayout: LinearLayout? = null
+    private var mContext: Context? = null
+    private var submitComment: MaterialRippleLayout? = null
+    private var publicsImageView: ImageView? = null
+    private var platformType: ImageView? = null
+    private var publicspostsupvotewhiteTop: ImageView? = null
+    private var publicsPostsDownvoteWhite: ImageView? = null
+    private var publicspostsupvotegreenTop: ImageView? = null
+    private var publicspostsdownvoteredTop: ImageView? = null
+    private var publicsTopicMenu: ImageView? = null
+    private var noRequests: Button? = null
+    private var joinRequests: Button? = null
+    private var requestToJoin: Button? = null
+    private var requestedToJoin: Button? = null
+    private var topicJoined: Button? = null
+    private var deleteTopic: Button? = null
+    private var topicMembers: Button? = null
+    private var topicEdit: Button? = null
+    private var newComment: Button? = null
+    private var commentEditText: EditText? = null
+    private var newCommentLayout: RelativeLayout? = null
+    private var publicsView: RecyclerView? = null
+    private var adapter: PublicsPostAdapter? = null
+    private var publicsSwipe: SwipeRefreshLayout? = null
+    private var publicsPostList: MutableList<PublicsPostRecycler>? = null
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val publicsRootView = inflater.inflate(R.layout.fragment_publics_topic, null)
+        mProgressBar = publicsRootView.findViewById(R.id.topicProgressBar)
+        publicsPostTitle = publicsRootView.findViewById(R.id.publicsPostTitle)
+        publicspostsnicknameTop = publicsRootView.findViewById(R.id.publicsPostsNickname_top)
+        publicspostsusernameTop = publicsRootView.findViewById(R.id.publicsPostsUsername_top)
+        publicspostbodyTop = publicsRootView.findViewById(R.id.publicsPostBody_top)
+        publicspostsdatetimeTop = publicsRootView.findViewById(R.id.publicsPostsDateTime_top)
+        publicspostsprofileImageTop = publicsRootView.findViewById(R.id.publicsPostsProfile_image_top)
+        numPlayersNeeded = publicsRootView.findViewById(R.id.numPlayersNeeded)
+        numPlayersAdded = publicsRootView.findViewById(R.id.numPlayersAdded)
+        topicLayout = publicsRootView.findViewById(R.id.topicLayout)
+        tvWhen = publicsRootView.findViewById(R.id.tvWhen)
+        whenLayout = publicsRootView.findViewById(R.id.whenLayout)
+        platformType = publicsRootView.findViewById(R.id.platformType)
+        noRequests = publicsRootView.findViewById(R.id.noRequests)
+        joinRequests = publicsRootView.findViewById(R.id.joinRequests)
+        requestToJoin = publicsRootView.findViewById(R.id.requestToJoin)
+        requestedToJoin = publicsRootView.findViewById(R.id.requestedToJoin)
+        topicJoined = publicsRootView.findViewById(R.id.topicJoined)
+        textviewnumpublicspointsTop = publicsRootView.findViewById(R.id.textViewNumPublicsPoints_top)
+        requestProgressBar = publicsRootView.findViewById(R.id.requestProgressBar)
+        submitComment = publicsRootView.findViewById(R.id.submitComment)
+        commentEditText = publicsRootView.findViewById(R.id.commentEditText)
+        publicspostsdownvoteredTop = publicsRootView.findViewById(R.id.publicsPostsDownvoteRed_top)
+        publicspostsupvotegreenTop = publicsRootView.findViewById(R.id.publicsPostsUpvoteGreen_top)
+        publicsPostsDownvoteWhite = publicsRootView.findViewById(R.id.publicsPostsDownvoteWhite)
+        publicspostsupvotewhiteTop = publicsRootView.findViewById(R.id.publicsPostsUpvoteWhite_top)
+        voteProgress = publicsRootView.findViewById(R.id.voteProgress)
+        deleteTopic = publicsRootView.findViewById(R.id.deleteTopic)
+        postDeletedScreenContent = publicsRootView.findViewById(R.id.postDeletedScreenContent)
+        newCommentLayout = publicsRootView.findViewById(R.id.newCommentLayout)
+        publicsTopicMenu = publicsRootView.findViewById(R.id.publicsTopicMenu)
+        publicsImageView = publicsRootView.findViewById(R.id.publicsImageView)
+        nicknameLayout = publicsRootView.findViewById(R.id.nicknameLayout)
+        clantag = publicsRootView.findViewById(R.id.clantag)
+        topicMembers = publicsRootView.findViewById(R.id.topicMembers)
+        online = publicsRootView.findViewById(R.id.online)
+        verified = publicsRootView.findViewById(R.id.verified)
+        topicTitle = publicsRootView.findViewById(R.id.topicTitle)
+        topicEdit = publicsRootView.findViewById(R.id.topicEdit)
+        newComment = publicsRootView.findViewById(R.id.newComment)
+        playingNowLayout = publicsRootView.findViewById(R.id.playingNowLayout)
+        mContext = activity
+        userID = SharedPrefManager.getInstance(mContext!!)!!.userID
+        deviceusername = SharedPrefManager.getInstance(mContext!!)!!.username
+        publicsID = requireArguments().getString("PublicsId")
+        publicsPostList = ArrayList()
+        publicsView = publicsRootView.findViewById(R.id.recyclerPublicsTopic)
+        publicsView?.setHasFixedSize(true)
+        publicsView?.layoutManager = LinearLayoutManager(mContext)
+        loadPublicsTopicTop()
+        loadPublicsTopic()
+        publicsSwipe = publicsRootView.findViewById(R.id.publicsPostsSwipe)
+        publicsSwipe?.setOnRefreshListener {
+            val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
+            if (currentFragment is PublicsTopicFragment) {
+                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                fragTransaction.detach(currentFragment)
+                fragTransaction.attach(currentFragment)
+                fragTransaction.commit()
             }
-            publicsSwipe.setRefreshing(false);
-        });
-        newComment.setOnClickListener(v -> {
-            newCommentLayout.setVisibility(View.VISIBLE);
-            submitComment.setVisibility(View.VISIBLE);
-            commentEditText.requestFocus();
-            if (commentEditText.hasFocus()) {
-                InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+            publicsSwipe?.isRefreshing = false
+        }
+        newComment?.setOnClickListener {
+            newCommentLayout?.visibility = View.VISIBLE
+            submitComment?.visibility = View.VISIBLE
+            commentEditText?.requestFocus()
+            if (commentEditText?.hasFocus()!!) {
+                val imm = mContext!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
             }
-        });
-        commentEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(s.toString().trim().length()==0){
-                    submitComment.setEnabled(false);
-                    submitComment.setVisibility(View.GONE);
+        }
+        commentEditText?.addTextChangedListener(object : TextWatcher {
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                if (s.toString().trim { it <= ' ' }.isEmpty()) {
+                    submitComment?.isEnabled = false
+                    submitComment?.visibility = View.GONE
                 } else {
-                    submitComment.setEnabled(true);
-                    submitComment.setVisibility(View.VISIBLE);
+                    submitComment?.isEnabled = true
+                    submitComment?.visibility = View.VISIBLE
                 }
             }
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void afterTextChanged(Editable s) {}
-        });
-        if(!TextUtils.isEmpty(commentEditText.getText())){
-            submitComment.setVisibility(View.VISIBLE);
+
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun afterTextChanged(s: Editable) {}
+        })
+        if (!TextUtils.isEmpty(commentEditText?.text)) {
+            submitComment?.visibility = View.VISIBLE
         }
-        publicsPostTitle.requestFocus();
-        return publicsRootView;
+        publicsPostTitle?.requestFocus()
+        return publicsRootView
     }
 
-    private void loadPublicsTopicTop(){
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, PublicsTopicTop_URL+"?userid="+userID+"&username="+deviceusername+"&topicid="+publicsID, response -> {
+    private fun loadPublicsTopicTop() {
+        val stringRequest = StringRequest(Request.Method.GET, "$PublicsTopicTop_URL?userid=$userID&username=$deviceusername&topicid=$publicsID", { response: String? ->
             try {
-                JSONArray publicstop = new JSONArray(response);
-                JSONObject publicsObject = publicstop.getJSONObject(0);
-                String deleted = publicsObject.getString("deleted");
-                if (deleted.equals("yes")) {
-                    postDeletedScreenContent.setVisibility(View.VISIBLE);
+                val publicstop = JSONArray(response)
+                val publicsObject = publicstop.getJSONObject(0)
+                val deleted = publicsObject.getString("deleted")
+                if (deleted == "yes") {
+                    postDeletedScreenContent!!.visibility = View.VISIBLE
                 } else {
-                    final String post_id = publicsObject.getString("post_id");
-                    String post_topic = publicsObject.getString("post_topic");
-                    String post_content = publicsObject.getString("post_content");
-                    String post_date = publicsObject.getString("post_date");
-                    final String user_id = publicsObject.getString("user_id");
-                    String profile_pic = publicsObject.getString("profile_pic");
-                    String nickname = publicsObject.getString("nickname");
-                    final String username = publicsObject.getString("username");
-                    String num_players = publicsObject.getString("num_players");
-                    int num_added = publicsObject.getInt("num_added");
-                    String event_date = publicsObject.getString("event_date");
-                    String type = publicsObject.getString("type");
-                    String votes = publicsObject.getString("votes");
-                    String accepted_array = publicsObject.getString("accepted_array");
-                    int requests = publicsObject.getInt("requests");
-                    String vote = publicsObject.getString("vote");
-                    String backimage = publicsObject.getString("back_image");
-                    String clan_tag = publicsObject.getString("clantag");
-                    String isOnline = publicsObject.getString("online");
-                    String isVerified = publicsObject.getString("verified");
-                    String gameName = publicsObject.getString("game_name");
-                    String cat_id = publicsObject.getString("cat_id");
-                    String playing_now = publicsObject.getString("playing_now");
-
-                    clantag.setText(clan_tag);
-                    topicTitle.setText(post_topic);
-
-                    if (playing_now.equals("yes")){
-                        playingNowLayout.setVisibility(View.VISIBLE);
-                    }else{
-                        playingNowLayout.setVisibility(GONE);
-                    }
-
-                    if (isOnline.equals("yes")) {
-                        online.setVisibility(View.VISIBLE);
-                    }else{
-                        online.setVisibility(View.GONE);
-                    }
-                    if (isVerified.equals("yes")) {
-                        verified.setVisibility(View.VISIBLE);
-                    }else{
-                        verified.setVisibility(View.GONE);
-                    }
-
-                    if (vote.equals("up")){
-                        publicsPostsUpvoteWhite_top.setVisibility(GONE);
-                        publicsPostsUpvoteGreen_top.setVisibility(View.VISIBLE);
-                    }else if (vote.equals("down")){
-                        publicsPostsDownvoteWhite.setVisibility(GONE);
-                        publicsPostsDownvoteRed_top.setVisibility(View.VISIBLE);
-                    }
-
-                    String[] accepted = accepted_array.split(",");
-                    //if user is topic owner
-                    if (username.equals(deviceusername)) {
-                        topicEdit.setVisibility(View.VISIBLE);
-                        topicEdit.setOnClickListener(v -> {
-                            //Put the value
-                            EditPublicsTopic ldf = new EditPublicsTopic();
-                            Bundle args = new Bundle();
-                            args.putString("topic_id", post_id);
-                            args.putString("gamename", gameName);
-                            args.putString("gameimage", backimage);
-                            args.putString("content", post_content);
-                            args.putString("title", post_topic);
-                            args.putString("num_players", num_players);
-                            args.putString("gameid", cat_id);
-                            ldf.setArguments(args);
-                            ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
-                        });
-                        deleteTopic.setVisibility(View.VISIBLE);
-                        deleteTopic.setOnClickListener(v -> {
-                            DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-                                switch (which) {
-                                    case DialogInterface.BUTTON_POSITIVE:
-                                        if (mContext instanceof FragmentContainer) {
-                                            deleteTopic(post_id);
-                                        }
-                                        break;
-                                    case DialogInterface.BUTTON_NEGATIVE:
-                                        break;
-                                }
-                            };
-                            AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.AlertDialogStyle);
-                            builder.setMessage("Delete Publics?").setPositiveButton("Yes", dialogClickListener)
-                                    .setNegativeButton("No", dialogClickListener).show();
-                        });
-                        requestProgressBar.setVisibility(GONE);
-                        if (requests > 0) {
-                            joinRequests.setVisibility(View.VISIBLE);
-                            joinRequests.setOnClickListener(v -> {
-                                //Put the value
-                                TopicManagePlayers ldf = new TopicManagePlayers();
-                                Bundle args = new Bundle();
-                                args.putString("topic_id", post_id);
-                                args.putString("permission", "admin");
-                                ldf.setArguments(args);
-                                ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
-                            });
-                        } else {
-                            noRequests.setVisibility(View.VISIBLE);
-                        }
-                    }
-                    //if user join request accepted
-                    else if (Arrays.asList(accepted).contains(deviceusername)) {
-                        requestProgressBar.setVisibility(GONE);
-                        if (num_added > 0){
-                            topicMembers.setVisibility(View.VISIBLE);
-                            topicMembers.setOnClickListener(v -> {
-                                TopicManagePlayers ldf = new TopicManagePlayers();
-                                Bundle args = new Bundle();
-                                args.putString("topic_id", post_id);
-                                args.putString("permission", "user");
-                                ldf.setArguments(args);
-                                ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
-                            });
-                        }
-                        topicJoined.setVisibility(View.VISIBLE);
-                        topicJoined.setOnClickListener(v -> {
-                            DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-                                switch (which) {
-                                    case DialogInterface.BUTTON_POSITIVE:
-                                        if (mContext instanceof FragmentContainer) {
-                                            topicJoined.setVisibility(GONE);
-                                            requestProgressBar.setVisibility(View.VISIBLE);
-                                            leaveTopic(post_id);
-                                        }
-                                        break;
-                                    case DialogInterface.BUTTON_NEGATIVE:
-                                        //No button clicked
-                                        break;
-                                }
-                            };
-                            AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.AlertDialogStyle);
-                            builder.setMessage(R.string.leave_publics_topic).setPositiveButton("Yes", dialogClickListener)
-                                    .setNegativeButton("No", dialogClickListener).show();
-                        });
+                    val postId = publicsObject.getString("post_id")
+                    val postTopic = publicsObject.getString("post_topic")
+                    val postContent = publicsObject.getString("post_content")
+                    val postDate = publicsObject.getString("post_date")
+                    val userId = publicsObject.getString("user_id")
+                    val profilePic = publicsObject.getString("profile_pic")
+                    val nickname = publicsObject.getString("nickname")
+                    val username = publicsObject.getString("username")
+                    val numPlayers = publicsObject.getString("num_players")
+                    val numAdded = publicsObject.getInt("num_added")
+                    val eventDate = publicsObject.getString("event_date")
+                    val type = publicsObject.getString("type")
+                    val votes = publicsObject.getString("votes")
+                    val acceptedArray = publicsObject.getString("accepted_array")
+                    val requests = publicsObject.getInt("requests")
+                    val vote = publicsObject.getString("vote")
+                    val backimage = publicsObject.getString("back_image")
+                    val clanTag = publicsObject.getString("clantag")
+                    val isOnline = publicsObject.getString("online")
+                    val isVerified = publicsObject.getString("verified")
+                    val gameName = publicsObject.getString("game_name")
+                    val catId = publicsObject.getString("cat_id")
+                    val playingNow = publicsObject.getString("playing_now")
+                    clantag!!.text = clanTag
+                    topicTitle!!.text = postTopic
+                    if (playingNow == "yes") {
+                        playingNowLayout!!.visibility = View.VISIBLE
                     } else {
-                        isJoinRequested(post_id, event_date);
-                        if (num_added > 0){
-                            topicMembers.setVisibility(View.VISIBLE);
-                            topicMembers.setOnClickListener(v -> {
-                                TopicManagePlayers ldf = new TopicManagePlayers();
-                                Bundle args = new Bundle();
-                                args.putString("topic_id", post_id);
-                                args.putString("permission", "user");
-                                ldf.setArguments(args);
-                                ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
-                            });
+                        playingNowLayout!!.visibility = View.GONE
+                    }
+                    if (isOnline == "yes") {
+                        online!!.visibility = View.VISIBLE
+                    } else {
+                        online!!.visibility = View.GONE
+                    }
+                    if (isVerified == "yes") {
+                        verified!!.visibility = View.VISIBLE
+                    } else {
+                        verified!!.visibility = View.GONE
+                    }
+                    if (vote == "up") {
+                        publicspostsupvotewhiteTop!!.visibility = View.GONE
+                        publicspostsupvotegreenTop!!.visibility = View.VISIBLE
+                    } else if (vote == "down") {
+                        publicsPostsDownvoteWhite!!.visibility = View.GONE
+                        publicspostsdownvoteredTop!!.visibility = View.VISIBLE
+                    }
+                    val accepted = acceptedArray.split(",".toRegex()).toTypedArray()
+                    //if user is topic owner
+                    if (username == deviceusername) {
+                        topicEdit!!.visibility = View.VISIBLE
+                        topicEdit!!.setOnClickListener {
+                            val ldf = EditPublicsTopic()
+                            val args = Bundle()
+                            args.putString("topic_id", postId)
+                            args.putString("gamename", gameName)
+                            args.putString("gameimage", backimage)
+                            args.putString("content", postContent)
+                            args.putString("title", postTopic)
+                            args.putString("num_players", numPlayers)
+                            args.putString("gameid", catId)
+                            ldf.arguments = args
+                            (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                         }
-                    }
-
-                    if (event_date.equals("now")) {
-                        whenLayout.setBackgroundResource(details_button);
-                    } else if (event_date.equals("ended")) {
-                        whenLayout.setBackgroundResource(red_button);
-                    }
-
-                    textViewNumPublicsPoints_top.setText(votes);
-
-                    nicknameLayout.setOnClickListener(v -> {
-                        //Put the value
-                        FragmentProfile ldf = new FragmentProfile();
-                        Bundle args = new Bundle();
-                        args.putString("UserId", user_id);
-                        ldf.setArguments(args);
-                        ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
-                    });
-
-                    submitComment.setOnClickListener(view -> {
-                        String body = commentEditText.getText().toString();
-                        String added_by = SharedPrefManager.getInstance(mContext).getUsername();
-                        String image = "";
-                        if (!body.isEmpty()) {
-                            topicLayout.setVisibility(View.GONE);
-                            newCommentLayout.setVisibility(GONE);
-                            submitComment.setVisibility(GONE);
-                            mProgressBar.setVisibility(View.VISIBLE);
-                            submitComment(body, added_by, username, image, post_id);
-                            commentEditText.getText().clear();
-                            hideKeyboardFrom(mContext, view);
-                        } else {
-                            Toast.makeText(mContext, "You must enter text before submitting!", Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-                    switch (type) {
-                        case "Xbox":
-                            platformType.setImageResource(R.drawable.icons8_xbox_50);
-                            platformType.setVisibility(View.VISIBLE);
-                            break;
-                        case "PlayStation":
-                            platformType.setImageResource(R.drawable.icons8_playstation_50);
-                            platformType.setVisibility(View.VISIBLE);
-                            break;
-                        case "Steam":
-                            platformType.setImageResource(R.drawable.icons8_steam_48);
-                            platformType.setVisibility(View.VISIBLE);
-                            break;
-                        case "PC":
-                            platformType.setImageResource(R.drawable.icons8_workstation_48);
-                            platformType.setVisibility(View.VISIBLE);
-                            break;
-                        case "Mobile":
-                            platformType.setImageResource(R.drawable.icons8_mobile_48);
-                            platformType.setVisibility(View.VISIBLE);
-                            break;
-                        case "Switch":
-                            platformType.setImageResource(R.drawable.icons8_nintendo_switch_48);
-                            platformType.setVisibility(View.VISIBLE);
-                            break;
-                        case "Cross-Platform":
-                            platformType.setImageResource(R.drawable.icons8_collect_40);
-                            platformType.setVisibility(View.VISIBLE);
-                            break;
-                        default:
-                            platformType.setImageResource(R.drawable.icons8_question_mark_64);
-                            platformType.setVisibility(View.VISIBLE);
-                            break;
-                    }
-
-                    publicsPostsUpvoteWhite_top.setOnClickListener(v -> {
-                        publicsPostsDownvoteRed_top.setVisibility(View.GONE);
-                        publicsPostsDownvoteWhite.setVisibility(GONE);
-                        publicsPostsUpvoteGreen_top.setVisibility(GONE);
-                        publicsPostsUpvoteWhite_top.setVisibility(GONE);
-                        voteProgress.setVisibility(View.VISIBLE);
-                        topicVote("up", post_id, username);
-                    });
-                    publicsPostsUpvoteGreen_top.setOnClickListener(v -> {
-                        publicsPostsDownvoteRed_top.setVisibility(View.GONE);
-                        publicsPostsDownvoteWhite.setVisibility(GONE);
-                        publicsPostsUpvoteGreen_top.setVisibility(GONE);
-                        publicsPostsUpvoteWhite_top.setVisibility(GONE);
-                        voteProgress.setVisibility(View.VISIBLE);
-                        topicVote("remove", post_id, username);
-                    });
-                    publicsPostsDownvoteWhite.setOnClickListener(v -> {
-                        publicsPostsDownvoteRed_top.setVisibility(View.GONE);
-                        publicsPostsDownvoteWhite.setVisibility(GONE);
-                        publicsPostsUpvoteGreen_top.setVisibility(GONE);
-                        publicsPostsUpvoteWhite_top.setVisibility(GONE);
-                        voteProgress.setVisibility(View.VISIBLE);
-                        topicVote("down", post_id, username);
-                    });
-                    publicsPostsDownvoteRed_top.setOnClickListener(v -> {
-                        publicsPostsDownvoteRed_top.setVisibility(View.GONE);
-                        publicsPostsDownvoteWhite.setVisibility(GONE);
-                        publicsPostsUpvoteGreen_top.setVisibility(GONE);
-                        publicsPostsUpvoteWhite_top.setVisibility(GONE);
-                        voteProgress.setVisibility(View.VISIBLE);
-                        topicVote("remove", post_id, username);
-                    });
-
-                    numPlayersAdded.setText(String.valueOf(num_added));
-                    numPlayersNeeded.setText(num_players);
-
-                    publicsPostTitle.setText(gameName);
-                    publicsPostsNickname_top.setText(nickname);
-                    String usernameText = "@"+username;
-                    publicsPostsUsername_top.setText(usernameText);
-                    publicsPostBody_top.setText(post_content);
-                    publicsPostsDateTime_top.setText(post_date);
-                    tvWhen.setText(event_date);
-
-                    String profile_pic2 = profile_pic.substring(0, profile_pic.length() - 4)+"_r.JPG";
-                    Glide.with(mContext)
-                            .load(Constants.BASE_URL + profile_pic2)
-                            .into(publicsPostsProfile_image_top);
-                    Glide.with(mContext)
-                            .load(Constants.BASE_URL + backimage)
-                            .into(publicsImageView);
-
-                    topicLayout.setVisibility(View.VISIBLE);
-                    mProgressBar.setVisibility(View.GONE);
-
-                    publicsTopicMenu.setOnClickListener(view -> {
-                        PopupMenu popup = new PopupMenu(mContext, view);
-                        MenuInflater inflater = popup.getMenuInflater();
-                        inflater.inflate(R.menu.publics_topic_menu, popup.getMenu());
-                        popup.setOnMenuItemClickListener(item -> {
-                            if (item.getItemId() == R.id.menuTopicReport) {
-                                ReportFragment ldf = new ReportFragment();
-                                Bundle args = new Bundle();
-                                args.putString("context", "publics_topic");
-                                args.putString("type", "topic");
-                                args.putString("id", post_id);
-                                ldf.setArguments(args);
-                                ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
-                            }if (item.getItemId() == R.id.menuTopicPlayer) {
-                                if (mContext instanceof FragmentContainer) {
-                                    FragmentProfile ldf = new FragmentProfile ();
-                                    Bundle args = new Bundle();
-                                    args.putString("UserId", user_id);
-                                    ldf.setArguments(args);
-                                    ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
+                        deleteTopic!!.visibility = View.VISIBLE
+                        deleteTopic!!.setOnClickListener {
+                            val dialogClickListener = DialogInterface.OnClickListener { _: DialogInterface?, which: Int ->
+                                when (which) {
+                                    DialogInterface.BUTTON_POSITIVE -> if (mContext is FragmentContainer) {
+                                        deleteTopic(postId)
+                                    }
+                                    DialogInterface.BUTTON_NEGATIVE -> {
+                                    }
                                 }
                             }
-                            return true;
-                        });
-                        popup.show();
-                    });
-                }
-            }
-            catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }, error -> Toast.makeText(mContext, "Error!", Toast.LENGTH_SHORT).show());
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
-    }
-
-    private void loadPublicsTopic(){
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, PublicsTopic_URL+"?userid="+userID+"&username="+deviceusername+"&publicsid="+publicsID, response -> {
-            try {
-                JSONArray publics = new JSONArray(response);
-                for(int i = 0; i<publics.length(); i++){
-                    JSONObject publicsObject = publics.getJSONObject(i);
-
-                    String id = publicsObject.getString("id");
-                    String subject = publicsObject.getString("subject");
-                    String date = publicsObject.getString("date");
-                    String cat = publicsObject.getString("cat");
-                    String topic_by = publicsObject.getString("topic_by");
-                    String post_id = publicsObject.getString("post_id");
-                    String post_topic = publicsObject.getString("post_topic");
-                    String post_content = publicsObject.getString("post_content");
-                    String post_date = publicsObject.getString("post_date");
-                    String post_by = publicsObject.getString("post_by");
-                    String user_id = publicsObject.getString("user_id");
-                    String profile_pic = publicsObject.getString("profile_pic");
-                    String nickname = publicsObject.getString("nickname");
-                    String username = publicsObject.getString("username");
-                    String voted = publicsObject.getString("voted");
-                    String votes = publicsObject.getString("votes");
-                    String replies = publicsObject.getString("replies");
-                    String online = publicsObject.getString("online");
-                    String verified = publicsObject.getString("verified");
-                    String clantag = publicsObject.getString("clantag");
-
-                    PublicsPost_Recycler publicsPostResult = new PublicsPost_Recycler(id, subject, date, cat, topic_by, post_id,post_topic,post_content,post_date,post_by,user_id,profile_pic,nickname,username,voted,votes,replies,online,verified,clantag);
-                    publicsPostList.add(publicsPostResult);
-                }
-                adapter = new PublicsPostAdapter(mContext, publicsPostList);
-                publicsView.setAdapter(adapter);
-
-                mProgressBar.setVisibility(View.GONE);
-                publicsSwipe.setVisibility(View.VISIBLE);
-                publicsSwipe.setRefreshing(false);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }, error -> Toast.makeText(mContext, error.getMessage(), Toast.LENGTH_SHORT).show());
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
-    }
-
-    private void isJoinRequested(final String post_id, final String time){
-        StringRequest stringRequest=new StringRequest(Request.Method.POST, GET_REQUESTS, response -> {
-            try {
-                JSONObject obj = new JSONObject(response);
-                if (obj.getString("error").equals("false")) {
-                    if(obj.has("request_sent")&& obj.getString("request_sent").equals("yes")){
-                        requestedToJoin.setVisibility(View.VISIBLE);
-                        requestProgressBar.setVisibility(GONE);
-                        requestedToJoin.setOnClickListener(v -> {
-                            DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-                                switch (which){
-                                    case DialogInterface.BUTTON_POSITIVE:
-                                        requestedToJoin.setVisibility(GONE);
-                                        requestProgressBar.setVisibility(View.VISIBLE);
-                                        if (mContext instanceof FragmentContainer) {
-                                            leaveTopic(post_id);
-                                        }
-                                        break;
-                                    case DialogInterface.BUTTON_NEGATIVE:
-                                        break;
+                            val builder = AlertDialog.Builder(mContext, R.style.AlertDialogStyle)
+                            builder.setMessage("Delete Publics?").setPositiveButton("Yes", dialogClickListener)
+                                    .setNegativeButton("No", dialogClickListener).show()
+                        }
+                        requestProgressBar!!.visibility = View.GONE
+                        if (requests > 0) {
+                            joinRequests!!.visibility = View.VISIBLE
+                            joinRequests!!.setOnClickListener {
+                                val ldf = TopicManagePlayers()
+                                val args = Bundle()
+                                args.putString("topic_id", postId)
+                                args.putString("permission", "admin")
+                                ldf.arguments = args
+                                (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                            }
+                        } else {
+                            noRequests!!.visibility = View.VISIBLE
+                        }
+                    } else if (listOf(*accepted).contains(deviceusername)) {
+                        requestProgressBar!!.visibility = View.GONE
+                        if (numAdded > 0) {
+                            topicMembers!!.visibility = View.VISIBLE
+                            topicMembers!!.setOnClickListener {
+                                val ldf = TopicManagePlayers()
+                                val args = Bundle()
+                                args.putString("topic_id", postId)
+                                args.putString("permission", "user")
+                                ldf.arguments = args
+                                (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                            }
+                        }
+                        topicJoined!!.visibility = View.VISIBLE
+                        topicJoined!!.setOnClickListener {
+                            val dialogClickListener = DialogInterface.OnClickListener { _: DialogInterface?, which: Int ->
+                                when (which) {
+                                    DialogInterface.BUTTON_POSITIVE -> if (mContext is FragmentContainer) {
+                                        topicJoined!!.visibility = View.GONE
+                                        requestProgressBar!!.visibility = View.VISIBLE
+                                        leaveTopic(postId)
+                                    }
+                                    DialogInterface.BUTTON_NEGATIVE -> {
+                                    }
                                 }
-                            };
-                            AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.AlertDialogStyle);
-                            builder.setMessage(R.string.leave_publics_topic_requested).setPositiveButton("Yes", dialogClickListener)
-                                    .setNegativeButton("No", dialogClickListener).show();
-                        });
-                    }else if(obj.has("request_sent")&& obj.getString("request_sent").equals("no")){
-                        requestToJoin.setVisibility(View.VISIBLE);
-                        requestProgressBar.setVisibility(GONE);
-                        if (time.equals("ended")) {
-                            requestToJoin.setBackgroundResource(grey_button);
-                            requestToJoin.setOnClickListener(v -> {
+                            }
+                            val builder = AlertDialog.Builder(mContext, R.style.AlertDialogStyle)
+                            builder.setMessage(R.string.leave_publics_topic).setPositiveButton("Yes", dialogClickListener)
+                                    .setNegativeButton("No", dialogClickListener).show()
+                        }
+                    } else {
+                        isJoinRequested(postId, eventDate)
+                        if (numAdded > 0) {
+                            topicMembers!!.visibility = View.VISIBLE
+                            topicMembers!!.setOnClickListener {
+                                val ldf = TopicManagePlayers()
+                                val args = Bundle()
+                                args.putString("topic_id", postId)
+                                args.putString("permission", "user")
+                                ldf.arguments = args
+                                (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                            }
+                        }
+                    }
+                    if (eventDate == "now") {
+                        whenLayout!!.setBackgroundResource(drawable.details_button)
+                    } else if (eventDate == "ended") {
+                        whenLayout!!.setBackgroundResource(drawable.red_button)
+                    }
+                    textviewnumpublicspointsTop!!.text = votes
+                    nicknameLayout!!.setOnClickListener {
+                        val ldf = FragmentProfile()
+                        val args = Bundle()
+                        args.putString("UserId", userId)
+                        ldf.arguments = args
+                        (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    }
+                    submitComment!!.setOnClickListener { view: View ->
+                        val body = commentEditText!!.text.toString()
+                        val addedBy = SharedPrefManager.getInstance(mContext!!)!!.username
+                        val image = ""
+                        if (body.isNotEmpty()) {
+                            topicLayout!!.visibility = View.GONE
+                            newCommentLayout!!.visibility = View.GONE
+                            submitComment!!.visibility = View.GONE
+                            mProgressBar!!.visibility = View.VISIBLE
+                            submitComment(body, addedBy!!, username, image, postId)
+                            commentEditText!!.text.clear()
+                            hideKeyboardFrom(mContext, view)
+                        } else {
+                            Toast.makeText(mContext, "You must enter text before submitting!", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                    when (type) {
+                        "Xbox" -> {
+                            platformType!!.setImageResource(drawable.icons8_xbox_50)
+                            platformType!!.visibility = View.VISIBLE
+                        }
+                        "PlayStation" -> {
+                            platformType!!.setImageResource(drawable.icons8_playstation_50)
+                            platformType!!.visibility = View.VISIBLE
+                        }
+                        "Steam" -> {
+                            platformType!!.setImageResource(drawable.icons8_steam_48)
+                            platformType!!.visibility = View.VISIBLE
+                        }
+                        "PC" -> {
+                            platformType!!.setImageResource(drawable.icons8_workstation_48)
+                            platformType!!.visibility = View.VISIBLE
+                        }
+                        "Mobile" -> {
+                            platformType!!.setImageResource(drawable.icons8_mobile_48)
+                            platformType!!.visibility = View.VISIBLE
+                        }
+                        "Switch" -> {
+                            platformType!!.setImageResource(drawable.icons8_nintendo_switch_48)
+                            platformType!!.visibility = View.VISIBLE
+                        }
+                        "Cross-Platform" -> {
+                            platformType!!.setImageResource(drawable.icons8_collect_40)
+                            platformType!!.visibility = View.VISIBLE
+                        }
+                        else -> {
+                            platformType!!.setImageResource(drawable.icons8_question_mark_64)
+                            platformType!!.visibility = View.VISIBLE
+                        }
+                    }
+                    publicspostsupvotewhiteTop!!.setOnClickListener {
+                        publicspostsdownvoteredTop!!.visibility = View.GONE
+                        publicsPostsDownvoteWhite!!.visibility = View.GONE
+                        publicspostsupvotegreenTop!!.visibility = View.GONE
+                        publicspostsupvotewhiteTop!!.visibility = View.GONE
+                        voteProgress!!.visibility = View.VISIBLE
+                        topicVote("up", postId, username)
+                    }
+                    publicspostsupvotegreenTop!!.setOnClickListener {
+                        publicspostsdownvoteredTop!!.visibility = View.GONE
+                        publicsPostsDownvoteWhite!!.visibility = View.GONE
+                        publicspostsupvotegreenTop!!.visibility = View.GONE
+                        publicspostsupvotewhiteTop!!.visibility = View.GONE
+                        voteProgress!!.visibility = View.VISIBLE
+                        topicVote("remove", postId, username)
+                    }
+                    publicsPostsDownvoteWhite!!.setOnClickListener {
+                        publicspostsdownvoteredTop!!.visibility = View.GONE
+                        publicsPostsDownvoteWhite!!.visibility = View.GONE
+                        publicspostsupvotegreenTop!!.visibility = View.GONE
+                        publicspostsupvotewhiteTop!!.visibility = View.GONE
+                        voteProgress!!.visibility = View.VISIBLE
+                        topicVote("down", postId, username)
+                    }
+                    publicspostsdownvoteredTop!!.setOnClickListener {
+                        publicspostsdownvoteredTop!!.visibility = View.GONE
+                        publicsPostsDownvoteWhite!!.visibility = View.GONE
+                        publicspostsupvotegreenTop!!.visibility = View.GONE
+                        publicspostsupvotewhiteTop!!.visibility = View.GONE
+                        voteProgress!!.visibility = View.VISIBLE
+                        topicVote("remove", postId, username)
+                    }
+                    numPlayersAdded!!.text = numAdded.toString()
+                    numPlayersNeeded!!.text = numPlayers
+                    publicsPostTitle!!.text = gameName
+                    publicspostsnicknameTop!!.text = nickname
+                    val usernameText = "@$username"
+                    publicspostsusernameTop!!.text = usernameText
+                    publicspostbodyTop!!.text = postContent
+                    publicspostsdatetimeTop!!.text = postDate
+                    tvWhen!!.text = eventDate
+                    val profilePic2 = profilePic.substring(0, profilePic.length - 4) + "_r.JPG"
+                    Glide.with(mContext!!)
+                            .load(Constants.BASE_URL + profilePic2)
+                            .into(publicspostsprofileImageTop!!)
+                    Glide.with(mContext!!)
+                            .load(Constants.BASE_URL + backimage)
+                            .into(publicsImageView!!)
+                    topicLayout!!.visibility = View.VISIBLE
+                    mProgressBar!!.visibility = View.GONE
+                    publicsTopicMenu!!.setOnClickListener { view: View? ->
+                        val popup = PopupMenu(mContext, view)
+                        val inflater = popup.menuInflater
+                        inflater.inflate(R.menu.publics_topic_menu, popup.menu)
+                        popup.setOnMenuItemClickListener { item: MenuItem ->
+                            if (item.itemId == R.id.menuTopicReport) {
+                                val ldf = ReportFragment()
+                                val args = Bundle()
+                                args.putString("context", "publics_topic")
+                                args.putString("type", "topic")
+                                args.putString("id", postId)
+                                ldf.arguments = args
+                                (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                            }
+                            if (item.itemId == R.id.menuTopicPlayer) {
+                                if (mContext is FragmentContainer) {
+                                    val ldf = FragmentProfile()
+                                    val args = Bundle()
+                                    args.putString("UserId", userId)
+                                    ldf.arguments = args
+                                    (mContext as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                                }
+                            }
+                            true
+                        }
+                        popup.show()
+                    }
+                }
+            } catch (e: JSONException) {
+                e.printStackTrace()
+            }
+        }) { Toast.makeText(mContext, "Error!", Toast.LENGTH_SHORT).show() }
+        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
+    }
 
-                            });
-                        }else{
-                            requestToJoin.setOnClickListener(v -> {
-                                requestToJoin.setVisibility(GONE);
-                                requestProgressBar.setVisibility(View.VISIBLE);
-                                isConnectOrReceivedConnect(post_id);
-                            });
+    private fun loadPublicsTopic() {
+        val stringRequest = StringRequest(Request.Method.GET, "$PublicsTopic_URL?userid=$userID&username=$deviceusername&publicsid=$publicsID", { response: String? ->
+            try {
+                val publics = JSONArray(response)
+                for (i in 0 until publics.length()) {
+                    val publicsObject = publics.getJSONObject(i)
+                    val id = publicsObject.getString("id")
+                    val subject = publicsObject.getString("subject")
+                    val date = publicsObject.getString("date")
+                    val cat = publicsObject.getString("cat")
+                    val topicBy = publicsObject.getString("topic_by")
+                    val postId = publicsObject.getString("post_id")
+                    val postTopic = publicsObject.getString("post_topic")
+                    val postContent = publicsObject.getString("post_content")
+                    val postDate = publicsObject.getString("post_date")
+                    val postBy = publicsObject.getString("post_by")
+                    val userId = publicsObject.getString("user_id")
+                    val profilePic = publicsObject.getString("profile_pic")
+                    val nickname = publicsObject.getString("nickname")
+                    val username = publicsObject.getString("username")
+                    val voted = publicsObject.getString("voted")
+                    val votes = publicsObject.getString("votes")
+                    val replies = publicsObject.getString("replies")
+                    val online = publicsObject.getString("online")
+                    val verified = publicsObject.getString("verified")
+                    val clantag = publicsObject.getString("clantag")
+                    val publicsPostResult = PublicsPostRecycler(id, subject, date, cat, topicBy, postId, postTopic, postContent, postDate, postBy, userId, profilePic, nickname, username, voted, votes, replies, online, verified, clantag)
+                    publicsPostList!!.add(publicsPostResult)
+                }
+                adapter = PublicsPostAdapter(mContext!!, publicsPostList!!)
+                publicsView!!.adapter = adapter
+                mProgressBar!!.visibility = View.GONE
+                publicsSwipe!!.visibility = View.VISIBLE
+                publicsSwipe!!.isRefreshing = false
+            } catch (e: JSONException) {
+                e.printStackTrace()
+            }
+        }) { error: VolleyError -> Toast.makeText(mContext, error.message, Toast.LENGTH_SHORT).show() }
+        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
+    }
+
+    private fun isJoinRequested(post_id: String, time: String) {
+        val stringRequest: StringRequest = object : StringRequest(Method.POST, GET_REQUESTS, Response.Listener { response: String? ->
+            try {
+                val obj = JSONObject(response!!)
+                if (obj.getString("error") == "false") {
+                    if (obj.has("request_sent") && obj.getString("request_sent") == "yes") {
+                        requestedToJoin!!.visibility = View.VISIBLE
+                        requestProgressBar!!.visibility = View.GONE
+                        requestedToJoin!!.setOnClickListener {
+                            val dialogClickListener = DialogInterface.OnClickListener { _: DialogInterface?, which: Int ->
+                                when (which) {
+                                    DialogInterface.BUTTON_POSITIVE -> {
+                                        requestedToJoin!!.visibility = View.GONE
+                                        requestProgressBar!!.visibility = View.VISIBLE
+                                        if (mContext is FragmentContainer) {
+                                            leaveTopic(post_id)
+                                        }
+                                    }
+                                    DialogInterface.BUTTON_NEGATIVE -> { }
+                                }
+                            }
+                            val builder = AlertDialog.Builder(mContext, R.style.AlertDialogStyle)
+                            builder.setMessage(R.string.leave_publics_topic_requested).setPositiveButton("Yes", dialogClickListener)
+                                    .setNegativeButton("No", dialogClickListener).show()
+                        }
+                    } else if (obj.has("request_sent") && obj.getString("request_sent") == "no") {
+                        requestToJoin!!.visibility = View.VISIBLE
+                        requestProgressBar!!.visibility = View.GONE
+                        if (time == "ended") {
+                            requestToJoin!!.setBackgroundResource(drawable.grey_button)
+                            requestToJoin!!.setOnClickListener { }
+                        } else {
+                            requestToJoin!!.setOnClickListener {
+                                requestToJoin!!.visibility = View.GONE
+                                requestProgressBar!!.visibility = View.VISIBLE
+                                isConnectOrReceivedConnect(post_id)
+                            }
                         }
                     }
                 } else {
@@ -593,327 +557,338 @@ public class PublicsTopicFragment extends Fragment {
                             mContext,
                             obj.getString("message"),
                             Toast.LENGTH_LONG
-                    ).show();
+                    ).show()
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
-        }, error -> Toast.makeText(mContext,"Could not get requests, please try again later...",Toast.LENGTH_LONG).show()){
-            @Override
-            protected Map<String, String> getParams()  {
-                Map<String,String> parms= new HashMap<>();
-                parms.put("topic_id",post_id);
-                parms.put("thisusername",deviceusername);
-                return parms;
+        }, Response.ErrorListener { Toast.makeText(mContext, "Could not get requests, please try again later...", Toast.LENGTH_LONG).show() }) {
+            override fun getParams(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["topic_id"] = post_id
+                params["thisusername"] = deviceusername!!
+                return params
             }
-        };
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
+        }
+        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
-    public void requestToJoin(final String topic_id){
-        StringRequest stringRequest=new StringRequest(Request.Method.POST, JOIN_TOPIC, response -> {
+    fun requestToJoin(topic_id: String) {
+        val stringRequest: StringRequest = object : StringRequest(Method.POST, JOIN_TOPIC, Response.Listener { response: String? ->
             try {
-                JSONObject obj = new JSONObject(response);
-                if(obj.getString("result").equals("success")){
-                    requestedToJoin.setVisibility(View.VISIBLE);
-                    requestProgressBar.setVisibility(View.GONE);
-                    Toast.makeText(mContext, "Request Sent!", Toast.LENGTH_LONG).show();
-                }else{
-                    Toast.makeText(mContext, obj.getString("message"), Toast.LENGTH_LONG).show();
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }, error -> Toast.makeText(mContext,"Could not send request, please try again later...",Toast.LENGTH_LONG).show()){
-            @Override
-            protected Map<String, String> getParams()  {
-                Map<String,String> parms= new HashMap<>();
-                parms.put("topic_id",topic_id);
-                parms.put("thisusername",deviceusername);
-                parms.put("thisuserid",userID);
-                return parms;
-            }
-        };
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
-    }
-
-    public void requestToJoinNonConnection(final String topic_id){
-        StringRequest stringRequest=new StringRequest(Request.Method.POST, JOIN_TOPIC_NON_CONNECTION, response -> {
-            try {
-                JSONObject obj = new JSONObject(response);
-                if(obj.getString("result").equals("success")){
-                    requestedToJoin.setVisibility(View.VISIBLE);
-                    requestProgressBar.setVisibility(View.GONE);
-                    Toast.makeText(mContext, "Request Sent!", Toast.LENGTH_LONG).show();
+                val obj = JSONObject(response!!)
+                if (obj.getString("result") == "success") {
+                    requestedToJoin!!.visibility = View.VISIBLE
+                    requestProgressBar!!.visibility = View.GONE
+                    Toast.makeText(mContext, "Request Sent!", Toast.LENGTH_LONG).show()
                 } else {
-                    Toast.makeText(mContext, obj.getString("message"), Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, obj.getString("message"), Toast.LENGTH_LONG).show()
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
-        }, error -> Toast.makeText(mContext,"Could not send request, please try again later...",Toast.LENGTH_LONG).show()){
-            @Override
-            protected Map<String, String> getParams()  {
-                Map<String,String> parms= new HashMap<>();
-                parms.put("topic_id",topic_id);
-                parms.put("thisusername",deviceusername);
-                parms.put("thisuserid",userID);
-                return parms;
+        }, Response.ErrorListener { Toast.makeText(mContext, "Could not send request, please try again later...", Toast.LENGTH_LONG).show() }) {
+            override fun getParams(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["topic_id"] = topic_id
+                params["thisusername"] = deviceusername!!
+                params["thisuserid"] = userID!!
+                return params
             }
-        };
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
+        }
+        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
-    public void requestToJoinNewConnection(final String topic_id){
-        StringRequest stringRequest=new StringRequest(Request.Method.POST, JOIN_TOPIC_NEW_CONNECTION, response -> {
+    fun requestToJoinNonConnection(topic_id: String) {
+        val stringRequest: StringRequest = object : StringRequest(Method.POST, JOIN_TOPIC_NON_CONNECTION, Response.Listener { response: String? ->
             try {
-                JSONObject obj = new JSONObject(response);
-                if(obj.getString("result").equals("success")){
-                    requestedToJoin.setVisibility(View.VISIBLE);
-                    requestProgressBar.setVisibility(View.GONE);
-                    Toast.makeText(mContext, "Request Sent!", Toast.LENGTH_LONG).show();
+                val obj = JSONObject(response!!)
+                if (obj.getString("result") == "success") {
+                    requestedToJoin!!.visibility = View.VISIBLE
+                    requestProgressBar!!.visibility = View.GONE
+                    Toast.makeText(mContext, "Request Sent!", Toast.LENGTH_LONG).show()
                 } else {
-                    Toast.makeText(mContext, obj.getString("message"), Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, obj.getString("message"), Toast.LENGTH_LONG).show()
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
-        }, error -> Toast.makeText(mContext,"Could not send request, please try again later...",Toast.LENGTH_LONG).show()){
-            @Override
-            protected Map<String, String> getParams()  {
-                Map<String,String> parms= new HashMap<>();
-                parms.put("topic_id",topic_id);
-                parms.put("thisusername",deviceusername);
-                parms.put("thisuserid",userID);
-                return parms;
+        }, Response.ErrorListener { Toast.makeText(mContext, "Could not send request, please try again later...", Toast.LENGTH_LONG).show() }) {
+            override fun getParams(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["topic_id"] = topic_id
+                params["thisusername"] = deviceusername!!
+                params["thisuserid"] = userID!!
+                return params
             }
-        };
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
+        }
+        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
-    public void isConnectOrReceivedConnect(final String topic_id){
-        StringRequest stringRequest=new StringRequest(Request.Method.POST, IS_CONNECTED, response -> {
+    fun requestToJoinNewConnection(topic_id: String) {
+        val stringRequest: StringRequest = object : StringRequest(Method.POST, JOIN_TOPIC_NEW_CONNECTION, Response.Listener { response: String? ->
             try {
-                JSONObject obj = new JSONObject(response);
-                if(obj.getString("result").equals("success")){
-                    if(obj.get("isFriend").equals("yes")){
-                        requestToJoin(topic_id);
-                    }else if(obj.get("isFriend").equals("received")){
-                        new LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
-                                .setTopColorRes(R.color.green)
-                                .setButtonsColorRes(R.color.green)
-                                .setIcon(R.drawable.ic_friend_add)
-                                .setTitle(R.string.accept_connection_request_publics)
-                                .setMessage(R.string.accept_connection_request_publics_message)
-                                .setPositiveButton(R.string.yes, v -> requestToJoinNewConnection(topic_id))
-                                .setNegativeButton(R.string.no, null)
-                                .show();
-                    }else{
-                        new LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
-                                .setTopColorRes(R.color.green)
-                                .setButtonsColorRes(R.color.green)
-                                .setIcon(R.drawable.ic_friend_add)
-                                .setTitle(R.string.send_connection_request)
-                                .setMessage(R.string.send_connection_request_message)
-                                .setPositiveButton(R.string.yes, v -> requestToJoinNonConnection(topic_id))
-                                .setNegativeButton(R.string.no, null)
-                                .show();
+                val obj = JSONObject(response!!)
+                if (obj.getString("result") == "success") {
+                    requestedToJoin!!.visibility = View.VISIBLE
+                    requestProgressBar!!.visibility = View.GONE
+                    Toast.makeText(mContext, "Request Sent!", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(mContext, obj.getString("message"), Toast.LENGTH_LONG).show()
+                }
+            } catch (e: JSONException) {
+                e.printStackTrace()
+            }
+        }, Response.ErrorListener { Toast.makeText(mContext, "Could not send request, please try again later...", Toast.LENGTH_LONG).show() }) {
+            override fun getParams(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["topic_id"] = topic_id
+                params["thisusername"] = deviceusername!!
+                params["thisuserid"] = userID!!
+                return params
+            }
+        }
+        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
+    }
+
+    fun isConnectOrReceivedConnect(topic_id: String) {
+        val stringRequest: StringRequest = object : StringRequest(Method.POST, IS_CONNECTED, Response.Listener { response: String? ->
+            try {
+                val obj = JSONObject(response!!)
+                if (obj.getString("result") == "success") {
+                    when {
+                        obj["isFriend"] == "yes" -> {
+                            requestToJoin(topic_id)
+                        }
+                        obj["isFriend"] == "received" -> {
+                            LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
+                                    .setTopColorRes(R.color.green)
+                                    .setButtonsColorRes(R.color.green)
+                                    .setIcon(drawable.ic_friend_add)
+                                    .setTitle(R.string.accept_connection_request_publics)
+                                    .setMessage(R.string.accept_connection_request_publics_message)
+                                    .setPositiveButton(R.string.yes) { requestToJoinNewConnection(topic_id) }
+                                    .setNegativeButton(R.string.no, null)
+                                    .show()
+                        }
+                        else -> {
+                            LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
+                                    .setTopColorRes(R.color.green)
+                                    .setButtonsColorRes(R.color.green)
+                                    .setIcon(drawable.ic_friend_add)
+                                    .setTitle(R.string.send_connection_request)
+                                    .setMessage(R.string.send_connection_request_message)
+                                    .setPositiveButton(R.string.yes) { requestToJoinNonConnection(topic_id) }
+                                    .setNegativeButton(R.string.no, null)
+                                    .show()
+                        }
                     }
                 } else {
-                    Toast.makeText(mContext, obj.getString("message"), Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, obj.getString("message"), Toast.LENGTH_LONG).show()
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
-        }, error -> Toast.makeText(mContext,"Could not send request, please try again later...",Toast.LENGTH_LONG).show()){
-            @Override
-            protected Map<String, String> getParams()  {
-                Map<String,String> parms= new HashMap<>();
-                parms.put("topic_id",topic_id);
-                parms.put("thisusername",deviceusername);
-                parms.put("thisuserid",userID);
-                return parms;
+        }, Response.ErrorListener { Toast.makeText(mContext, "Could not send request, please try again later...", Toast.LENGTH_LONG).show() }) {
+            override fun getParams(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["topic_id"] = topic_id
+                params["thisusername"] = deviceusername!!
+                params["thisuserid"] = userID!!
+                return params
             }
-        };
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
+        }
+        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
-    public void leaveTopic(final String topic_id){
-        StringRequest stringRequest=new StringRequest(Request.Method.POST, LEAVE_TOPIC, response -> {
+    fun leaveTopic(topic_id: String) {
+        val stringRequest: StringRequest = object : StringRequest(Method.POST, LEAVE_TOPIC, Response.Listener { response: String? ->
             try {
-                JSONObject obj = new JSONObject(response);
-                if (obj.getString("error").equals("false")) {
-                    if(obj.getString("result").equals("yes")){
-                        resetFragment();
+                val obj = JSONObject(response!!)
+                if (obj.getString("error") == "false") {
+                    if (obj.getString("result") == "yes") {
+                        resetFragment()
                     }
                 } else {
                     Toast.makeText(
                             mContext,
                             obj.getString("message"),
                             Toast.LENGTH_LONG
-                    ).show();
+                    ).show()
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
-        }, error -> Toast.makeText(mContext,"Could not send request, please try again later...",Toast.LENGTH_LONG).show()){
-            @Override
-            protected Map<String, String> getParams()  {
-                Map<String,String> parms= new HashMap<>();
-                parms.put("topic_id",topic_id);
-                parms.put("thisusername",deviceusername);
-                parms.put("thisuserid",userID);
-                return parms;
+        }, Response.ErrorListener { Toast.makeText(mContext, "Could not send request, please try again later...", Toast.LENGTH_LONG).show() }) {
+            override fun getParams(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["topic_id"] = topic_id
+                params["thisusername"] = deviceusername!!
+                params["thisuserid"] = userID!!
+                return params
             }
-        };
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
+        }
+        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
-    public static void hideKeyboardFrom(Context context, View view) {
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-
-    private void resetFragment(){
-        Fragment currentFragment = requireActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if (currentFragment instanceof PublicsTopicFragment) {
-            FragmentTransaction fragTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
-            fragTransaction.detach(currentFragment);
-            fragTransaction.attach(currentFragment);
-            fragTransaction.commit();
-            publicsSwipe.setRefreshing(false);
-            publicsPostsNickname_top.requestFocus();
+    private fun resetFragment() {
+        val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
+        if (currentFragment is PublicsTopicFragment) {
+            val fragTransaction = requireActivity().supportFragmentManager.beginTransaction()
+            fragTransaction.detach(currentFragment)
+            fragTransaction.attach(currentFragment)
+            fragTransaction.commit()
+            publicsSwipe!!.isRefreshing = false
+            publicspostsnicknameTop!!.requestFocus()
         }
         //refresh.setRefreshing(false);
     }
 
-    private void submitComment(final String body, final String added_by, final String user_to, final String image, final String post_id) {
-        StringRequest stringRequest=new StringRequest(Request.Method.POST, PUBLICS_POST_SUBMIT, response -> resetFragment(), error -> {
-            mProgressBar.setVisibility(GONE);
-            Toast.makeText(mContext,"Network error, please try again later...",Toast.LENGTH_LONG).show();
-        }){
-            @Override
-            protected Map<String, String> getParams()  {
-                Map<String,String> parms= new HashMap<>();
-                parms.put("body",body);
-                parms.put("added_by",added_by);
-                parms.put("user_to",user_to);
-                parms.put("image",image);
-                parms.put("post_id",post_id);
-                parms.put("user_id",userID);
-                return parms;
+    private fun submitComment(body: String, added_by: String, user_to: String, image: String, post_id: String) {
+        val stringRequest: StringRequest = object : StringRequest(Method.POST, PUBLICS_POST_SUBMIT, Response.Listener { resetFragment() }, Response.ErrorListener {
+            mProgressBar!!.visibility = View.GONE
+            Toast.makeText(mContext, "Network error, please try again later...", Toast.LENGTH_LONG).show()
+        }) {
+            override fun getParams(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["body"] = body
+                params["added_by"] = added_by
+                params["user_to"] = user_to
+                params["image"] = image
+                params["post_id"] = post_id
+                params["user_id"] = userID!!
+                return params
             }
-        };
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
+        }
+        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
-    private void topicVote(final String method, final String layout_id, final String user_to){
-        StringRequest stringRequest=new StringRequest(Request.Method.POST, VOTE_URL, response -> {
-            JSONObject obj;
+    private fun topicVote(method: String, layout_id: String, user_to: String) {
+        val stringRequest: StringRequest = object : StringRequest(Method.POST, VOTE_URL, Response.Listener { response: String? ->
+            val obj: JSONObject
             try {
-                obj = new JSONObject(response);
-                if (obj.getString("error").equals("false")) {
-                    if (obj.getString("layout").equals("topic")) {
-                        if (obj.getString("method").equals("up")) {
-                            String newValue = Integer.toString(Integer.parseInt(textViewNumPublicsPoints_top.getText().toString()) + 1);
-                            textViewNumPublicsPoints_top.setText(newValue);
-                            voteProgress.setVisibility(View.GONE);
-                            publicsPostsUpvoteGreen_top.setVisibility(View.VISIBLE);
-                            publicsPostsDownvoteWhite.setVisibility(View.VISIBLE);
-                            publicsPostsUpvoteGreen_top.setEnabled(false);
-                            publicsPostsDownvoteWhite.setEnabled(false);
-                            new Handler().postDelayed(() -> {
-                                publicsPostsUpvoteGreen_top.setEnabled(true);
-                                publicsPostsDownvoteWhite.setEnabled(true);
-                            }, 3000);
-                        } else if (obj.getString("method").equals("down")) {
-                            String newValue = Integer.toString(Integer.parseInt(textViewNumPublicsPoints_top.getText().toString()));
-                            textViewNumPublicsPoints_top.setText(newValue);
-                            voteProgress.setVisibility(View.GONE);
-                            publicsPostsUpvoteWhite_top.setVisibility(View.VISIBLE);
-                            publicsPostsDownvoteRed_top.setVisibility(View.VISIBLE);
-                            publicsPostsUpvoteWhite_top.setEnabled(false);
-                            publicsPostsDownvoteRed_top.setEnabled(false);
-                            new Handler().postDelayed(() -> {
-                                publicsPostsUpvoteWhite_top.setEnabled(true);
-                                publicsPostsDownvoteRed_top.setEnabled(true);
-                            }, 3000);
-                        } else {
-                            String finalValue = "";
-                            if (obj.getString("result").equals("-1")){
-                                finalValue = Integer.toString(Integer.parseInt(textViewNumPublicsPoints_top.getText().toString())-1);
-                            }else if(obj.getString("result").equals("+1")){
-                                finalValue = Integer.toString(Integer.parseInt(textViewNumPublicsPoints_top.getText().toString())+1);
+                obj = JSONObject(response!!)
+                if (obj.getString("error") == "false") {
+                    if (obj.getString("layout") == "topic") {
+                        when {
+                            obj.getString("method") == "up" -> {
+                                val newValue = (textviewnumpublicspointsTop!!.text.toString().toInt() + 1).toString()
+                                textviewnumpublicspointsTop!!.text = newValue
+                                voteProgress!!.visibility = View.GONE
+                                publicspostsupvotegreenTop!!.visibility = View.VISIBLE
+                                publicsPostsDownvoteWhite!!.visibility = View.VISIBLE
+                                publicspostsupvotegreenTop!!.isEnabled = false
+                                publicsPostsDownvoteWhite!!.isEnabled = false
+                                Handler().postDelayed({
+                                    publicspostsupvotegreenTop!!.isEnabled = true
+                                    publicsPostsDownvoteWhite!!.isEnabled = true
+                                }, 3000)
                             }
-                            textViewNumPublicsPoints_top.setText(finalValue);
-                            publicsPostsUpvoteWhite_top.setVisibility(View.VISIBLE);
-                            publicsPostsDownvoteWhite.setVisibility(View.VISIBLE);
-                            voteProgress.setVisibility(View.GONE);
-                            publicsPostsUpvoteWhite_top.setEnabled(false);
-                            publicsPostsDownvoteWhite.setEnabled(false);
-                            new Handler().postDelayed(() -> {
-                                publicsPostsUpvoteWhite_top.setEnabled(true);
-                                publicsPostsDownvoteWhite.setEnabled(true);
-                            }, 3000);
+                            obj.getString("method") == "down" -> {
+                                val newValue = textviewnumpublicspointsTop!!.text.toString().toInt().toString()
+                                textviewnumpublicspointsTop!!.text = newValue
+                                voteProgress!!.visibility = View.GONE
+                                publicspostsupvotewhiteTop!!.visibility = View.VISIBLE
+                                publicspostsdownvoteredTop!!.visibility = View.VISIBLE
+                                publicspostsupvotewhiteTop!!.isEnabled = false
+                                publicspostsdownvoteredTop!!.isEnabled = false
+                                Handler().postDelayed({
+                                    publicspostsupvotewhiteTop!!.isEnabled = true
+                                    publicspostsdownvoteredTop!!.isEnabled = true
+                                }, 3000)
+                            }
+                            else -> {
+                                var finalValue = ""
+                                if (obj.getString("result") == "-1") {
+                                    finalValue = (textviewnumpublicspointsTop!!.text.toString().toInt() - 1).toString()
+                                } else if (obj.getString("result") == "+1") {
+                                    finalValue = (textviewnumpublicspointsTop!!.text.toString().toInt() + 1).toString()
+                                }
+                                textviewnumpublicspointsTop!!.text = finalValue
+                                publicspostsupvotewhiteTop!!.visibility = View.VISIBLE
+                                publicsPostsDownvoteWhite!!.visibility = View.VISIBLE
+                                voteProgress!!.visibility = View.GONE
+                                publicspostsupvotewhiteTop!!.isEnabled = false
+                                publicsPostsDownvoteWhite!!.isEnabled = false
+                                Handler().postDelayed({
+                                    publicspostsupvotewhiteTop!!.isEnabled = true
+                                    publicsPostsDownvoteWhite!!.isEnabled = true
+                                }, 3000)
+                            }
                         }
                     }
                 } else {
-                    Toast.makeText(mContext,obj.getString("message"),Toast.LENGTH_LONG).show();
-                    voteProgress.setVisibility(View.GONE);
-                    publicsPostsUpvoteWhite_top.setVisibility(View.VISIBLE);
-                    publicsPostsDownvoteWhite.setVisibility(View.VISIBLE);
-                    publicsPostsUpvoteWhite_top.setEnabled(false);
-                    publicsPostsDownvoteWhite.setEnabled(false);
-                    new Handler().postDelayed(() -> {
-                        publicsPostsUpvoteWhite_top.setEnabled(true);
-                        publicsPostsDownvoteWhite.setEnabled(true);
-                    },3000);
+                    Toast.makeText(mContext, obj.getString("message"), Toast.LENGTH_LONG).show()
+                    voteProgress!!.visibility = View.GONE
+                    publicspostsupvotewhiteTop!!.visibility = View.VISIBLE
+                    publicsPostsDownvoteWhite!!.visibility = View.VISIBLE
+                    publicspostsupvotewhiteTop!!.isEnabled = false
+                    publicsPostsDownvoteWhite!!.isEnabled = false
+                    Handler().postDelayed({
+                        publicspostsupvotewhiteTop!!.isEnabled = true
+                        publicsPostsDownvoteWhite!!.isEnabled = true
+                    }, 3000)
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
-        }, error -> {
-            Toast.makeText(mContext,"Could not vote, please try again later...",Toast.LENGTH_LONG).show();
-            voteProgress.setVisibility(View.GONE);
-            publicsPostsUpvoteWhite_top.setVisibility(View.VISIBLE);
-            publicsPostsDownvoteWhite.setVisibility(View.VISIBLE);
-            publicsPostsUpvoteWhite_top.setEnabled(false);
-            publicsPostsDownvoteWhite.setEnabled(false);
-            new Handler().postDelayed(() -> {
-                publicsPostsUpvoteWhite_top.setEnabled(true);
-                publicsPostsDownvoteWhite.setEnabled(true);
-            },3000);
-        }){
-            @Override
-            protected Map<String, String> getParams()  {
-                Map<String,String> parms= new HashMap<>();
-                parms.put("post_id",layout_id);
-                parms.put("method",method);
-                parms.put("layout", "topic");
-                parms.put("user_to",user_to);
-                parms.put("user_id",userID);
-                parms.put("username",deviceusername);
-                return parms;
+        }, Response.ErrorListener {
+            Toast.makeText(mContext, "Could not vote, please try again later...", Toast.LENGTH_LONG).show()
+            voteProgress!!.visibility = View.GONE
+            publicspostsupvotewhiteTop!!.visibility = View.VISIBLE
+            publicsPostsDownvoteWhite!!.visibility = View.VISIBLE
+            publicspostsupvotewhiteTop!!.isEnabled = false
+            publicsPostsDownvoteWhite!!.isEnabled = false
+            Handler().postDelayed({
+                publicspostsupvotewhiteTop!!.isEnabled = true
+                publicsPostsDownvoteWhite!!.isEnabled = true
+            }, 3000)
+        }) {
+            override fun getParams(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["post_id"] = layout_id
+                params["method"] = method
+                params["layout"] = "topic"
+                params["user_to"] = user_to
+                params["user_id"] = userID!!
+                params["username"] = deviceusername!!
+                return params
             }
-        };
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
+        }
+        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
-    private void deleteTopic(final String post_id){
-        StringRequest stringRequest=new StringRequest(Request.Method.POST, PUBLICS_DELETE, response -> resetFragment(), error -> {
-            mProgressBar.setVisibility(GONE);
-            Toast.makeText(mContext,"Network error, please try again later...",Toast.LENGTH_LONG).show();
-        }){
-            @Override
-            protected Map<String, String> getParams()  {
-                Map<String,String> parms= new HashMap<>();
-                parms.put("username",deviceusername);
-                parms.put("topic_id",post_id);
-                parms.put("user_id",userID);
-                return parms;
+    private fun deleteTopic(post_id: String) {
+        val stringRequest: StringRequest = object : StringRequest(Method.POST, PUBLICS_DELETE, Response.Listener { resetFragment() }, Response.ErrorListener {
+            mProgressBar!!.visibility = View.GONE
+            Toast.makeText(mContext, "Network error, please try again later...", Toast.LENGTH_LONG).show()
+        }) {
+            override fun getParams(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["username"] = deviceusername!!
+                params["topic_id"] = post_id
+                params["user_id"] = userID!!
+                return params
             }
-        };
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
+        }
+        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
+    companion object {
+        private const val PublicsTopicTop_URL = Constants.ROOT_URL + "publicsTopicTop_api.php"
+        private const val PublicsTopic_URL = Constants.ROOT_URL + "publicsTopic_api.php"
+        private const val LEAVE_TOPIC = Constants.ROOT_URL + "publics_leave_topic.php"
+        private const val JOIN_TOPIC = Constants.ROOT_URL + "publics_join_topic.php"
+        private const val JOIN_TOPIC_NON_CONNECTION = Constants.ROOT_URL + "publics_join_topic_non_connection.php"
+        private const val JOIN_TOPIC_NEW_CONNECTION = Constants.ROOT_URL + "publics_join_topic_new_connection.php"
+        private const val IS_CONNECTED = Constants.ROOT_URL + "publics_join_topic_is_connected.php"
+        private const val GET_REQUESTS = Constants.ROOT_URL + "publics_get_requests.php"
+        private const val PUBLICS_POST_SUBMIT = Constants.ROOT_URL + "publics_comment_submit.php"
+        private const val PUBLICS_DELETE = Constants.ROOT_URL + "publics_topic_delete.php"
+        private const val VOTE_URL = Constants.ROOT_URL + "publics_topic_vote.php"
+        fun hideKeyboardFrom(context: Context?, view: View) {
+            val imm = context!!.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+    }
 }

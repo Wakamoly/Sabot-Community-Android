@@ -53,7 +53,7 @@ class ClanFragment : Fragment() {
     private var clanEventsRecycler: RecyclerView? = null
     private var clanNewsRecycler: RecyclerView? = null
     private var clanNewsAdapter: ProfilenewsAdapter? = null
-    private var clanNewsRecyclerList: MutableList<Profilenews_Recycler>? = null
+    private var clanNewsRecyclerList: MutableList<ProfilenewsRecycler>? = null
     private var textViewTvClicks: TextView? = null
     private var textViewTvReviews: TextView? = null
     private var eventsCount: TextView? = null
@@ -156,8 +156,8 @@ class ClanFragment : Fragment() {
         backArrow = clanRootView.findViewById(R.id.backArrow)
         clanNewsMoreBtn = clanRootView.findViewById(R.id.profileNewsMoreBtn)
         mContext = activity
-        userID = SharedPrefManager.getInstance(mContext).userID
-        username = SharedPrefManager.getInstance(mContext).username
+        userID = SharedPrefManager.getInstance(mContext!!)!!.userID
+        username = SharedPrefManager.getInstance(mContext!!)!!.username
         clanID = requireArguments().getString("ClanId")
         clanNewsRecyclerList = ArrayList()
         clanNewsRecycler = clanRootView.findViewById(R.id.recyclerProfilenews)
@@ -255,13 +255,13 @@ class ClanFragment : Fragment() {
                                 }
                                 submitStatusButton!!.setOnClickListener { view: View ->
                                     val body = statusUpdate!!.text.toString()
-                                    val addedBy = SharedPrefManager.getInstance(mContext).username
+                                    val addedBy = SharedPrefManager.getInstance(mContext!!)!!.username
                                     val spinnerText = postTypeSpinner!!.selectedItem.toString()
                                     val form = "clan"
                                     if (statusUpdate!!.text.toString().isNotEmpty() && spinnerText.isNotEmpty()) {
                                         clanLayout!!.visibility = View.GONE
                                         mProgressBar!!.visibility = View.VISIBLE
-                                        submitClanPost(body, addedBy, tag, spinnerText, form)
+                                        submitClanPost(body, addedBy!!, tag, spinnerText, form)
                                         hideKeyboardFrom(mContext, view)
                                     } else {
                                         Toast.makeText(mContext, "You must enter text before submitting!", Toast.LENGTH_LONG).show()
@@ -290,13 +290,13 @@ class ClanFragment : Fragment() {
                                 }
                                 submitStatusButton!!.setOnClickListener { view: View ->
                                     val body = statusUpdate!!.text.toString()
-                                    val addedBy = SharedPrefManager.getInstance(mContext).username
+                                    val addedBy = SharedPrefManager.getInstance(mContext!!)!!.username
                                     val spinnerText = postTypeSpinner!!.selectedItem.toString()
                                     val form = "clan"
                                     if (statusUpdate!!.text.toString().isNotEmpty() && spinnerText.isNotEmpty()) {
                                         clanLayout!!.visibility = View.GONE
                                         mProgressBar!!.visibility = View.VISIBLE
-                                        submitClanPost(body, addedBy, tag, spinnerText, form)
+                                        submitClanPost(body, addedBy!!, tag, spinnerText, form)
                                         hideKeyboardFrom(mContext, view)
                                     } else {
                                         Toast.makeText(mContext, "You must enter text before submitting!", Toast.LENGTH_LONG).show()
@@ -621,10 +621,10 @@ class ClanFragment : Fragment() {
                     val likedbyuserYes = clannewsObject.getString("likedbyuseryes")
                     val form = clannewsObject.getString("form")
                     val edited = clannewsObject.getString("edited")
-                    val clanpostsRecycler = Profilenews_Recycler(id, type, likes, body, addedBy, userTo, dateAdded, userClosed, deleted, image, userId, profilePic, verified, online, nickname, username, commentcount, likedbyuserYes, form, edited)
+                    val clanpostsRecycler = ProfilenewsRecycler(id, type, likes, body, addedBy, userTo, dateAdded, userClosed, deleted, image, userId, profilePic, verified, online, nickname, username, commentcount, likedbyuserYes, form, edited)
                     clanNewsRecyclerList!!.add(clanpostsRecycler)
                 }
-                clanNewsAdapter = ProfilenewsAdapter(mContext, clanNewsRecyclerList)
+                clanNewsAdapter = ProfilenewsAdapter(mContext!!, clanNewsRecyclerList)
                 clanNewsRecycler!!.adapter = clanNewsAdapter
                 if (clannews.length() == 0) {
                     clanNewsSpotlight!!.visibility = View.GONE

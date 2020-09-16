@@ -1,105 +1,92 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.os.Bundle;
-import com.google.android.material.textfield.TextInputEditText;
-import androidx.fragment.app.FragmentActivity;
-import android.text.TextUtils;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.app.ProgressDialog
+import android.content.Intent
+import android.os.Bundle
+import android.text.TextUtils
+import android.widget.TextView
+import android.widget.Toast
+import androidx.fragment.app.FragmentActivity
+import com.android.volley.Response
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.StringRequest
+import com.google.android.material.textfield.TextInputEditText
+import org.json.JSONException
+import org.json.JSONObject
+import java.util.*
+import java.util.regex.Pattern
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.regex.Pattern;
-
-import static com.lucidsoftworksllc.sabotcommunity.Constants.ROOT_URL;
-
-public class ForgotPassActivity extends FragmentActivity {
-
-    public static final String URL_FORGOT_PASS = ROOT_URL+"password_recovery.php";
-
-    private TextInputEditText emailEditText, usernameEditText;
-    private ProgressDialog progressDialog;
-    private TextView forgotButton;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_forgot_pass);
-        progressDialog = new ProgressDialog(this);
-        emailEditText = findViewById(R.id.emailForgotEditText);
-        usernameEditText = findViewById(R.id.usernameForgotEditText);
-        forgotButton = findViewById(R.id.forgotButton);
-        forgotButton.setOnClickListener(v -> {
-            final String email = Objects.requireNonNull(emailEditText.getText()).toString().trim();
-            final String username = Objects.requireNonNull(usernameEditText.getText()).toString().trim();
-            ForgotPassword(email,username);
-        });
+class ForgotPassActivity : FragmentActivity() {
+    private var emailEditText: TextInputEditText? = null
+    private var usernameEditText: TextInputEditText? = null
+    private var progressDialog: ProgressDialog? = null
+    private var forgotButton: TextView? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.fragment_forgot_pass)
+        progressDialog = ProgressDialog(this)
+        emailEditText = findViewById(R.id.emailForgotEditText)
+        usernameEditText = findViewById(R.id.usernameForgotEditText)
+        forgotButton = findViewById(R.id.forgotButton)
+        forgotButton?.setOnClickListener {
+            val email = Objects.requireNonNull(emailEditText?.text).toString().trim { it <= ' ' }
+            val username = Objects.requireNonNull(usernameEditText?.text).toString().trim { it <= ' ' }
+            forgotPassword(email, username)
+        }
     }
 
-    public void ForgotPassword(final String email, final String username){
-        if (username.length() < 4 || username.length() > 20) {
-            Toast.makeText(getApplicationContext(), "Username must be 4 to 20 characters long!", Toast.LENGTH_LONG).show();
-            progressDialog.dismiss();
+    private fun forgotPassword(email: String, username: String) {
+        if (username.length < 4 || username.length > 20) {
+            Toast.makeText(applicationContext, "Username must be 4 to 20 characters long!", Toast.LENGTH_LONG).show()
+            progressDialog!!.dismiss()
         } else {
             if (isValidEmail(email)) {
-                progressDialog.setMessage("Checking credentials...");
-                progressDialog.show();
-                StringRequest stringRequest = new StringRequest(Request.Method.POST,
+                progressDialog!!.setMessage("Checking credentials...")
+                progressDialog!!.show()
+                val stringRequest: StringRequest = object : StringRequest(Method.POST,
                         URL_FORGOT_PASS,
-                        response -> {
-                            progressDialog.dismiss();
+                        Response.Listener { response: String? ->
+                            progressDialog!!.dismiss()
                             try {
-                                JSONObject jsonObject = new JSONObject(response);
+                                val jsonObject = JSONObject(response!!)
                                 if (!jsonObject.getBoolean("error")) {
-                                    startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-                                    finish();
-                                    Toast.makeText(getApplicationContext(), "Success, check your emails!", Toast.LENGTH_LONG).show();
+                                    startActivity(Intent(applicationContext, LoginActivity::class.java))
+                                    finish()
+                                    Toast.makeText(applicationContext, "Success, check your emails!", Toast.LENGTH_LONG).show()
                                 } else {
-                                    Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_LONG).show();
+                                    Toast.makeText(applicationContext, jsonObject.getString("message"), Toast.LENGTH_LONG).show()
                                 }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+                            } catch (e: JSONException) {
+                                e.printStackTrace()
                             }
-                        }, error -> {
-                            progressDialog.hide();
-                            Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
-                        }) {
-                    @Override
-                    protected Map<String, String> getParams() {
-                        Map<String, String> params = new HashMap<>();
-                        params.put("username", username);
-                        params.put("email", email);
-                        return params;
+                        }, Response.ErrorListener { error: VolleyError ->
+                    progressDialog!!.hide()
+                    Toast.makeText(applicationContext, error.message, Toast.LENGTH_LONG).show()
+                }) {
+                    override fun getParams(): Map<String, String> {
+                        val params: MutableMap<String, String> = HashMap()
+                        params["username"] = username
+                        params["email"] = email
+                        return params
                     }
-                };
-                RequestHandler.getInstance(this).addToRequestQueue(stringRequest);
+                }
+                RequestHandler.getInstance(this)!!.addToRequestQueue(stringRequest)
             } else {
-                Toast.makeText(getApplicationContext(), "E-mail not valid!", Toast.LENGTH_LONG).show();
-                progressDialog.dismiss();
+                Toast.makeText(applicationContext, "E-mail not valid!", Toast.LENGTH_LONG).show()
+                progressDialog!!.dismiss()
             }
         }
     }
 
-    public final static boolean isValidEmail(CharSequence target) {
-        return !TextUtils.isEmpty(target) && Pattern.compile("^(([\\w-]+\\.)+[\\w-]+|([a-zA-Z]{1}|[\\w-]{2,}))@"
-                + "((([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
-                + "[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\."
-                + "([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
-                + "[0-9]{1,2}|25[0-5]|2[0-4][0-9])){1}|"
-                + "([a-zA-Z]+[\\w-]+\\.)+[a-zA-Z]{2,4})$").matcher(target).matches();
+    companion object {
+        const val URL_FORGOT_PASS: String = Constants.ROOT_URL + "password_recovery.php"
+        fun isValidEmail(target: CharSequence?): Boolean {
+            return !TextUtils.isEmpty(target!!) && Pattern.compile("^(([\\w-]+\\.)+[\\w-]+|([a-zA-Z]{1}|[\\w-]{2,}))@"
+                    + "((([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
+                    + "[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\."
+                    + "([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
+                    + "[0-9]{1,2}|25[0-5]|2[0-4][0-9])){1}|"
+                    + "([a-zA-Z]+[\\w-]+\\.)+[a-zA-Z]{2,4})$").matcher(target).matches()
+        }
     }
-
 }

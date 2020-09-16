@@ -1,6 +1,6 @@
 package com.lucidsoftworksllc.sabotcommunity
 
-internal class ClansRecycler(val position: String,
+class ClansRecycler(val position: String,
                              val tag: String,
                              val name: String,
                              val num_members: String,

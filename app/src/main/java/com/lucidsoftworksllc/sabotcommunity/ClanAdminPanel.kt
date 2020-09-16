@@ -100,8 +100,8 @@ class ClanAdminPanel : Fragment() {
         setClanPhotoButton = clanAdminRootView.findViewById(R.id.setClanPhotoButton)
         progressDialog = ProgressDialog(activity)
         mContext = activity
-        userID = SharedPrefManager.getInstance(mContext).userID
-        username = SharedPrefManager.getInstance(mContext).username
+        userID = SharedPrefManager.getInstance(mContext!!)!!.userID
+        username = SharedPrefManager.getInstance(mContext!!)!!.username
         clanID = requireArguments().getString("ClanId")
         saveChanges?.setOnClickListener { saveChangesClick() }
         backArrow?.setOnClickListener { requireActivity().supportFragmentManager.popBackStackImmediate() }
@@ -197,8 +197,8 @@ class ClanAdminPanel : Fragment() {
         val description = descriptionET!!.text.toString().trim { it <= ' ' }
         val discord = discordInput!!.text.toString().trim { it <= ' ' }
         val clanname = editClanname!!.text.toString().trim { it <= ' ' }
-        val username = SharedPrefManager.getInstance(activity).username
-        if (clanname.isNotEmpty() && username.isNotEmpty()) {
+        val username = SharedPrefManager.getInstance(requireActivity())!!.username
+        if (clanname.isNotEmpty() && username!!.isNotEmpty()) {
             val stringRequest: StringRequest = object : StringRequest(Method.POST,
                     CLAN_SAVE_SETTINGS,
                     Response.Listener { response: String? ->
@@ -219,7 +219,7 @@ class ClanAdminPanel : Fragment() {
                     }) {
                 override fun getParams(): Map<String, String> {
                     val params: MutableMap<String, String> = HashMap()
-                    params["username"] = username
+                    params["username"] = username!!
                     params["userid"] = userID!!
                     params["clanid"] = clanID!!
                     params["facebook"] = facebook
@@ -233,7 +233,7 @@ class ClanAdminPanel : Fragment() {
                     return params
                 }
             }
-            RequestHandler.getInstance(mContext).addToRequestQueue(stringRequest)
+            RequestHandler.getInstance(mContext!!)!!.addToRequestQueue(stringRequest)
         } else {
             progressDialog!!.dismiss()
             Toast.makeText(mContext, "Please fill in clan name field!", Toast.LENGTH_LONG).show()

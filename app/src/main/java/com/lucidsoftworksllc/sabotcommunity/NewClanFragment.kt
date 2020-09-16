@@ -1,352 +1,354 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.Manifest;
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Handler;
-import android.provider.MediaStore;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Base64;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.provider.MediaStore
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Base64
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import com.android.volley.*
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.DexterError
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import com.lucidsoftworksllc.sabotcommunity.Constants.ROOT_URL
+import com.theartofdev.edmodo.cropper.CropImage
+import org.json.JSONException
+import org.json.JSONObject
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.util.*
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.MultiplePermissionsReport;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.DexterError;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.PermissionRequestErrorListener;
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-import com.theartofdev.edmodo.cropper.CropImage;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static android.app.Activity.RESULT_CANCELED;
-import static android.app.Activity.RESULT_OK;
-import static android.view.View.GONE;
-import static com.lucidsoftworksllc.sabotcommunity.Constants.ROOT_URL;
-
-public class NewClanFragment extends Fragment {
-
-    private ImageView newClanCover, new_clan_insignia;
-    private RelativeLayout setNewClanCoverButton, setInsigniaButton;
-    private TextView newClanTag, newClanName;
-    private EditText etNewClanTag, etNewClanName, etNewClanDescription;
-    private Button btnSubmit;
-    private Context mContext;
-    private String userID,username,tagTakenString;
-    private ProgressBar newClanProgressBar;
-    private final int GALLERY_COVER = 1;
-    private final int GALLERY_INSIGNIA = 2;
-    private Bitmap newClanCoverBitmap,new_clan_insigniaBitmap;
-    JSONObject jsonObject;
-    RequestQueue rQueue;
-    public static final String URL_TAG_IN_USE = ROOT_URL + "clan_tag_used.php";
-    public static final String UPLOAD_COVER_URL = Constants.ROOT_URL+"uploadCoverClan.php";
-    public static final String UPLOAD_INSIGNIA_URL = Constants.ROOT_URL+"uploadInsigniaClan.php";
-    public static final String URL_CLAN_SUBMIT = Constants.ROOT_URL+"submit_new_clan.php";
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View newClanRootView = inflater.inflate(R.layout.fragment_new_clan, null);
-
-        new_clan_insignia = newClanRootView.findViewById(R.id.new_clan_insignia);
-        btnSubmit = newClanRootView.findViewById(R.id.btnSubmit);
-        etNewClanTag = newClanRootView.findViewById(R.id.etNewClanTag);
-        etNewClanName = newClanRootView.findViewById(R.id.etNewClanName);
-        etNewClanDescription = newClanRootView.findViewById(R.id.etNewClanDescription);
-        newClanTag = newClanRootView.findViewById(R.id.newClanTag);
-        newClanName = newClanRootView.findViewById(R.id.newClanName);
-        setNewClanCoverButton = newClanRootView.findViewById(R.id.setNewClanCoverButton);
-        setInsigniaButton = newClanRootView.findViewById(R.id.setInsigniaButton);
-        newClanCover = newClanRootView.findViewById(R.id.newClanCover);
-        newClanProgressBar = newClanRootView.findViewById(R.id.newClanProgressBar);
-        mContext = getActivity();
-        userID = SharedPrefManager.getInstance(mContext).getUserID();
-        username = SharedPrefManager.getInstance(mContext).getUsername();
-        newClanCoverBitmap = null;
-        new_clan_insigniaBitmap = null;
-        tagTakenString = "";
-
-        btnSubmit.setOnClickListener(v -> {
-            if((etNewClanTag.getText().toString().length()>=2)){
-                if (etNewClanName.getText().toString().length()>=3&&(etNewClanName.getText().toString().length()<=25)){
-                    if(tagTakenString.equals("")){
-                        newClanProgressBar.setVisibility(View.VISIBLE);
-                        btnSubmit.setVisibility(View.GONE);
-                        SubmitClan(etNewClanTag.getText().toString(),etNewClanName.getText().toString(),etNewClanDescription.getText().toString());
-                    }else{
-                        etNewClanTag.requestFocus();
-                        Toast.makeText(mContext, "Clan Tag Taken!", Toast.LENGTH_SHORT).show();
+class NewClanFragment : Fragment() {
+    private var newClanCover: ImageView? = null
+    private var newClanInsignia: ImageView? = null
+    private var setNewClanCoverButton: RelativeLayout? = null
+    private var setInsigniaButton: RelativeLayout? = null
+    private var newClanTag: TextView? = null
+    private var newClanName: TextView? = null
+    private var etNewClanTag: EditText? = null
+    private var etNewClanName: EditText? = null
+    private var etNewClanDescription: EditText? = null
+    private var btnSubmit: Button? = null
+    private var mContext: Context? = null
+    private var userID: String? = null
+    private var username: String? = null
+    private var tagTakenString: String? = null
+    private var newClanProgressBar: ProgressBar? = null
+    private val galleryCover = 1
+    private val galleryInsignia = 2
+    private var newClanCoverBitmap: Bitmap? = null
+    private var newClanInsigniabitmap: Bitmap? = null
+    var jsonObject: JSONObject? = null
+    var rQueue: RequestQueue? = null
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val newClanRootView = inflater.inflate(R.layout.fragment_new_clan, null)
+        newClanInsignia = newClanRootView.findViewById(R.id.new_clan_insignia)
+        btnSubmit = newClanRootView.findViewById(R.id.btnSubmit)
+        etNewClanTag = newClanRootView.findViewById(R.id.etNewClanTag)
+        etNewClanName = newClanRootView.findViewById(R.id.etNewClanName)
+        etNewClanDescription = newClanRootView.findViewById(R.id.etNewClanDescription)
+        newClanTag = newClanRootView.findViewById(R.id.newClanTag)
+        newClanName = newClanRootView.findViewById(R.id.newClanName)
+        setNewClanCoverButton = newClanRootView.findViewById(R.id.setNewClanCoverButton)
+        setInsigniaButton = newClanRootView.findViewById(R.id.setInsigniaButton)
+        newClanCover = newClanRootView.findViewById(R.id.newClanCover)
+        newClanProgressBar = newClanRootView.findViewById(R.id.newClanProgressBar)
+        mContext = activity
+        userID = SharedPrefManager.getInstance(mContext!!)!!.userID
+        username = SharedPrefManager.getInstance(mContext!!)!!.username
+        newClanCoverBitmap = null
+        newClanInsigniabitmap = null
+        tagTakenString = ""
+        btnSubmit?.setOnClickListener {
+            if (etNewClanTag?.text.toString().length >= 2) {
+                if (etNewClanName?.text.toString().length in 3..25) {
+                    if (tagTakenString == "") {
+                        newClanProgressBar?.visibility = View.VISIBLE
+                        btnSubmit?.visibility = View.GONE
+                        submitClan(etNewClanTag?.text.toString(), etNewClanName?.text.toString(), etNewClanDescription?.text.toString())
+                    } else {
+                        etNewClanTag?.requestFocus()
+                        Toast.makeText(mContext, "Clan Tag Taken!", Toast.LENGTH_SHORT).show()
                     }
-                }else{
-                    Toast.makeText(mContext, "Clan name must be 6-25 characters long", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(mContext, "Clan name must be 6-25 characters long", Toast.LENGTH_SHORT).show()
                 }
-            }else{
-                Toast.makeText(mContext, "Clan tag must be at least 2 characters long", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(mContext, "Clan tag must be at least 2 characters long", Toast.LENGTH_SHORT).show()
             }
-        });
-
-        setNewClanCoverButton.setOnClickListener(v -> {
-            requestMultiplePermissions();
-            Intent galleryIntent = CropImage.activity().getIntent(requireContext());
-            startActivityForResult(galleryIntent, GALLERY_COVER);
-        });
-
-        setInsigniaButton.setOnClickListener(v -> {
-            requestMultiplePermissions();
-            Intent galleryIntent = CropImage.activity().setAspectRatio(1,1).getIntent(requireContext());
-            startActivityForResult(galleryIntent, GALLERY_INSIGNIA);
-        });
-
-        etNewClanTag.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String clantag = etNewClanTag.getText().toString();
-                newClanTag.setText(String.format("[%s]", clantag));
-                final Handler handler = new Handler();
-                handler.postDelayed(() -> {
-                    String clantag1 = etNewClanTag.getText().toString();
-                    StringRequest stringRequest = new StringRequest(Request.Method.GET, URL_TAG_IN_USE+"?userid="+userID+"&username="+username+"&tag="+ clantag1, response -> {
+        }
+        setNewClanCoverButton?.setOnClickListener {
+            requestMultiplePermissions()
+            val galleryIntent = CropImage.activity().getIntent(requireContext())
+            startActivityForResult(galleryIntent, galleryCover)
+        }
+        setInsigniaButton?.setOnClickListener {
+            requestMultiplePermissions()
+            val galleryIntent = CropImage.activity().setAspectRatio(1, 1).getIntent(requireContext())
+            startActivityForResult(galleryIntent, galleryInsignia)
+        }
+        etNewClanTag?.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                val clantag = etNewClanTag?.text.toString()
+                newClanTag?.text = String.format("[%s]", clantag)
+                val handler = Handler()
+                handler.postDelayed({
+                    val clantag1 = etNewClanTag?.text.toString()
+                    val stringRequest = StringRequest(Request.Method.GET, "$URL_TAG_IN_USE?userid=$userID&username=$username&tag=$clantag1", { response: String? ->
                         try {
-                            JSONObject tagTakenObject = new JSONObject(response);
-                            if(tagTakenObject.getString("error").equals("false")){
-                                if(tagTakenObject.getString("result").equals("yes")){
-                                    etNewClanTag.setBackgroundResource(R.color.pin);
-                                    etNewClanTag.requestFocus();
-                                    Toast.makeText(mContext, "Clan Tag Taken!", Toast.LENGTH_SHORT).show();
+                            val tagTakenObject = JSONObject(response!!)
+                            if (tagTakenObject.getString("error") == "false") {
+                                if (tagTakenObject.getString("result") == "yes") {
+                                    etNewClanTag?.setBackgroundResource(R.color.pin)
+                                    etNewClanTag?.requestFocus()
+                                    Toast.makeText(mContext, "Clan Tag Taken!", Toast.LENGTH_SHORT).show()
                                 } else {
-                                    tagTakenString = "";
-                                    etNewClanTag.setBackgroundResource(R.color.colorPrimary);
+                                    tagTakenString = ""
+                                    etNewClanTag?.setBackgroundResource(R.color.colorPrimary)
                                 }
                             }
+                        } catch (e: JSONException) {
+                            e.printStackTrace()
                         }
-                        catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }, error -> Toast.makeText(mContext, "Network error on Response: Is Tag Taken", Toast.LENGTH_SHORT).show());
-                    ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
-                }, 1000);
+                    }) { Toast.makeText(mContext, "Network error on Response: Is Tag Taken", Toast.LENGTH_SHORT).show() }
+                    (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
+                }, 1000)
             }
-            @Override public void afterTextChanged(Editable s) {}
-        });
-        etNewClanName.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String clanname = etNewClanName.getText().toString();
-                newClanName.setText(clanname);
+
+            override fun afterTextChanged(s: Editable) {}
+        })
+        etNewClanName?.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                val clanname = etNewClanName?.text.toString()
+                newClanName?.text = clanname
             }
-            @Override public void afterTextChanged(Editable s) {}
-        });
-        return newClanRootView;
+
+            override fun afterTextChanged(s: Editable) {}
+        })
+        return newClanRootView
     }
 
-    public void SubmitClan(final String tag, final String name, final String desc){
-        StringRequest stringRequest=new StringRequest(Request.Method.POST, URL_CLAN_SUBMIT, response -> {
+    private fun submitClan(tag: String, name: String, desc: String) {
+        val stringRequest: StringRequest = object : StringRequest(Method.POST, URL_CLAN_SUBMIT, Response.Listener { response: String? ->
             try {
-                JSONObject jsonObject = new JSONObject(response);
-                if(jsonObject.getString("error").equals("false")){
-                    String clanID = jsonObject.getString("clanid");
-                    if(new_clan_insigniaBitmap!=null){
-                        uploadInsigniaImage(new_clan_insigniaBitmap, etNewClanName.getText().toString(), etNewClanTag.getText().toString(),clanID);
+                val jsonObject = JSONObject(response!!)
+                if (jsonObject.getString("error") == "false") {
+                    val clanID = jsonObject.getString("clanid")
+                    if (newClanInsigniabitmap != null) {
+                        uploadInsigniaImage(newClanInsigniabitmap!!, etNewClanName!!.text.toString(), etNewClanTag!!.text.toString(), clanID)
                     }
-                    if(newClanCoverBitmap!=null){
-                        uploadCoverImage(newClanCoverBitmap, etNewClanName.getText().toString(), etNewClanTag.getText().toString(),clanID);
+                    if (newClanCoverBitmap != null) {
+                        uploadCoverImage(newClanCoverBitmap!!, etNewClanName!!.text.toString(), etNewClanTag!!.text.toString(), clanID)
                     }
-                    ClansListFragment ldf = new ClansListFragment();
-                    ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragment_container, ldf).commit();
-                }else{
-                    Toast.makeText(mContext, jsonObject.getString("message"), Toast.LENGTH_SHORT).show();
-                    btnSubmit.setVisibility(View.VISIBLE);
-                    newClanProgressBar.setVisibility(GONE);
+                    val ldf = ClansListFragment()
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().addToBackStack(null).replace(R.id.fragment_container, ldf).commit()
+                } else {
+                    Toast.makeText(mContext, jsonObject.getString("message"), Toast.LENGTH_SHORT).show()
+                    btnSubmit!!.visibility = View.VISIBLE
+                    newClanProgressBar!!.visibility = View.GONE
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
-        }, error -> {
-            newClanProgressBar.setVisibility(GONE);
-            Toast.makeText(mContext,"Error on Submit Clan, please try again later...",Toast.LENGTH_LONG).show();
-        }){
-            @Override
-            protected Map<String, String> getParams()  {
-                Map<String,String> parms= new HashMap<>();
-                parms.put("tag",tag);
-                parms.put("name",name);
-                parms.put("desc",desc);
-                parms.put("username",username);
-                parms.put("userid",userID);
-                return parms;
+        }, Response.ErrorListener {
+            newClanProgressBar!!.visibility = View.GONE
+            Toast.makeText(mContext, "Error on Submit Clan, please try again later...", Toast.LENGTH_LONG).show()
+        }) {
+            override fun getParams(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["tag"] = tag
+                params["name"] = name
+                params["desc"] = desc
+                params["username"] = username!!
+                params["userid"] = userID!!
+                return params
             }
-        };
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
+        }
+        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_CANCELED) {
-            return;
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_CANCELED) {
+            return
         }
-        if (requestCode == GALLERY_COVER) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
-            if (resultCode == RESULT_OK) {
-                Uri resultUri = result.getUri();
+        if (requestCode == galleryCover) {
+            val result = CropImage.getActivityResult(data)
+            if (resultCode == Activity.RESULT_OK) {
+                val resultUri = result.uri
+                var bitmap1: Bitmap? = null
                 try {
-                    final Bitmap bitmap1 = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), resultUri);
-                    newClanCover.setImageBitmap(bitmap1);
-                    newClanCoverBitmap = bitmap1;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(mContext, "Failed!", Toast.LENGTH_SHORT).show();
+                    if (Build.VERSION.SDK_INT >= 29) {
+                        val source: ImageDecoder.Source = ImageDecoder.createSource(mContext!!.contentResolver, resultUri)
+                        try {
+                            bitmap1 = ImageDecoder.decodeBitmap(source)
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        }
+                    } else {
+                        try {
+                            bitmap1 = MediaStore.Images.Media.getBitmap(mContext!!.contentResolver, resultUri)
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        }
+                    }
+                    newClanCover!!.setImageBitmap(bitmap1)
+                    newClanCoverBitmap = bitmap1
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                    Toast.makeText(mContext, "Failed!", Toast.LENGTH_SHORT).show()
                 }
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                Exception error = result.getError();
-                Toast.makeText(getActivity(), "Failed! Error: "+error, Toast.LENGTH_SHORT).show();
+                val error = result.error
+                Toast.makeText(activity, "Failed! Error: $error", Toast.LENGTH_SHORT).show()
             }
         }
-        if (requestCode == GALLERY_INSIGNIA) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
-            if (resultCode == RESULT_OK) {
-                Uri resultUri = result.getUri();
+        if (requestCode == galleryInsignia) {
+            val result = CropImage.getActivityResult(data)
+            if (resultCode == Activity.RESULT_OK) {
+                val resultUri = result.uri
+                var bitmap2: Bitmap? = null
                 try {
-                    final Bitmap bitmap2 = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), resultUri);
-                    new_clan_insignia.setImageBitmap(bitmap2);
-                    new_clan_insigniaBitmap = bitmap2;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(mContext, "Failed!", Toast.LENGTH_SHORT).show();
+                    if (Build.VERSION.SDK_INT >= 29) {
+                        val source: ImageDecoder.Source = ImageDecoder.createSource(mContext!!.contentResolver, resultUri)
+                        try {
+                            bitmap2 = ImageDecoder.decodeBitmap(source)
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        }
+                    } else {
+                        try {
+                            bitmap2 = MediaStore.Images.Media.getBitmap(mContext!!.contentResolver, resultUri)
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        }
+                    }
+                    newClanInsignia!!.setImageBitmap(bitmap2)
+                    newClanInsigniabitmap = bitmap2
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                    Toast.makeText(mContext, "Failed!", Toast.LENGTH_SHORT).show()
                 }
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                Exception error = result.getError();
-                Toast.makeText(getActivity(), "Failed! Error: "+error, Toast.LENGTH_SHORT).show();
+                val error = result.error
+                Toast.makeText(activity, "Failed! Error: $error", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    private void uploadInsigniaImage(Bitmap bitmap, String clanname, String clantag, String clanID){
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 65, byteArrayOutputStream);
-        String encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+    private fun uploadInsigniaImage(bitmap: Bitmap, clanname: String, clantag: String, clanID: String) {
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 65, byteArrayOutputStream)
+        val encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT)
         try {
-            jsonObject = new JSONObject();
-            String imgname = String.valueOf(Calendar.getInstance().getTimeInMillis());
-            jsonObject.put("name", imgname);
-            jsonObject.put("clantag", clantag);
-            jsonObject.put("clanname", clanname);
-            jsonObject.put("image", encodedImage);
-            jsonObject.put("user", username);
-            jsonObject.put("clanid", clanID);
-        } catch (JSONException e) {
-            Log.e("JSONObject Here", e.toString());
+            jsonObject = JSONObject()
+            val imgname = Calendar.getInstance().timeInMillis.toString()
+            jsonObject!!.put("name", imgname)
+            jsonObject!!.put("clantag", clantag)
+            jsonObject!!.put("clanname", clanname)
+            jsonObject!!.put("image", encodedImage)
+            jsonObject!!.put("user", username)
+            jsonObject!!.put("clanid", clanID)
+        } catch (e: JSONException) {
+            Log.e("JSONObject Here", e.toString())
         }
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, UPLOAD_INSIGNIA_URL, jsonObject,
-                jsonObject -> {
-                    rQueue.getCache().clear();
-                    try{
-                        if(jsonObject.getString("error").equals("true")){
-                            Toast.makeText(mContext, jsonObject.getString("message"), Toast.LENGTH_SHORT).show();
+        val jsonObjectRequest = JsonObjectRequest(Request.Method.POST, UPLOAD_INSIGNIA_URL, jsonObject,
+                { jsonObject: JSONObject ->
+                    rQueue!!.cache.clear()
+                    try {
+                        if (jsonObject.getString("error") == "true") {
+                            Toast.makeText(mContext, jsonObject.getString("message"), Toast.LENGTH_SHORT).show()
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        Toast.makeText(mContext, "Failed!", Toast.LENGTH_SHORT).show();
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
+                        Toast.makeText(mContext, "Failed!", Toast.LENGTH_SHORT).show()
                     }
-                }, volleyError -> Log.e("UploadCoverFragment", volleyError.toString()));
-        rQueue = Volley.newRequestQueue(mContext);
-        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(20 * 1000, 0,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        rQueue.add(jsonObjectRequest);
+                }) { volleyError: VolleyError -> Log.e("UploadCoverFragment", volleyError.toString()) }
+        rQueue = Volley.newRequestQueue(mContext)
+        jsonObjectRequest.retryPolicy = DefaultRetryPolicy(20 * 1000, 0,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+        rQueue?.add(jsonObjectRequest)
     }
 
-    private void uploadCoverImage(Bitmap bitmap, String clanname, String clantag, String clanID){
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream);
-        String encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+    private fun uploadCoverImage(bitmap: Bitmap, clanname: String, clantag: String, clanID: String) {
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream)
+        val encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT)
         try {
-            jsonObject = new JSONObject();
-            String imgname = String.valueOf(Calendar.getInstance().getTimeInMillis());
-            jsonObject.put("name", imgname);
-            jsonObject.put("clantag", clantag);
-            jsonObject.put("clanname", clanname);
-            jsonObject.put("image", encodedImage);
-            jsonObject.put("owner", username);
-            jsonObject.put("clanid", clanID);
-        } catch (JSONException e) {
-            Log.e("JSONObject Here", e.toString());
+            jsonObject = JSONObject()
+            val imgname = Calendar.getInstance().timeInMillis.toString()
+            jsonObject!!.put("name", imgname)
+            jsonObject!!.put("clantag", clantag)
+            jsonObject!!.put("clanname", clanname)
+            jsonObject!!.put("image", encodedImage)
+            jsonObject!!.put("owner", username)
+            jsonObject!!.put("clanid", clanID)
+        } catch (e: JSONException) {
+            Log.e("JSONObject Here", e.toString())
         }
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, UPLOAD_COVER_URL, jsonObject,
-                jsonObject -> {
-                    rQueue.getCache().clear();
-                    try{
-                        if(jsonObject.getString("error").equals("true")){
-                            Toast.makeText(mContext, jsonObject.getString("message"), Toast.LENGTH_SHORT).show();
+        val jsonObjectRequest = JsonObjectRequest(Request.Method.POST, UPLOAD_COVER_URL, jsonObject,
+                { jsonObject: JSONObject ->
+                    rQueue!!.cache.clear()
+                    try {
+                        if (jsonObject.getString("error") == "true") {
+                            Toast.makeText(mContext, jsonObject.getString("message"), Toast.LENGTH_SHORT).show()
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        Toast.makeText(mContext, "Failed!", Toast.LENGTH_SHORT).show();
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
+                        Toast.makeText(mContext, "Failed!", Toast.LENGTH_SHORT).show()
                     }
-                }, volleyError -> Log.e("UploadCoverFragment", volleyError.toString()));
-        rQueue = Volley.newRequestQueue(mContext);
-        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(20 * 1000, 0,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        rQueue.add(jsonObjectRequest);
+                }) { volleyError: VolleyError -> Log.e("UploadCoverFragment", volleyError.toString()) }
+        rQueue = Volley.newRequestQueue(mContext)
+        jsonObjectRequest.retryPolicy = DefaultRetryPolicy(20 * 1000, 0,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+        rQueue?.add(jsonObjectRequest)
     }
 
-    private void  requestMultiplePermissions(){
-        Dexter.withActivity(getActivity())
+    private fun requestMultiplePermissions() {
+        Dexter.withActivity(activity)
                 .withPermissions(
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
                         Manifest.permission.READ_EXTERNAL_STORAGE)
-                .withListener(new MultiplePermissionsListener() {
-                    @Override
-                    public void onPermissionsChecked(MultiplePermissionsReport report) {
-                        if (report.isAnyPermissionPermanentlyDenied()) {
-                            Toast.makeText(mContext.getApplicationContext(), "No permissions are granted by user!", Toast.LENGTH_SHORT).show();
+                .withListener(object : MultiplePermissionsListener {
+                    override fun onPermissionsChecked(report: MultiplePermissionsReport) {
+                        if (report.isAnyPermissionPermanentlyDenied) {
+                            Toast.makeText(mContext!!.applicationContext, "No permissions are granted by user!", Toast.LENGTH_SHORT).show()
                         }
                     }
-                    @Override
-                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                        token.continuePermissionRequest();
+                    override fun onPermissionRationaleShouldBeShown(permissions: List<PermissionRequest>, token: PermissionToken) {
+                        token.continuePermissionRequest()
                     }
-                }).
-                withErrorListener(error -> Toast.makeText(mContext.getApplicationContext(), "Error!", Toast.LENGTH_SHORT).show())
+                }).withErrorListener { Toast.makeText(mContext!!.applicationContext, "Error!", Toast.LENGTH_SHORT).show() }
                 .onSameThread()
-                .check();
+                .check()
     }
 
+    companion object {
+        val URL_TAG_IN_USE: String = ROOT_URL + "clan_tag_used.php"
+        const val UPLOAD_COVER_URL = ROOT_URL + "uploadCoverClan.php"
+        const val UPLOAD_INSIGNIA_URL = ROOT_URL + "uploadInsigniaClan.php"
+        const val URL_CLAN_SUBMIT = ROOT_URL + "submit_new_clan.php"
+    }
 }

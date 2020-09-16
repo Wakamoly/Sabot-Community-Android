@@ -1,550 +1,522 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Handler;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.PopupMenu;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.balysv.materialripple.MaterialRippleLayout;
-import com.bumptech.glide.Glide;
-import com.yarolegovich.lovelydialog.LovelyStandardDialog;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import de.hdodenhof.circleimageview.CircleImageView;
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.os.Handler
+import android.util.Patterns
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.balysv.materialripple.MaterialRippleLayout
+import com.bumptech.glide.Glide
+import com.yarolegovich.lovelydialog.LovelyStandardDialog
+import de.hdodenhof.circleimageview.CircleImageView
+import org.json.JSONException
+import org.json.JSONObject
+import org.jsoup.Jsoup
+import java.io.IOException
+import java.util.*
 
-public class ProfilenewsAdapter extends RecyclerView.Adapter<BaseViewHolder> {
-    private static final int VIEW_TYPE_LOADING = 0;
-    private static final int VIEW_TYPE_NORMAL = 1;
-    private boolean isLoaderVisible = false;
-    private static final String LIKE_URL = Constants.ROOT_URL+"post_like.php";
-    private static final String POST_DELETE = Constants.ROOT_URL+"profile_post_action.php/post_delete";
-    private Context mCtx;
-    private List<Profilenews_Recycler> profilenewsList;
-
-    public ProfilenewsAdapter(Context mCtx, List<Profilenews_Recycler> profilenewsList) {
-        this.mCtx = mCtx;
-        this.profilenewsList = profilenewsList;
-    }
-
-    @NonNull
-    @Override
-    public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        switch (viewType) {
-            case VIEW_TYPE_NORMAL:
-                return new ViewHolder(
-                        LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_profilenews, parent, false));
-            case VIEW_TYPE_LOADING:
-                return new ProgressHolder(
-                        LayoutInflater.from(parent.getContext()).inflate(R.layout.item_progress, parent, false));
-            default:
-                return null;
+class ProfilenewsAdapter(private val mCtx: Context, private val profilenewsList: MutableList<ProfilenewsRecycler>?) : RecyclerView.Adapter<BaseViewHolder>() {
+    private var isLoaderVisible = false
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
+        return when (viewType) {
+            VIEW_TYPE_NORMAL -> ViewHolder(
+                    LayoutInflater.from(parent.context).inflate(R.layout.recycler_profilenews, parent, false))
+            VIEW_TYPE_LOADING -> ProgressHolder(
+                    LayoutInflater.from(parent.context).inflate(R.layout.item_progress, parent, false))
+            else -> ProgressHolder(
+                    LayoutInflater.from(parent.context).inflate(R.layout.item_progress, parent, false))
         }
     }
 
-    @Override public void onBindViewHolder(@NonNull BaseViewHolder holder, int position) {holder.onBind(position);}
+    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
+        holder.onBind(position)
+    }
 
-    @Override
-    public int getItemViewType(int position) {
-        if (isLoaderVisible) {
-            return position == profilenewsList.size() - 1 ? VIEW_TYPE_LOADING : VIEW_TYPE_NORMAL;
+    override fun getItemViewType(position: Int): Int {
+        return if (isLoaderVisible) {
+            if (position == profilenewsList!!.size - 1) VIEW_TYPE_LOADING else VIEW_TYPE_NORMAL
         } else {
-            return VIEW_TYPE_NORMAL;
+            VIEW_TYPE_NORMAL
         }
     }
 
-    @Override
-    public int getItemCount() {
-        return profilenewsList == null ? 0 : profilenewsList.size();
+    override fun getItemCount(): Int {
+        return profilenewsList?.size ?: 0
     }
 
-    public void addItems(List<Profilenews_Recycler> items) {
-        profilenewsList.addAll(items);
-        notifyDataSetChanged();
+    fun addItems(items: List<ProfilenewsRecycler>?) {
+        profilenewsList!!.addAll(items!!)
+        notifyDataSetChanged()
     }
 
-    public void addLoading() {
-        isLoaderVisible = true;
-        profilenewsList.add(new Profilenews_Recycler(0,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null));
-        notifyItemInserted(profilenewsList.size() - 1);
+    fun addLoading() {
+        isLoaderVisible = true
+        profilenewsList!!.add(ProfilenewsRecycler(0, null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString()))
+        notifyItemInserted(profilenewsList.size - 1)
     }
 
-    public void removeLoading() {
-        isLoaderVisible = false;
-        if (profilenewsList.size()!=0){
-            int position = profilenewsList.size() - 1;
-            Profilenews_Recycler item = getItem(position);
-            if (item != null) {
-                profilenewsList.remove(position);
-                notifyItemRemoved(position);
-            }
+    fun removeLoading() {
+        isLoaderVisible = false
+        if (profilenewsList!!.size != 0) {
+            val position = profilenewsList.size - 1
+            val item = getItem(position)
+            profilenewsList.removeAt(position)
+            notifyItemRemoved(position)
         }
     }
 
-    public void clear() {
-        profilenewsList.clear();
-        notifyDataSetChanged();
+    fun clear() {
+        profilenewsList!!.clear()
+        notifyDataSetChanged()
     }
 
-    Profilenews_Recycler getItem(int position) {
-        return profilenewsList.get(position);
+    private fun getItem(position: Int): ProfilenewsRecycler {
+        return profilenewsList!![position]
     }
 
-    public class ViewHolder extends BaseViewHolder {
-        CircleImageView verified, online;
-        LinearLayout urlBits, urlPreview;
-        RelativeLayout publicsTopicList;
-        MaterialRippleLayout contentLayout;
-        ProgressBar likeProgress, urlProgress;
-        SharedPrefManager Sharedprefmanager = SharedPrefManager.getInstance(mCtx);
-        ImageView imageProfilenewsView, imageViewProfilenewsPic, notiType, likeView, likedView, urlImage;
-        TextView tvEdited, textViewBody, textViewAdded_by, textViewDate_added, textViewUser_to, textViewLikes, postUsername_top, textViewNumComments, urlTitle, urlDesc, textViewComments, textViewLikesText;
-        String userID, username;
-
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            userID = Sharedprefmanager.getUserID();
-            username = Sharedprefmanager.getUsername();
-            verified = itemView.findViewById(R.id.verified);
-            online = itemView.findViewById(R.id.online);
-            likeProgress = itemView.findViewById(R.id.likeProgress);
-            likeView = itemView.findViewById(R.id.like);
-            likedView = itemView.findViewById(R.id.liked);
-            notiType = itemView.findViewById(R.id.platformType);
-            publicsTopicList = itemView.findViewById(R.id.publicsTopicList);
-            textViewAdded_by = itemView.findViewById(R.id.textViewProfileName);
-            postUsername_top = itemView.findViewById(R.id.postUsername_top);
-            textViewUser_to = itemView.findViewById(R.id.textViewToUserName);
-            imageViewProfilenewsPic = itemView.findViewById(R.id.imageViewProfilenewsPic);
-            imageProfilenewsView = itemView.findViewById(R.id.profileNewsImage);
-            textViewBody = itemView.findViewById(R.id.textViewBody);
-            textViewLikes = itemView.findViewById(R.id.textViewNumLikes);
-            textViewDate_added = itemView.findViewById(R.id.profileCommentsDateTime_top);
-            textViewNumComments = itemView.findViewById(R.id.textViewNumComments);
-            urlPreview = itemView.findViewById(R.id.urlPreview);
-            urlProgress = itemView.findViewById(R.id.urlProgress);
-            urlImage = itemView.findViewById(R.id.urlImage);
-            urlTitle = itemView.findViewById(R.id.urlTitle);
-            urlDesc = itemView.findViewById(R.id.urlDesc);
-            urlBits = itemView.findViewById(R.id.urlBits);
-            textViewComments = itemView.findViewById(R.id.textViewComments);
-            textViewLikesText = itemView.findViewById(R.id.textViewLikes);
-            contentLayout = itemView.findViewById(R.id.contentLayout);
-            tvEdited = itemView.findViewById(R.id.tvEdited);
-        }
-
-        @Override protected void clear() {}
-
-        public void onBind(int position) {
-            super.onBind(position);
-            final Profilenews_Recycler profilenews = profilenewsList.get(position);
-            textViewBody.setText(profilenews.getBody());
-            textViewNumComments.setText(profilenews.getCommentcount());
-            textViewAdded_by.setText(profilenews.getNickname());
-            textViewDate_added.setText(profilenews.getDate_added());
-            textViewLikes.setText(profilenews.getLikes());
-            postUsername_top.setText(String.format("@%s", profilenews.getAdded_by()));
-            String User_to = profilenews.getUser_to();
-            if (!User_to.equals("none")) {
-                switch (profilenews.getForm()) {
-                    case "user":
-                        textViewUser_to.setText(String.format("to @%s", User_to));
-                        break;
-                    case "clan":
-                        textViewUser_to.setText(String.format("to [%s]", User_to));
-                        textViewUser_to.setTextColor(ContextCompat.getColor(mCtx, R.color.pin));
-                        break;
-                    case "event":
-                        break;
+    inner class ViewHolder(itemView: View) : BaseViewHolder(itemView) {
+        var verified: CircleImageView
+        var online: CircleImageView
+        private var urlBits: LinearLayout
+        private var urlPreview: LinearLayout
+        var publicsTopicList: RelativeLayout
+        var contentLayout: MaterialRippleLayout
+        var likeProgress: ProgressBar
+        private var urlProgress: ProgressBar
+        private var sharedPrefManager: SharedPrefManager = SharedPrefManager.getInstance(mCtx)!!
+        private var imageProfilenewsView: ImageView
+        var imageViewProfilenewsPic: ImageView
+        private var notiType: ImageView
+        var likeView: ImageView
+        var likedView: ImageView
+        private var urlImage: ImageView
+        private var tvEdited: TextView
+        var textViewBody: TextView
+        private var textviewaddedBy: TextView
+        private var textviewdateAdded: TextView
+        private var textviewuserTo: TextView
+        var textViewLikes: TextView
+        private var postusernameTop: TextView
+        private var textViewNumComments: TextView
+        private var urlTitle: TextView
+        private var urlDesc: TextView
+        private var textViewComments: TextView
+        private var textViewLikesText: TextView
+        var userID: String
+        var username: String
+        override fun clear() {}
+        override fun onBind(position: Int) {
+            super.onBind(position)
+            val profilenews = profilenewsList!![position]
+            textViewBody.text = profilenews.body
+            textViewNumComments.text = profilenews.commentcount
+            textviewaddedBy.text = profilenews.nickname
+            textviewdateAdded.text = profilenews.date_added
+            textViewLikes.text = profilenews.likes
+            postusernameTop.text = String.format("@%s", profilenews.added_by)
+            val userTo = profilenews.user_to
+            if (userTo != "none") {
+                when (profilenews.form) {
+                    "user" -> textviewuserTo.text = String.format("to @%s", userTo)
+                    "clan" -> {
+                        textviewuserTo.text = String.format("to [%s]", userTo)
+                        textviewuserTo.setTextColor(ContextCompat.getColor(mCtx, R.color.pin))
+                    }
+                    "event" -> {
+                    }
                 }
             } else {
-                textViewUser_to.setVisibility(View.GONE);
+                textviewuserTo.visibility = View.GONE
             }
-            switch (profilenews.getType()) {
-                case "Xbox":
-                    notiType.setImageResource(R.drawable.icons8_xbox_50);
-                    notiType.setVisibility(View.VISIBLE);
-                    break;
-                case "PlayStation":
-                    notiType.setImageResource(R.drawable.icons8_playstation_50);
-                    notiType.setVisibility(View.VISIBLE);
-                    break;
-                case "Steam":
-                    notiType.setImageResource(R.drawable.icons8_steam_48);
-                    notiType.setVisibility(View.VISIBLE);
-                    break;
-                case "PC":
-                    notiType.setImageResource(R.drawable.icons8_workstation_48);
-                    notiType.setVisibility(View.VISIBLE);
-                    break;
-                case "Mobile":
-                    notiType.setImageResource(R.drawable.icons8_mobile_48);
-                    notiType.setVisibility(View.VISIBLE);
-                    break;
-                case "Switch":
-                    notiType.setImageResource(R.drawable.icons8_nintendo_switch_48);
-                    notiType.setVisibility(View.VISIBLE);
-                    break;
-                case "General":
-                    break;
-                default:
-                    notiType.setImageResource(R.drawable.icons8_question_mark_64);
-                    notiType.setVisibility(View.VISIBLE);
-                    break;
+            when (profilenews.type) {
+                "Xbox" -> {
+                    notiType.setImageResource(R.drawable.icons8_xbox_50)
+                    notiType.visibility = View.VISIBLE
+                }
+                "PlayStation" -> {
+                    notiType.setImageResource(R.drawable.icons8_playstation_50)
+                    notiType.visibility = View.VISIBLE
+                }
+                "Steam" -> {
+                    notiType.setImageResource(R.drawable.icons8_steam_48)
+                    notiType.visibility = View.VISIBLE
+                }
+                "PC" -> {
+                    notiType.setImageResource(R.drawable.icons8_workstation_48)
+                    notiType.visibility = View.VISIBLE
+                }
+                "Mobile" -> {
+                    notiType.setImageResource(R.drawable.icons8_mobile_48)
+                    notiType.visibility = View.VISIBLE
+                }
+                "Switch" -> {
+                    notiType.setImageResource(R.drawable.icons8_nintendo_switch_48)
+                    notiType.visibility = View.VISIBLE
+                }
+                "General" -> {
+                }
+                else -> {
+                    notiType.setImageResource(R.drawable.icons8_question_mark_64)
+                    notiType.visibility = View.VISIBLE
+                }
             }
-
-            contentLayout.setOnLongClickListener(v -> {
-                PopupMenu popup = new PopupMenu(mCtx, v);
-                MenuInflater inflater = popup.getMenuInflater();
-                if (profilenews.getAdded_by().equals(username)) {
-                    inflater.inflate(R.menu.profile_post_owner, popup.getMenu());
-                    popup.setOnMenuItemClickListener(item -> {
-                        if (item.getItemId() == R.id.menuDelete) {
-                            new LovelyStandardDialog(mCtx, LovelyStandardDialog.ButtonLayout.VERTICAL)
+            contentLayout.setOnLongClickListener { v: View? ->
+                val popup = PopupMenu(mCtx, v)
+                val inflater = popup.menuInflater
+                if (profilenews.added_by == username) {
+                    inflater.inflate(R.menu.profile_post_owner, popup.menu)
+                    popup.setOnMenuItemClickListener { item: MenuItem ->
+                        if (item.itemId == R.id.menuDelete) {
+                            LovelyStandardDialog(mCtx, LovelyStandardDialog.ButtonLayout.VERTICAL)
                                     .setTopColorRes(R.color.green)
                                     .setButtonsColorRes(R.color.green)
                                     .setIcon(R.drawable.ic_error)
                                     .setTitle(R.string.delete_post_string)
                                     .setMessage(R.string.confirm)
-                                    .setPositiveButton(R.string.yes, v1 -> {
-                                        StringRequest stringRequest = new StringRequest(Request.Method.POST, POST_DELETE, response -> {
+                                    .setPositiveButton(R.string.yes) {
+                                        val stringRequest: StringRequest = object : StringRequest(Method.POST, POST_DELETE, Response.Listener { response: String? ->
                                             try {
-                                                JSONObject jsonObject = new JSONObject(response);
-                                                if (jsonObject.getString("error").equals("false")) {
-                                                    Toast.makeText(mCtx, "Post deleted!", Toast.LENGTH_LONG).show();
-                                                    contentLayout.setVisibility(View.GONE);
+                                                val jsonObject = JSONObject(response!!)
+                                                if (jsonObject.getString("error") == "false") {
+                                                    Toast.makeText(mCtx, "Post deleted!", Toast.LENGTH_LONG).show()
+                                                    contentLayout.visibility = View.GONE
                                                 } else {
-                                                    Toast.makeText(mCtx, jsonObject.getString("message"), Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(mCtx, jsonObject.getString("message"), Toast.LENGTH_SHORT).show()
                                                 }
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
+                                            } catch (e: JSONException) {
+                                                e.printStackTrace()
                                             }
-                                        }, error -> Toast.makeText(mCtx, "Network error, please try again later...", Toast.LENGTH_LONG).show()) {
-                                            @Override
-                                            protected Map<String, String> getParams() {
-                                                Map<String, String> parms = new HashMap<>();
-                                                parms.put("postid", Integer.toString(profilenews.getId()));
-                                                parms.put("username", username);
-                                                parms.put("userid", userID);
-                                                return parms;
+                                        }, Response.ErrorListener { Toast.makeText(mCtx, "Network error, please try again later...", Toast.LENGTH_LONG).show() }) {
+                                            override fun getParams(): Map<String, String> {
+                                                val params: MutableMap<String, String> = HashMap()
+                                                params["postid"] = profilenews.id.toString()
+                                                params["username"] = username
+                                                params["userid"] = userID
+                                                return params
                                             }
-                                        };
-                                        ((FragmentContainer) mCtx).addToRequestQueue(stringRequest);
-                                    })
+                                        }
+                                        (mCtx as FragmentContainer).addToRequestQueue(stringRequest)
+                                    }
                                     .setNegativeButton(R.string.no, null)
-                                    .show();
+                                    .show()
                         }
-                        if (item.getItemId() == R.id.menuEdit) {
-                            ProfilePostEditFragment ldf = new ProfilePostEditFragment();
-                            Bundle args = new Bundle();
-                            args.putString("id", Integer.toString(profilenews.getId()));
-                            ldf.setArguments(args);
-                            ((FragmentActivity) mCtx).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
+                        if (item.itemId == R.id.menuEdit) {
+                            val ldf = ProfilePostEditFragment()
+                            val args = Bundle()
+                            args.putString("id", profilenews.id.toString())
+                            ldf.arguments = args
+                            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                         }
-                        if (item.getItemId() == R.id.menuReport) {
-                            ReportFragment ldf = new ReportFragment();
-                            Bundle args = new Bundle();
-                            args.putString("context", profilenews.getBody());
-                            args.putString("type", "post");
-                            args.putString("id", Integer.toString(profilenews.getId()));
-                            ldf.setArguments(args);
+                        if (item.itemId == R.id.menuReport) {
+                            val ldf = ReportFragment()
+                            val args = Bundle()
+                            args.putString("context", profilenews.body)
+                            args.putString("type", "post")
+                            args.putString("id", profilenews.id.toString())
+                            ldf.arguments = args
                             //Inflate the fragment
-                            ((FragmentActivity) mCtx).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
+                            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                         }
-                        return true;
-                    });
+                        true
+                    }
                 } else {
-                    inflater.inflate(R.menu.profile_post_nonowner, popup.getMenu());
-                    popup.setOnMenuItemClickListener(item -> {
-                        if (item.getItemId() == R.id.menuReport) {
-                            ReportFragment ldf = new ReportFragment();
-                            Bundle args = new Bundle();
-                            args.putString("context", profilenews.getBody());
-                            args.putString("type", "post");
-                            args.putString("id", Integer.toString(profilenews.getId()));
-                            ldf.setArguments(args);
-                            ((FragmentActivity) mCtx).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit();
+                    inflater.inflate(R.menu.profile_post_nonowner, popup.menu)
+                    popup.setOnMenuItemClickListener { item: MenuItem ->
+                        if (item.itemId == R.id.menuReport) {
+                            val ldf = ReportFragment()
+                            val args = Bundle()
+                            args.putString("context", profilenews.body)
+                            args.putString("type", "post")
+                            args.putString("id", profilenews.id.toString())
+                            ldf.arguments = args
+                            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                         }
-                        return true;
-                    });
+                        true
+                    }
                 }
-                popup.show();
-                return false;
-            });
-            contentLayout.setOnClickListener(v -> {
-                ProfilePostFragment ldf = new ProfilePostFragment();
-                Bundle args = new Bundle();
-                args.putString("id", String.valueOf(profilenews.getId()));
-                args.putString("UserId", profilenews.getUser_id());
-                args.putString("Username", profilenews.getAdded_by());
-                ldf.setArguments(args);
-                ((FragmentActivity) mCtx).getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit();
-            });
-            textViewAdded_by.setOnClickListener(v -> {
-                FragmentProfile ldf = new FragmentProfile();
-                Bundle args = new Bundle();
-                args.putString("UserId", profilenews.getUser_id());
-                args.putString("Username", profilenews.getAdded_by());
-                ldf.setArguments(args);
-                ((FragmentActivity) mCtx).getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit();
-            });
-
-            String profile_pic = profilenews.getProfile_pic().substring(0, profilenews.getProfile_pic().length() - 4) + "_r.JPG";
+                popup.show()
+                false
+            }
+            contentLayout.setOnClickListener {
+                val ldf = ProfilePostFragment()
+                val args = Bundle()
+                args.putString("id", profilenews.id.toString())
+                args.putString("UserId", profilenews.user_id)
+                args.putString("Username", profilenews.added_by)
+                ldf.arguments = args
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+            }
+            textviewaddedBy.setOnClickListener {
+                val ldf = FragmentProfile()
+                val args = Bundle()
+                args.putString("UserId", profilenews.user_id)
+                args.putString("Username", profilenews.added_by)
+                ldf.arguments = args
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+            }
+            val profilePic = profilenews.profile_pic.substring(0, profilenews.profile_pic.length - 4) + "_r.JPG"
             Glide.with(mCtx)
-                    .load(Constants.BASE_URL + profile_pic)
-                    .into(imageViewProfilenewsPic);
-            if (!profilenews.getImage().isEmpty()) {
-                imageProfilenewsView.setVisibility(View.VISIBLE);
+                    .load(Constants.BASE_URL + profilePic)
+                    .into(imageViewProfilenewsPic)
+            if (profilenews.image.isNotEmpty()) {
+                imageProfilenewsView.visibility = View.VISIBLE
                 Glide.with(mCtx)
-                        .load(Constants.BASE_URL + profilenews.getImage()).override(1000)
-                        .into(imageProfilenewsView);
+                        .load(Constants.BASE_URL + profilenews.image).override(1000)
+                        .into(imageProfilenewsView)
             } else {
-                imageProfilenewsView.setVisibility(View.GONE);
+                imageProfilenewsView.visibility = View.GONE
             }
-
-            if (profilenews.getLikedbyuseryes().equals("yes")) {
-                likeView.setVisibility(View.GONE);
-                likedView.setVisibility(View.VISIBLE);
+            if (profilenews.likedbyuseryes == "yes") {
+                likeView.visibility = View.GONE
+                likedView.visibility = View.VISIBLE
             } else {
-                likeView.setVisibility(View.VISIBLE);
-                likedView.setVisibility(View.GONE);
+                likeView.visibility = View.VISIBLE
+                likedView.visibility = View.GONE
             }
-
-            likeView.setOnClickListener(v -> {
-                likeView.setVisibility(View.GONE);
-                likeProgress.setVisibility(View.VISIBLE);
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, LIKE_URL, response -> {
-                    JSONObject obj;
+            likeView.setOnClickListener {
+                likeView.visibility = View.GONE
+                likeProgress.visibility = View.VISIBLE
+                val stringRequest: StringRequest = object : StringRequest(Method.POST, LIKE_URL, Response.Listener { response: String? ->
+                    val obj: JSONObject
                     try {
-                        obj = new JSONObject(response);
+                        obj = JSONObject(response!!)
                         if (!obj.getBoolean("error")) {
-                            String newValue = Integer.toString(Integer.parseInt(textViewLikes.getText().toString()) + 1);
-                            textViewLikes.setText(newValue);
-                            likeProgress.setVisibility(View.GONE);
-                            likedView.setVisibility(View.VISIBLE);
-                            likedView.setEnabled(false);
-                            new Handler().postDelayed(() -> likedView.setEnabled(true), 3500);
+                            val newValue = (textViewLikes.text.toString().toInt() + 1).toString()
+                            textViewLikes.text = newValue
+                            likeProgress.visibility = View.GONE
+                            likedView.visibility = View.VISIBLE
+                            likedView.isEnabled = false
+                            Handler().postDelayed({ likedView.isEnabled = true }, 3500)
                         } else {
-                            Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show();
-                            likeProgress.setVisibility(View.GONE);
-                            likeView.setVisibility(View.VISIBLE);
-                            likeView.setEnabled(false);
-                            new Handler().postDelayed(() -> likeView.setEnabled(true), 3000);
+                            Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show()
+                            likeProgress.visibility = View.GONE
+                            likeView.visibility = View.VISIBLE
+                            likeView.isEnabled = false
+                            Handler().postDelayed({ likeView.isEnabled = true }, 3000)
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
                     }
-                }, error -> {
-                    Toast.makeText(mCtx, "Could not like, please try again later...", Toast.LENGTH_LONG).show();
-                    likeProgress.setVisibility(View.GONE);
-                    likeView.setVisibility(View.VISIBLE);
-                    likeView.setEnabled(false);
-                    new Handler().postDelayed(() -> likeView.setEnabled(true), 3000);
+                }, Response.ErrorListener {
+                    Toast.makeText(mCtx, "Could not like, please try again later...", Toast.LENGTH_LONG).show()
+                    likeProgress.visibility = View.GONE
+                    likeView.visibility = View.VISIBLE
+                    likeView.isEnabled = false
+                    Handler().postDelayed({ likeView.isEnabled = true }, 3000)
                 }) {
-                    @Override
-                    protected Map<String, String> getParams() {
-                        Map<String, String> parms = new HashMap<>();
-                        parms.put("post_id", String.valueOf(profilenews.getId()));
-                        parms.put("method", "like");
-                        parms.put("user_to", profilenews.getUsername());
-                        parms.put("user_id", userID);
-                        parms.put("username", username);
-                        return parms;
+                    override fun getParams(): Map<String, String> {
+                        val params: MutableMap<String, String> = HashMap()
+                        params["post_id"] = profilenews.id.toString()
+                        params["method"] = "like"
+                        params["user_to"] = profilenews.username
+                        params["user_id"] = userID
+                        params["username"] = username
+                        return params
                     }
-                };
-                ((FragmentContainer) mCtx).addToRequestQueue(stringRequest);
-            });
-
-            likedView.setOnClickListener(v -> {
-                likedView.setVisibility(View.GONE);
-                likeProgress.setVisibility(View.VISIBLE);
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, LIKE_URL, response -> {
-                    JSONObject obj;
+                }
+                (mCtx as FragmentContainer).addToRequestQueue(stringRequest)
+            }
+            likedView.setOnClickListener {
+                likedView.visibility = View.GONE
+                likeProgress.visibility = View.VISIBLE
+                val stringRequest: StringRequest = object : StringRequest(Method.POST, LIKE_URL, Response.Listener { response: String? ->
+                    val obj: JSONObject
                     try {
-                        obj = new JSONObject(response);
+                        obj = JSONObject(response!!)
                         if (!obj.getBoolean("error")) {
-                            String newValue = Integer.toString(Integer.parseInt(textViewLikes.getText().toString()) - 1);
-                            textViewLikes.setText(newValue);
-                            likeProgress.setVisibility(View.GONE);
-                            likeView.setVisibility(View.VISIBLE);
-                            likeView.setEnabled(false);
-                            new Handler().postDelayed(() -> likeView.setEnabled(true), 3500);
+                            val newValue = (textViewLikes.text.toString().toInt() - 1).toString()
+                            textViewLikes.text = newValue
+                            likeProgress.visibility = View.GONE
+                            likeView.visibility = View.VISIBLE
+                            likeView.isEnabled = false
+                            Handler().postDelayed({ likeView.isEnabled = true }, 3500)
                         } else {
-                            Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show();
-                            likeProgress.setVisibility(View.GONE);
-                            likedView.setVisibility(View.VISIBLE);
-                            likedView.setEnabled(false);
-                            new Handler().postDelayed(() -> likedView.setEnabled(true), 3000);
+                            Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show()
+                            likeProgress.visibility = View.GONE
+                            likedView.visibility = View.VISIBLE
+                            likedView.isEnabled = false
+                            Handler().postDelayed({ likedView.isEnabled = true }, 3000)
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
                     }
-                }, error -> {
-                    Toast.makeText(mCtx, "Could not remove like, please try again later...", Toast.LENGTH_LONG).show();
-                    likeProgress.setVisibility(View.GONE);
-                    likedView.setVisibility(View.VISIBLE);
-                    likedView.setEnabled(false);
-                    new Handler().postDelayed(() -> likeView.setEnabled(true), 3000);
+                }, Response.ErrorListener {
+                    Toast.makeText(mCtx, "Could not remove like, please try again later...", Toast.LENGTH_LONG).show()
+                    likeProgress.visibility = View.GONE
+                    likedView.visibility = View.VISIBLE
+                    likedView.isEnabled = false
+                    Handler().postDelayed({ likeView.isEnabled = true }, 3000)
                 }) {
-                    @Override
-                    protected Map<String, String> getParams() {
-                        Map<String, String> parms = new HashMap<>();
-                        parms.put("post_id", String.valueOf(profilenews.getId()));
-                        parms.put("method", "unlike");
-                        parms.put("user_to", profilenews.getUsername());
-                        parms.put("user_id", userID);
-                        parms.put("username", username);
-                        return parms;
+                    override fun getParams(): Map<String, String> {
+                        val params: MutableMap<String, String> = HashMap()
+                        params["post_id"] = profilenews.id.toString()
+                        params["method"] = "unlike"
+                        params["user_to"] = profilenews.username
+                        params["user_id"] = userID
+                        params["username"] = username
+                        return params
                     }
-                };
-                ((FragmentContainer) mCtx).addToRequestQueue(stringRequest);
-            });
-
-            if (profilenews.getOnline().equals("yes")) {
-                online.setVisibility(View.VISIBLE);
-            } else {
-                online.setVisibility(View.GONE);
+                }
+                (mCtx as FragmentContainer).addToRequestQueue(stringRequest)
             }
-            if (profilenews.getVerified().equals("yes")) {
-                verified.setVisibility(View.VISIBLE);
+            if (profilenews.online == "yes") {
+                online.visibility = View.VISIBLE
             } else {
-                verified.setVisibility(View.GONE);
+                online.visibility = View.GONE
             }
-
-            String[] bodybits = profilenews.getBody().split("\\s+");
-            for (final String item : bodybits) {
-                if (android.util.Patterns.WEB_URL.matcher(item).matches()) {
-                    final String finalItem;
-                    if (!item.contains("http://") && !item.contains("https://")) {
-                        finalItem = "https://" + item;
+            if (profilenews.verified == "yes") {
+                verified.visibility = View.VISIBLE
+            } else {
+                verified.visibility = View.GONE
+            }
+            val bodybits = profilenews.body.split("\\s+".toRegex()).toTypedArray()
+            for (item in bodybits) {
+                if (Patterns.WEB_URL.matcher(item).matches()) {
+                    val finalItem: String = if (!item.contains("http://") && !item.contains("https://")) {
+                        "https://$item"
                     } else {
-                        finalItem = item;
+                        item
                     }
-                    final String[] imageUrl = new String[1];
-                    final String[] title = new String[1];
-                    final String[] desc = new String[1];
-                    urlPreview.setVisibility(View.VISIBLE);
-                    urlImage.setOnClickListener(v -> {
-                        Uri uri = Uri.parse(finalItem);
-                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                        mCtx.startActivity(intent);
-                    });
-                    new Thread(() -> {
+                    val imageUrl = arrayOfNulls<String>(1)
+                    val title = arrayOfNulls<String>(1)
+                    val desc = arrayOfNulls<String>(1)
+                    urlPreview.visibility = View.VISIBLE
+                    urlImage.setOnClickListener {
+                        val uri = Uri.parse(finalItem)
+                        val intent = Intent(Intent.ACTION_VIEW, uri)
+                        mCtx.startActivity(intent)
+                    }
+                    Thread( Runnable runnable@ {
                         try {
-                            Document doc = Jsoup.connect(finalItem).get();
-                            Elements ogTags = doc.select("meta[property^=og:]");
-                            if (ogTags.size() <= 0) {
-                                return;
+                            val doc = Jsoup.connect(finalItem).get()
+                            val ogTags = doc.select("meta[property^=og:]")
+                            if (ogTags.size <= 0) {
+                                return@runnable
                             }
-                            Elements metaOgTitle = doc.select("meta[property=og:title]");
+                            val metaOgTitle = doc.select("meta[property=og:title]")
                             if (metaOgTitle != null) {
-                                title[0] = metaOgTitle.attr("content");
+                                title[0] = metaOgTitle.attr("content")
                             } else {
-                                title[0] = doc.title();
+                                title[0] = doc.title()
                             }
-                            Elements metaOgDesc = doc.select("meta[property=og:description]");
+                            val metaOgDesc = doc.select("meta[property=og:description]")
                             if (metaOgDesc != null) {
-                                desc[0] = metaOgDesc.attr("content");
+                                desc[0] = metaOgDesc.attr("content")
                             }
-                            Elements metaOgImage = doc.select("meta[property=og:image]");
+                            val metaOgImage = doc.select("meta[property=og:image]")
                             if (metaOgImage != null) {
-                                imageUrl[0] = metaOgImage.attr("content");
+                                imageUrl[0] = metaOgImage.attr("content")
                             }
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        } catch (e: IOException) {
+                            e.printStackTrace()
                         }
-                    }).start();
+                    }).start()
                     //Fucking code wouldn't work any other way than I'm currently capable. Fuck it, have a delay
-                    final Handler handler = new Handler();
-                    handler.postDelayed(() -> {
-                        if (imageUrl[0] != null && imageUrl[0].isEmpty()) {
-                            urlImage.setImageResource(R.drawable.ic_error);
+                    val handler = Handler()
+                    handler.postDelayed({
+                        if (imageUrl[0] != null && imageUrl[0]!!.isEmpty()) {
+                            urlImage.setImageResource(R.drawable.ic_error)
                         } else {
                             Glide.with(mCtx)
                                     .load(imageUrl[0])
                                     .error(R.drawable.ic_error)
-                                    .into(urlImage);
+                                    .into(urlImage)
                         }
                         if (title[0] != null) {
-                            urlTitle.setText(title[0]);
+                            urlTitle.text = title[0]
                         } else {
-                            urlTitle.setText(mCtx.getString(R.string.no_content));
+                            urlTitle.text = mCtx.getString(R.string.no_content)
                         }
                         if (desc[0] != null) {
-                            urlDesc.setText(desc[0]);
+                            urlDesc.text = desc[0]
                         }
-                        urlProgress.setVisibility(View.GONE);
-                        urlBits.setVisibility(View.VISIBLE);
-                    }, 5000);
-                    break;
+                        urlProgress.visibility = View.GONE
+                        urlBits.visibility = View.VISIBLE
+                    }, 5000)
+                    break
                 } else {
-                    urlPreview.setVisibility(View.GONE);
+                    urlPreview.visibility = View.GONE
                 }
             }
-
-            textViewLikesText.setOnClickListener(v -> {
-                Fragment asf = new UserListFragment();
-                Bundle args = new Bundle();
-                args.putString("query", "post");
-                args.putString("queryID", String.valueOf(profilenews.getId()));
-                asf.setArguments(args);
-                FragmentTransaction fragmentTransaction = ((FragmentActivity) mCtx).getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.add(R.id.fragment_container, asf);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-            });
-            textViewComments.setOnClickListener(v -> {
-                ProfilePostFragment ldf = new ProfilePostFragment();
-                Bundle args = new Bundle();
-                args.putString("id", String.valueOf(profilenews.getId()));
-                args.putString("UserId", profilenews.getUser_id());
-                args.putString("Username", profilenews.getAdded_by());
-                ldf.setArguments(args);
-                ((FragmentActivity) mCtx).getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit();
-            });
-            if (profilenews.getIsEdited().equals("yes")) {
-                tvEdited.setVisibility(View.VISIBLE);
-            } else {
-                tvEdited.setVisibility(View.GONE);
+            textViewLikesText.setOnClickListener {
+                val asf: Fragment = UserListFragment()
+                val args = Bundle()
+                args.putString("query", "post")
+                args.putString("queryID", profilenews.id.toString())
+                asf.arguments = args
+                val fragmentTransaction = (mCtx as FragmentActivity).supportFragmentManager.beginTransaction()
+                fragmentTransaction.add(R.id.fragment_container, asf)
+                fragmentTransaction.addToBackStack(null)
+                fragmentTransaction.commit()
             }
+            textViewComments.setOnClickListener {
+                val ldf = ProfilePostFragment()
+                val args = Bundle()
+                args.putString("id", profilenews.id.toString())
+                args.putString("UserId", profilenews.user_id)
+                args.putString("Username", profilenews.added_by)
+                ldf.arguments = args
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+            }
+            if (profilenews.isEdited == "yes") {
+                tvEdited.visibility = View.VISIBLE
+            } else {
+                tvEdited.visibility = View.GONE
+            }
+        }
+
+        init {
+            userID = sharedPrefManager.userID!!
+            username = sharedPrefManager.username!!
+            verified = itemView.findViewById(R.id.verified)
+            online = itemView.findViewById(R.id.online)
+            likeProgress = itemView.findViewById(R.id.likeProgress)
+            likeView = itemView.findViewById(R.id.like)
+            likedView = itemView.findViewById(R.id.liked)
+            notiType = itemView.findViewById(R.id.platformType)
+            publicsTopicList = itemView.findViewById(R.id.publicsTopicList)
+            textviewaddedBy = itemView.findViewById(R.id.textViewProfileName)
+            postusernameTop = itemView.findViewById(R.id.postUsername_top)
+            textviewuserTo = itemView.findViewById(R.id.textViewToUserName)
+            imageViewProfilenewsPic = itemView.findViewById(R.id.imageViewProfilenewsPic)
+            imageProfilenewsView = itemView.findViewById(R.id.profileNewsImage)
+            textViewBody = itemView.findViewById(R.id.textViewBody)
+            textViewLikes = itemView.findViewById(R.id.textViewNumLikes)
+            textviewdateAdded = itemView.findViewById(R.id.profileCommentsDateTime_top)
+            textViewNumComments = itemView.findViewById(R.id.textViewNumComments)
+            urlPreview = itemView.findViewById(R.id.urlPreview)
+            urlProgress = itemView.findViewById(R.id.urlProgress)
+            urlImage = itemView.findViewById(R.id.urlImage)
+            urlTitle = itemView.findViewById(R.id.urlTitle)
+            urlDesc = itemView.findViewById(R.id.urlDesc)
+            urlBits = itemView.findViewById(R.id.urlBits)
+            textViewComments = itemView.findViewById(R.id.textViewComments)
+            textViewLikesText = itemView.findViewById(R.id.textViewLikes)
+            contentLayout = itemView.findViewById(R.id.contentLayout)
+            tvEdited = itemView.findViewById(R.id.tvEdited)
         }
     }
 
-        public static class ProgressHolder extends BaseViewHolder {
-            ProgressHolder(View itemView) {
-                super(itemView);
-            }
+    class ProgressHolder internal constructor(itemView: View?) : BaseViewHolder(itemView) {
+        override fun clear() {}
+    }
 
-            @Override
-            protected void clear() {
-            }
-        }
+    companion object {
+        private const val VIEW_TYPE_LOADING = 0
+        private const val VIEW_TYPE_NORMAL = 1
+        private const val LIKE_URL = Constants.ROOT_URL + "post_like.php"
+        private const val POST_DELETE = Constants.ROOT_URL + "profile_post_action.php/post_delete"
+    }
 }

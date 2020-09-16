@@ -1,51 +1,30 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.content.Context;
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.balysv.materialripple.MaterialRippleLayout
+import com.bumptech.glide.Glide
+import de.hdodenhof.circleimageview.CircleImageView
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.balysv.materialripple.MaterialRippleLayout;
-import com.bumptech.glide.Glide;
-
-import java.util.List;
-
-import de.hdodenhof.circleimageview.CircleImageView;
-
-public class UserListGroupMessageAdapter extends RecyclerView.Adapter<UserListGroupMessageAdapter.UserListHolder> {
-
-    private List<UserListRecycler> users;
-    private Context context;
-    private AdapterCallback mAdapterCallback;
-
-    public UserListGroupMessageAdapter(List<UserListRecycler> UserListRecycler, Context context, AdapterCallback callback) {
-        this.users = UserListRecycler;
-        this.context = context;
-        this.mAdapterCallback = callback;
+class UserListGroupMessageAdapter(private val users: List<UserListRecycler>, private val context: Context, private val mAdapterCallback: AdapterCallback) : RecyclerView.Adapter<UserListGroupMessageAdapter.UserListHolder>() {
+    interface AdapterCallback {
+        fun onMethodCallbackUserList(position: Int, username: String?)
     }
 
-    public interface AdapterCallback {
-        void onMethodCallbackUserList(int position, String username);
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserListHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.recycler_user_list_new_group_message, parent, false)
+        return UserListHolder(view)
     }
 
-    @NonNull
-    @Override
-    public UserListGroupMessageAdapter.UserListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_user_list_new_group_message, parent, false);
-        return new UserListGroupMessageAdapter.UserListHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(UserListGroupMessageAdapter.UserListHolder holder, int position) {
-        final UserListRecycler user = users.get(position);
-
-        holder.nickname.setText(user.getNickname());
-        holder.username.setText(String.format("@%s", user.getUsername()));
+    override fun onBindViewHolder(holder: UserListHolder, position: Int) {
+        val user = users[position]
+        holder.nickname.text = user.nickname
+        holder.username.text = String.format("@%s", user.username)
         /*holder.userListLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,42 +38,35 @@ public class UserListGroupMessageAdapter extends RecyclerView.Adapter<UserListGr
                 //Toast.makeText(context, "You clicked " + user.getId(), Toast.LENGTH_LONG).show();
             }
         });*/
-        if (user.getOnline()!=null&&user.getOnline().equals("yes")){
-            holder.online.setVisibility(View.VISIBLE);
-        }else{
-            holder.online.setVisibility(View.GONE);
+        if (user.online == "yes") {
+            holder.online.visibility = View.VISIBLE
+        } else {
+            holder.online.visibility = View.GONE
         }
-        if (user.getVerified()!=null&&user.getVerified().equals("yes")){
-            holder.verified.setVisibility(View.VISIBLE);
-        }else{
-            holder.verified.setVisibility(View.GONE);
+        if (user.verified == "yes") {
+            holder.verified.visibility = View.VISIBLE
+        } else {
+            holder.verified.visibility = View.GONE
         }
-        String profile_pic = user.getProfile_pic().substring(0, user.getProfile_pic().length() - 4)+"_r.JPG";
+        val profilePic = user.profile_pic.substring(0, user.profile_pic.length - 4) + "_r.JPG"
         Glide.with(context)
-                .load(Constants.BASE_URL + profile_pic)
-                .into(holder.profile_pic);
-        holder.removeBtn.setOnClickListener(v -> mAdapterCallback.onMethodCallbackUserList(position, user.getUsername()));
+                .load(Constants.BASE_URL + profilePic)
+                .into(holder.profilePic)
+        holder.removeBtn.setOnClickListener { mAdapterCallback.onMethodCallbackUserList(position, user.username) }
     }
 
-    @Override
-    public int getItemCount() {
-        return users.size();
-    }
-    public static class UserListHolder extends RecyclerView.ViewHolder{
-        TextView username,nickname;
-        CircleImageView profile_pic, online, verified;
-        MaterialRippleLayout userListLayout;
-        ImageView removeBtn;
-        public UserListHolder(View itemView) {
-            super(itemView);
-            username = itemView.findViewById(R.id.username);
-            nickname = itemView.findViewById(R.id.nickname);
-            profile_pic = itemView.findViewById(R.id.profile_image);
-            userListLayout = itemView.findViewById(R.id.userListLayout);
-            verified = itemView.findViewById(R.id.verified);
-            online = itemView.findViewById(R.id.online);
-            removeBtn = itemView.findViewById(R.id.removeBtn);
-        }
+    override fun getItemCount(): Int {
+        return users.size
     }
 
+    class UserListHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var username: TextView = itemView.findViewById(R.id.username)
+        var nickname: TextView = itemView.findViewById(R.id.nickname)
+        var profilePic: CircleImageView = itemView.findViewById(R.id.profile_image)
+        var online: CircleImageView = itemView.findViewById(R.id.online)
+        var verified: CircleImageView = itemView.findViewById(R.id.verified)
+        var userListLayout: MaterialRippleLayout = itemView.findViewById(R.id.userListLayout)
+        var removeBtn: ImageView = itemView.findViewById(R.id.removeBtn)
+
+    }
 }

@@ -1,49 +1,32 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import com.google.gson.annotations.SerializedName;
+import com.google.gson.annotations.SerializedName
 
-public class User {
-    @SerializedName("type") private String Type;
-    @SerializedName("id") private String Id;
-    @SerializedName("name") private String Name;
-    @SerializedName("subname") private String Subname;
-    @SerializedName("image") private String Image;
-    @SerializedName("extra") private String Extra;
-    @SerializedName("verified") private String Verified;
-    @SerializedName("last_online") private String Last_Online;
-    @SerializedName("numratings") private String Numratings;
+class User {
+    @SerializedName("type")
+    val type: String? = null
 
-    public String getType() { return Type; }
+    @SerializedName("id")
+    val id: String? = null
 
-    public String getId() {
-        return Id;
-    }
+    @SerializedName("name")
+    val name: String? = null
 
-    public String getName() {
-        return Name;
-    }
+    @SerializedName("subname")
+    val subname: String? = null
 
-    public String getSubname() {
-        return Subname;
-    }
+    @SerializedName("image")
+    val image: String? = null
 
-    public String getImage() {
-        return Image;
-    }
+    @SerializedName("extra")
+    val extra: String? = null
 
-    public String getExtra() {
-        return Extra;
-    }
+    @SerializedName("verified")
+    val verified: String? = null
 
-    public String getVerified() {
-        return Verified;
-    }
+    @SerializedName("last_online")
+    val last_Online: String? = null
 
-    public String getLast_Online() {
-        return Last_Online;
-    }
-
-    public String getNumratings() {
-        return Numratings;
-    }
+    @SerializedName("numratings")
+    val numratings: String? = null
 }

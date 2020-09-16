@@ -12,7 +12,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
-import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.bumptech.glide.Glide
 import com.iarcuschin.simpleratingbar.SimpleRatingBar
@@ -42,7 +41,7 @@ class ClanReviewFragment : Fragment() {
     private var playerReviewProgress: ProgressBar? = null
     private var reviewStarRating: SimpleRatingBar? = null
     private var gamereviewsView: RecyclerView? = null
-    private var gamereviewRecyclerList: MutableList<GameReview_Recycler>? = null
+    private var gamereviewRecyclerList: MutableList<GameReviewRecycler>? = null
     private var reviewButton: Button? = null
     private var joinToReview: Button? = null
     private var reviewAdapter: GameReviewAdapter? = null
@@ -71,9 +70,9 @@ class ClanReviewFragment : Fragment() {
         gamereviewRecyclerList = ArrayList()
         gamereviewsView = clanReviewRootView.findViewById(R.id.recyclerReviews)
         gamereviewsView?.setHasFixedSize(true)
-        gamereviewsView?.setLayoutManager(LinearLayoutManager(mContext))
-        userID = SharedPrefManager.getInstance(mContext).userID
-        username = SharedPrefManager.getInstance(mContext).username
+        gamereviewsView?.layoutManager = LinearLayoutManager(mContext)
+        userID = SharedPrefManager.getInstance(mContext!!)!!.userID
+        username = SharedPrefManager.getInstance(mContext!!)!!.username
         loadReviewsTop()
         loadReviews()
         tvratingsandreviews?.requestFocus()
@@ -161,7 +160,7 @@ class ClanReviewFragment : Fragment() {
                     val profilePic = profilenewsObject.getString("profile_pic")
                     val nickname = profilenewsObject.getString("nickname")
                     val userid = profilenewsObject.getString("userid")
-                    val gamenewsResult = GameReview_Recycler(ratingnumber, title, comments, reply, time, profilePic, nickname, userid)
+                    val gamenewsResult = GameReviewRecycler(ratingnumber, title, comments, reply, time, profilePic, nickname, userid)
                     gamereviewRecyclerList!!.add(gamenewsResult)
                 }
                 if (profilenews.length() == 0) {

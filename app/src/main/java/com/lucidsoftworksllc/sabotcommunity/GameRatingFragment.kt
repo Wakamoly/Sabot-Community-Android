@@ -1,166 +1,150 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity
 
-import android.content.Context;
-import android.graphics.Color;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.bumptech.glide.Glide;
-import com.iarcuschin.simpleratingbar.SimpleRatingBar;
-import com.yarolegovich.lovelydialog.LovelyStandardDialog;
-import java.util.HashMap;
-import java.util.Map;
-import de.hdodenhof.circleimageview.CircleImageView;
-import static android.view.View.GONE;
-public class GameRatingFragment extends Fragment {
+import android.content.Context
+import android.graphics.Color
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import androidx.fragment.app.Fragment
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.bumptech.glide.Glide
+import com.iarcuschin.simpleratingbar.SimpleRatingBar
+import com.yarolegovich.lovelydialog.LovelyStandardDialog
+import de.hdodenhof.circleimageview.CircleImageView
+import java.util.*
 
-    private static final String New_Review_URL = Constants.ROOT_URL+"new_game_review.php";
-
-    SimpleRatingBar mRatingBar;
-    TextView mRatingScale, nicknameReview, usernameReview;
-    EditText mFeedback, mTitle;
-    Button mSendFeedback;
-    LinearLayout newReviewProgressBar, newReviewDetails;
-    ImageView profileOnlineIcon, player_rating_profile_photo;
-    CircleImageView verifiedIcon;
-    Context mContext;
-    String userID, nickname, username, verified, profile_pic;
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View playerRatingRootView = inflater.inflate(R.layout.fragment_gamerating, container, false);
-
-        mRatingBar = playerRatingRootView.findViewById(R.id.newReviewStarRating);
-        profileOnlineIcon = playerRatingRootView.findViewById(R.id.profileOnlineIcon);
-        verifiedIcon = playerRatingRootView.findViewById(R.id.verifiedIcon);
-        player_rating_profile_photo = playerRatingRootView.findViewById(R.id.player_rating_profile_photo);
-        newReviewDetails = playerRatingRootView.findViewById(R.id.newReviewDetails);
-        nicknameReview = playerRatingRootView.findViewById(R.id.nicknameReview);
-        usernameReview = playerRatingRootView.findViewById(R.id.usernameReview);
-        mRatingScale = (TextView) playerRatingRootView.findViewById(R.id.tvRatingScale);
-        mFeedback = (EditText) playerRatingRootView.findViewById(R.id.etFeedback);
-        mSendFeedback = (Button) playerRatingRootView.findViewById(R.id.btnSubmit);
-        mTitle = playerRatingRootView.findViewById(R.id.mTitle);
-        newReviewProgressBar = playerRatingRootView.findViewById(R.id.newReviewProgressBar);
-        mContext = getActivity();
-
-        loadNewReview();
-        newReviewProgressBar.setVisibility(View.GONE);
-        return playerRatingRootView;
+class GameRatingFragment : Fragment() {
+    var mRatingBar: SimpleRatingBar? = null
+    var mRatingScale: TextView? = null
+    var nicknameReview: TextView? = null
+    var usernameReview: TextView? = null
+    var mFeedback: EditText? = null
+    var mTitle: EditText? = null
+    var mSendFeedback: Button? = null
+    var newReviewProgressBar: LinearLayout? = null
+    var newReviewDetails: LinearLayout? = null
+    var profileOnlineIcon: ImageView? = null
+    private var playerRatingProfilePhoto: ImageView? = null
+    var verifiedIcon: CircleImageView? = null
+    var mContext: Context? = null
+    var userID: String? = null
+    var nickname: String? = null
+    var username: String? = null
+    var verified: String? = null
+    var profilePic: String? = null
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val playerRatingRootView = inflater.inflate(R.layout.fragment_gamerating, container, false)
+        mRatingBar = playerRatingRootView.findViewById(R.id.newReviewStarRating)
+        profileOnlineIcon = playerRatingRootView.findViewById(R.id.profileOnlineIcon)
+        verifiedIcon = playerRatingRootView.findViewById(R.id.verifiedIcon)
+        playerRatingProfilePhoto = playerRatingRootView.findViewById(R.id.player_rating_profile_photo)
+        newReviewDetails = playerRatingRootView.findViewById(R.id.newReviewDetails)
+        nicknameReview = playerRatingRootView.findViewById(R.id.nicknameReview)
+        usernameReview = playerRatingRootView.findViewById(R.id.usernameReview)
+        mRatingScale = playerRatingRootView.findViewById<View>(R.id.tvRatingScale) as TextView
+        mFeedback = playerRatingRootView.findViewById<View>(R.id.etFeedback) as EditText
+        mSendFeedback = playerRatingRootView.findViewById<View>(R.id.btnSubmit) as Button
+        mTitle = playerRatingRootView.findViewById(R.id.mTitle)
+        newReviewProgressBar = playerRatingRootView.findViewById(R.id.newReviewProgressBar)
+        mContext = activity
+        loadNewReview()
+        newReviewProgressBar?.visibility = View.GONE
+        return playerRatingRootView
     }
 
-    private void submitReview(final String body, final String added_by, final String game_id, final String rating, final String title) {
-        StringRequest stringRequest=new StringRequest(Request.Method.POST, New_Review_URL, response -> {
+    private fun submitReview(body: String, added_by: String, game_id: String?, rating: String, title: String) {
+        val stringRequest: StringRequest = object : StringRequest(Method.POST, New_Review_URL, Response.Listener {
             //TODO FIX THIS
-            newReviewProgressBar.setVisibility(GONE);
-            Toast.makeText(mContext,"Review Posted!",Toast.LENGTH_LONG).show();
-            requireActivity().getSupportFragmentManager().popBackStackImmediate();
-        }, error -> {
-            newReviewProgressBar.setVisibility(GONE);
-            newReviewDetails.setVisibility(View.VISIBLE);
-            Toast.makeText(mContext,"Error on Response, please try again later...",Toast.LENGTH_LONG).show();
-        }){
-            @Override
-            protected Map<String, String> getParams()  {
-                Map<String,String> parms= new HashMap<>();
-                parms.put("body",body);
-                parms.put("added_by",added_by);
-                parms.put("game_id",game_id);
-                parms.put("rating",rating);
-                parms.put("title",title);
-                return parms;
+            newReviewProgressBar!!.visibility = View.GONE
+            Toast.makeText(mContext, "Review Posted!", Toast.LENGTH_LONG).show()
+            requireActivity().supportFragmentManager.popBackStackImmediate()
+        }, Response.ErrorListener {
+            newReviewProgressBar!!.visibility = View.GONE
+            newReviewDetails!!.visibility = View.VISIBLE
+            Toast.makeText(mContext, "Error on Response, please try again later...", Toast.LENGTH_LONG).show()
+        }) {
+            override fun getParams(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["body"] = body
+                params["added_by"] = added_by
+                params["game_id"] = game_id!!
+                params["rating"] = rating
+                params["title"] = title
+                return params
             }
-        };
-        ((FragmentContainer)mContext).addToRequestQueue(stringRequest);
+        }
+        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
-    private void loadNewReview(){
-        assert getArguments() != null;
-        final String gameID = getArguments().getString("GameId");
-        final String gamename = getArguments().getString("game");
-        final String gametag = getArguments().getString("tag");
-    //    verified = getArguments().getString("verified");
-        final String game_pic = getArguments().getString("game_pic");
-
-        mRatingBar.setOnRatingBarChangeListener((simpleRatingBar, rating, fromUser) -> {
-            mRatingScale.setText(String.valueOf(rating));
-            switch ((int) simpleRatingBar.getRating()) {
-                case 1:
-                    mRatingScale.setText(getString(R.string.bad));
-                    break;
-                case 2:
-                    mRatingScale.setText(getString(R.string.cusi));
-                    break;
-                case 3:
-                    mRatingScale.setText(getString(R.string.average));
-                    break;
-                case 4:
-                    mRatingScale.setText(getString(R.string.good));
-                    break;
-                case 5:
-                    mRatingScale.setText(getString(R.string.great));
-                    break;
-                default:
-                    mRatingScale.setText(getString(R.string.review_text));
+    private fun loadNewReview() {
+        val gameID = requireArguments().getString("GameId")
+        val gamename = requireArguments().getString("game")
+        val gametag = requireArguments().getString("tag")
+        //    verified = getArguments().getString("verified");
+        val gamePic = requireArguments().getString("game_pic")
+        mRatingBar!!.setOnRatingBarChangeListener { simpleRatingBar: SimpleRatingBar, rating: Float, fromUser: Boolean ->
+            mRatingScale!!.text = rating.toString()
+            when (simpleRatingBar.rating.toInt()) {
+                1 -> mRatingScale!!.text = getString(R.string.bad)
+                2 -> mRatingScale!!.text = getString(R.string.cusi)
+                3 -> mRatingScale!!.text = getString(R.string.average)
+                4 -> mRatingScale!!.text = getString(R.string.good)
+                5 -> mRatingScale!!.text = getString(R.string.great)
+                else -> mRatingScale!!.text = getString(R.string.review_text)
             }
-        });
-        mSendFeedback.setOnClickListener(view -> {
-            if(!(mFeedback.getText().toString()).isEmpty() && !(mTitle.getText().toString()).isEmpty() && !(String.valueOf(mRatingBar.getRating())).equals("0.0")) {
-                new LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
+        }
+        mSendFeedback!!.setOnClickListener {
+            if (mFeedback!!.text.toString().isNotEmpty() && mTitle!!.text.toString().isNotEmpty() && mRatingBar!!.rating.toString() != "0.0") {
+                LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
                         .setTopColorRes(R.color.green)
                         .setButtonsColorRes(R.color.green)
                         .setIcon(R.drawable.ic_error)
                         .setTitle("New Review")
-                        .setMessage("WARNING: You risk immediate account termination if your submitted review goes against our code of conduct.\nExamples of inappropriate content include (but are not limited to):\n" +
-                                "\n" +
-                                "•Content that could be considered violent or threatening.\n" +
-                                "•References to illegal use of alcohol, illegal drugs/illicit substances.\n" +
-                                "•Content that is sexually suggestive or revealing, or could be considered objectionable.\n" +
-                                "•Content that may be considered insulting, non-constructive, defamatory to individuals/organizations.\n" +
-                                "•Staff/users' confidential or private information.\n" +
-                                "•Any other content that is inconsistent with Sabot Community policies, code of conduct, or mission statement.\n\nSubmit Review?")
-                        .setPositiveButton(R.string.yes, v -> {
-                            newReviewProgressBar.setVisibility(View.VISIBLE);
-                            newReviewDetails.setVisibility(GONE);
-                            String body = mFeedback.getText().toString();
-                            String added_by = SharedPrefManager.getInstance(getActivity()).getUsername();
-                            String rating = String.valueOf(mRatingBar.getRating());
-                            String title = mTitle.getText().toString();
-                            submitReview(body, added_by, gameID, rating, title);
-                        })
+                        .setMessage("""
+    WARNING: You risk immediate account termination if your submitted review goes against our code of conduct.
+    Examples of inappropriate content include (but are not limited to):
+
+    •Content that could be considered violent or threatening.
+    •References to illegal use of alcohol, illegal drugs/illicit substances.
+    •Content that is sexually suggestive or revealing, or could be considered objectionable.
+    •Content that may be considered insulting, non-constructive, defamatory to individuals/organizations.
+    •Staff/users' confidential or private information.
+    •Any other content that is inconsistent with Sabot Community policies, code of conduct, or mission statement.
+
+    Submit Review?
+    """.trimIndent())
+                        .setPositiveButton(R.string.yes) {
+                            newReviewProgressBar!!.visibility = View.VISIBLE
+                            newReviewDetails!!.visibility = View.GONE
+                            val body = mFeedback!!.text.toString()
+                            val addedBy = SharedPrefManager.getInstance(requireActivity())!!.username
+                            val rating = mRatingBar!!.rating.toString()
+                            val title = mTitle!!.text.toString()
+                            submitReview(body, addedBy!!, gameID, rating, title)
+                        }
                         .setNegativeButton(R.string.no, null)
-                        .show();
+                        .show()
             } else {
-                Toast.makeText(mContext,"You must enter the required fields!",Toast.LENGTH_LONG).show();
-                if (mRatingScale.getText().equals("Please select a rating!")){
-                    mRatingScale.setTextColor(Color.RED);
+                Toast.makeText(mContext, "You must enter the required fields!", Toast.LENGTH_LONG).show()
+                if (mRatingScale!!.text == "Please select a rating!") {
+                    mRatingScale!!.setTextColor(Color.RED)
                 }
             }
-        });
-       /* if(verified.equals("yes")){
+        }
+        /* if(verified.equals("yes")){
             verifiedIcon.setVisibility(View.VISIBLE);
-        }*/
-        usernameReview.setText(String.format("@%s", gametag));
-        nicknameReview.setText(gamename);
-        Glide.with(mContext)
-                .load(Constants.BASE_URL+ game_pic)
+        }*/usernameReview!!.text = String.format("@%s", gametag)
+        nicknameReview!!.text = gamename
+        Glide.with(mContext!!)
+                .load(Constants.BASE_URL + gamePic)
                 .error(R.mipmap.ic_launcher)
-                .into(player_rating_profile_photo);
+                .into(playerRatingProfilePhoto!!)
     }
 
+    companion object {
+        private const val New_Review_URL = Constants.ROOT_URL + "new_game_review.php"
+    }
 }
