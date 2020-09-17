@@ -141,7 +141,7 @@ class PublicsTopicFragment : Fragment() {
         publicsSwipe?.setOnRefreshListener {
             val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
             if (currentFragment is PublicsTopicFragment) {
-                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                 fragTransaction.detach(currentFragment)
                 fragTransaction.attach(currentFragment)
                 fragTransaction.commit()
@@ -249,7 +249,7 @@ class PublicsTopicFragment : Fragment() {
                             args.putString("num_players", numPlayers)
                             args.putString("gameid", catId)
                             ldf.arguments = args
-                            (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                            (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                         }
                         deleteTopic!!.visibility = View.VISIBLE
                         deleteTopic!!.setOnClickListener {
@@ -275,7 +275,7 @@ class PublicsTopicFragment : Fragment() {
                                 args.putString("topic_id", postId)
                                 args.putString("permission", "admin")
                                 ldf.arguments = args
-                                (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                                (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                             }
                         } else {
                             noRequests!!.visibility = View.VISIBLE
@@ -290,7 +290,7 @@ class PublicsTopicFragment : Fragment() {
                                 args.putString("topic_id", postId)
                                 args.putString("permission", "user")
                                 ldf.arguments = args
-                                (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                                (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                             }
                         }
                         topicJoined!!.visibility = View.VISIBLE
@@ -320,7 +320,7 @@ class PublicsTopicFragment : Fragment() {
                                 args.putString("topic_id", postId)
                                 args.putString("permission", "user")
                                 ldf.arguments = args
-                                (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                                (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                             }
                         }
                     }
@@ -335,7 +335,7 @@ class PublicsTopicFragment : Fragment() {
                         val args = Bundle()
                         args.putString("UserId", userId)
                         ldf.arguments = args
-                        (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                        (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                     }
                     submitComment!!.setOnClickListener { view: View ->
                         val body = commentEditText!!.text.toString()
@@ -449,7 +449,7 @@ class PublicsTopicFragment : Fragment() {
                                 args.putString("type", "topic")
                                 args.putString("id", postId)
                                 ldf.arguments = args
-                                (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                                (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                             }
                             if (item.itemId == R.id.menuTopicPlayer) {
                                 if (mContext is FragmentContainer) {
@@ -457,7 +457,7 @@ class PublicsTopicFragment : Fragment() {
                                     val args = Bundle()
                                     args.putString("UserId", userId)
                                     ldf.arguments = args
-                                    (mContext as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                                    (mContext as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                                 }
                             }
                             true
@@ -734,7 +734,7 @@ class PublicsTopicFragment : Fragment() {
     private fun resetFragment() {
         val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
         if (currentFragment is PublicsTopicFragment) {
-            val fragTransaction = requireActivity().supportFragmentManager.beginTransaction()
+            val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
             fragTransaction.detach(currentFragment)
             fragTransaction.attach(currentFragment)
             fragTransaction.commit()

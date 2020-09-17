@@ -55,7 +55,7 @@ class NewMessageSearchAdapter(private val users: MutableList<User>, context: Con
                     args.putString("profile_pic", user.image)
                     args.putString("nickname", user.subname)
                     ldf.arguments = args
-                    (context as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.chat_fragment_container, ldf).addToBackStack(null).commit()
+                    (context as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.chat_fragment_container, ldf).addToBackStack(null).commit()
                 } /*
 
                 if(user.getType().equals("publics_cat")) {

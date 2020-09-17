@@ -122,7 +122,7 @@ class DashCurrentPublicsAdapter(currentPublicsSlider: List<*>, private val conte
                 val args = Bundle()
                 args.putString("PublicsId", utils.id)
                 ldf.arguments = args
-                (context as FragmentActivity).supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                (context as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
             }
         }
         val vp = container as ViewPager

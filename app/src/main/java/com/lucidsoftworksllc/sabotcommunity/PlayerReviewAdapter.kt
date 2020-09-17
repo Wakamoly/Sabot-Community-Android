@@ -31,7 +31,7 @@ class PlayerReviewAdapter(private val mCtx: Context, private val playerreviewLis
             val args = Bundle()
             args.putString("UserId", playerreviews.user_id)
             ldf.arguments = args
-            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
         }
         holder.textviewdateAdded.text = playerreviews.time
         holder.playerrated.rating = playerreviews.ratingnumber.toFloat()

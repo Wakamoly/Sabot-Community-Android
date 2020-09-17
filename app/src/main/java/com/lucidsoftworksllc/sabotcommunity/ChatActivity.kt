@@ -41,7 +41,7 @@ class ChatActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                 val args = Bundle()
                 args.putString("user_to", userTo)
                 ldf.arguments = args
-                this.supportFragmentManager.beginTransaction().addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
+                this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
             }
         } else if (getIntent().hasExtra("link") && getIntent().getStringExtra("link") != null) {
             val link = getIntent().getStringExtra("link")
@@ -53,7 +53,7 @@ class ChatActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                         val args = Bundle()
                         args.putString("group_id", linkfinal)
                         ldf.arguments = args
-                        this.supportFragmentManager.beginTransaction().addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
+                        this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
                     }
                 } else if (link.contains("user=")) {
                     val linkfinal = link.replace("user=", "")
@@ -62,7 +62,7 @@ class ChatActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                         val args = Bundle()
                         args.putString("user_to", linkfinal)
                         ldf.arguments = args
-                        this.supportFragmentManager.beginTransaction().addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
+                        this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
                     }
                 }
             }
@@ -72,6 +72,7 @@ class ChatActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.chat_fragment_container)
+        //setSupportActionBar(findViewById(R.id.chat_fragment_container))
         navView = findViewById(R.id.chat_nav_view)
         navView!!.setOnNavigationItemSelectedListener(this)
         deviceUsername = SharedPrefManager.getInstance(this)!!.username
@@ -90,7 +91,7 @@ class ChatActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                 val args = Bundle()
                 args.putString("user_to", userTo)
                 ldf.arguments = args
-                supportFragmentManager.beginTransaction().addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
+                supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
             }
         } else if (intent.hasExtra("link") && intent.getStringExtra("link") != null) {
             val link = intent.getStringExtra("link")
@@ -102,7 +103,7 @@ class ChatActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                         val args = Bundle()
                         args.putString("group_id", linkfinal)
                         ldf.arguments = args
-                        supportFragmentManager.beginTransaction().addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
+                        supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
                     }
                 } else if (link.contains("user=")) {
                     val linkfinal = link.replace("user=", "")
@@ -111,13 +112,13 @@ class ChatActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                         val args = Bundle()
                         args.putString("user_to", linkfinal)
                         ldf.arguments = args
-                        supportFragmentManager.beginTransaction().addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
+                        supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
                     }
                 } else if (link.contains("requests")) {
                     val ldf = MessageRequestsFragment()
                     val args = Bundle()
                     ldf.arguments = args
-                    supportFragmentManager.beginTransaction().addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
+                    supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
                 }
             }
         }
@@ -194,7 +195,7 @@ class ChatActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     private fun loadFragment(fragment: Fragment?): Boolean {
         if (fragment != null) {
-            supportFragmentManager.beginTransaction().replace(R.id.chat_fragment_container, fragment).commit()
+            supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).setCustomAnimations(R.anim.slide_in,R.anim.fade_out).replace(R.id.chat_fragment_container, fragment).commit()
             return true
         }
         return false

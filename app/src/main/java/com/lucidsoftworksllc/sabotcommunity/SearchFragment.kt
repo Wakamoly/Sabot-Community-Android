@@ -70,7 +70,7 @@ class SearchFragment : Fragment() {
         searchSwipe?.setOnRefreshListener {
             val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
             if (currentFragment is SearchFragment) {
-                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                 fragTransaction.detach(currentFragment)
                 fragTransaction.attach(currentFragment)
                 fragTransaction.commit()
@@ -125,7 +125,7 @@ class SearchFragment : Fragment() {
                             val args = Bundle()
                             args.putString("PublicsId", gameId)
                             ldf.arguments = args
-                            requireActivity().supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                            requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                         }
                         for (i in 0 until profiles.length()) {
                             val profilenewsObject = profiles.getJSONObject(i)

@@ -41,7 +41,7 @@ class PublicsSubCommentAdapter(private val mCtx: Context, private val subComment
             val args = Bundle()
             args.putString("UserId", subComment.userid)
             ldf.arguments = args
-            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
         }
         holder.commentDate.text = subComment.post_date
         val profilePic = subComment.profile_pic.substring(0, subComment.profile_pic.length - 4) + "_r.JPG"

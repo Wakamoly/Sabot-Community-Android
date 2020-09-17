@@ -143,7 +143,7 @@ class DashboardFragment : Fragment() {
             adNotified!!.clear()
             val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
             if (currentFragment is DashboardFragment) {
-                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                 fragTransaction.detach(currentFragment)
                 fragTransaction.attach(currentFragment)
                 fragTransaction.commit()
@@ -296,7 +296,7 @@ class DashboardFragment : Fragment() {
                             }
                             noCurrentPublics!!.setOnClickListener {
                                 val asf: Fragment = PublicsFragment()
-                                val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                                val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                                 fragmentTransaction.replace(R.id.fragment_container, asf)
                                 fragmentTransaction.addToBackStack(null)
                                 fragmentTransaction.commit()

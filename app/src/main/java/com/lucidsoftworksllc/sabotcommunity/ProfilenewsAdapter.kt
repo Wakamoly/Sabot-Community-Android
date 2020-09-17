@@ -10,6 +10,8 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -217,7 +219,7 @@ class ProfilenewsAdapter(private val mCtx: Context, private val profilenewsList:
                             val args = Bundle()
                             args.putString("id", profilenews.id.toString())
                             ldf.arguments = args
-                            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                         }
                         if (item.itemId == R.id.menuReport) {
                             val ldf = ReportFragment()
@@ -227,7 +229,7 @@ class ProfilenewsAdapter(private val mCtx: Context, private val profilenewsList:
                             args.putString("id", profilenews.id.toString())
                             ldf.arguments = args
                             //Inflate the fragment
-                            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                         }
                         true
                     }
@@ -241,7 +243,7 @@ class ProfilenewsAdapter(private val mCtx: Context, private val profilenewsList:
                             args.putString("type", "post")
                             args.putString("id", profilenews.id.toString())
                             ldf.arguments = args
-                            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                         }
                         true
                     }
@@ -256,7 +258,7 @@ class ProfilenewsAdapter(private val mCtx: Context, private val profilenewsList:
                 args.putString("UserId", profilenews.user_id)
                 args.putString("Username", profilenews.added_by)
                 ldf.arguments = args
-                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
             }
             textviewaddedBy.setOnClickListener {
                 val ldf = FragmentProfile()
@@ -264,7 +266,7 @@ class ProfilenewsAdapter(private val mCtx: Context, private val profilenewsList:
                 args.putString("UserId", profilenews.user_id)
                 args.putString("Username", profilenews.added_by)
                 ldf.arguments = args
-                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
             }
             val profilePic = profilenews.profile_pic.substring(0, profilenews.profile_pic.length - 4) + "_r.JPG"
             Glide.with(mCtx)
@@ -286,22 +288,26 @@ class ProfilenewsAdapter(private val mCtx: Context, private val profilenewsList:
                 likedView.visibility = View.GONE
             }
             likeView.setOnClickListener {
+                likeView.isEnabled = false
                 likeView.visibility = View.GONE
-                likeProgress.visibility = View.VISIBLE
+                //val unlikeAnim:Animation = AnimationUtils.loadAnimation(mCtx, R.anim.fade_out)
+                val likeAppear:Animation = AnimationUtils.loadAnimation(mCtx, R.anim.expand_in)
+
+                val newValue = (textViewLikes.text.toString().toInt() + 1).toString()
+                textViewLikes.text = newValue
+                likeProgress.visibility = View.GONE
+                likedView.visibility = View.VISIBLE
+                likedView.startAnimation(likeAppear)
+                likedView.isEnabled = false
+                Handler().postDelayed({ likedView.isEnabled = true }, 3500)
+                //likeProgress.visibility = View.VISIBLE
                 val stringRequest: StringRequest = object : StringRequest(Method.POST, LIKE_URL, Response.Listener { response: String? ->
                     val obj: JSONObject
                     try {
                         obj = JSONObject(response!!)
-                        if (!obj.getBoolean("error")) {
-                            val newValue = (textViewLikes.text.toString().toInt() + 1).toString()
-                            textViewLikes.text = newValue
-                            likeProgress.visibility = View.GONE
-                            likedView.visibility = View.VISIBLE
-                            likedView.isEnabled = false
-                            Handler().postDelayed({ likedView.isEnabled = true }, 3500)
-                        } else {
+                        if (obj.getBoolean("error")) {
                             Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show()
-                            likeProgress.visibility = View.GONE
+                            //likeProgress.visibility = View.GONE
                             likeView.visibility = View.VISIBLE
                             likeView.isEnabled = false
                             Handler().postDelayed({ likeView.isEnabled = true }, 3000)
@@ -329,20 +335,23 @@ class ProfilenewsAdapter(private val mCtx: Context, private val profilenewsList:
                 (mCtx as FragmentContainer).addToRequestQueue(stringRequest)
             }
             likedView.setOnClickListener {
+                likedView.isEnabled = false
                 likedView.visibility = View.GONE
-                likeProgress.visibility = View.VISIBLE
+                //val unlikeAnim:Animation = AnimationUtils.loadAnimation(mCtx, R.anim.fade_out)
+                val likedAppear:Animation = AnimationUtils.loadAnimation(mCtx, R.anim.expand_in)
+
+                val newValue = (textViewLikes.text.toString().toInt() - 1).toString()
+                textViewLikes.text = newValue
+                likeProgress.visibility = View.GONE
+                likeView.visibility = View.VISIBLE
+                likeView.startAnimation(likedAppear)
+                likeView.isEnabled = false
+                Handler().postDelayed({ likeView.isEnabled = true }, 3500)
                 val stringRequest: StringRequest = object : StringRequest(Method.POST, LIKE_URL, Response.Listener { response: String? ->
                     val obj: JSONObject
                     try {
                         obj = JSONObject(response!!)
                         if (!obj.getBoolean("error")) {
-                            val newValue = (textViewLikes.text.toString().toInt() - 1).toString()
-                            textViewLikes.text = newValue
-                            likeProgress.visibility = View.GONE
-                            likeView.visibility = View.VISIBLE
-                            likeView.isEnabled = false
-                            Handler().postDelayed({ likeView.isEnabled = true }, 3500)
-                        } else {
                             Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show()
                             likeProgress.visibility = View.GONE
                             likedView.visibility = View.VISIBLE
@@ -456,7 +465,7 @@ class ProfilenewsAdapter(private val mCtx: Context, private val profilenewsList:
                 args.putString("query", "post")
                 args.putString("queryID", profilenews.id.toString())
                 asf.arguments = args
-                val fragmentTransaction = (mCtx as FragmentActivity).supportFragmentManager.beginTransaction()
+                val fragmentTransaction = (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                 fragmentTransaction.add(R.id.fragment_container, asf)
                 fragmentTransaction.addToBackStack(null)
                 fragmentTransaction.commit()
@@ -468,7 +477,7 @@ class ProfilenewsAdapter(private val mCtx: Context, private val profilenewsList:
                 args.putString("UserId", profilenews.user_id)
                 args.putString("Username", profilenews.added_by)
                 ldf.arguments = args
-                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
             }
             if (profilenews.isEdited == "yes") {
                 tvEdited.visibility = View.VISIBLE

@@ -132,7 +132,7 @@ class ProfilePostFragment : Fragment() {
         profilePostsSwipe?.setOnRefreshListener {
             val currentFragment = (mCtx as FragmentActivity?)!!.supportFragmentManager.findFragmentById(R.id.fragment_container)
             if (currentFragment is ProfilePostFragment) {
-                val fragTransaction = (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction()
+                val fragTransaction = (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                 fragTransaction.detach(currentFragment)
                 fragTransaction.attach(currentFragment)
                 fragTransaction.commit()
@@ -147,7 +147,7 @@ class ProfilePostFragment : Fragment() {
         val stringRequest: StringRequest = object : StringRequest(Method.POST, CommentPost_URL, Response.Listener {
             val currentFragment = (mCtx as FragmentActivity?)!!.supportFragmentManager.findFragmentById(R.id.fragment_container)
             if (currentFragment is ProfilePostFragment) {
-                val fragTransaction = (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction()
+                val fragTransaction = (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                 fragTransaction.detach(currentFragment)
                 fragTransaction.attach(currentFragment)
                 fragTransaction.commit()
@@ -218,7 +218,7 @@ class ProfilePostFragment : Fragment() {
                                 val args = Bundle()
                                 args.putString("id", id.toString())
                                 ldf.arguments = args
-                                (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                                (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                             }
                             if (item.itemId == R.id.menuReport) {
                                 val ldf = ReportFragment()
@@ -227,7 +227,7 @@ class ProfilePostFragment : Fragment() {
                                 args.putString("type", "post")
                                 args.putString("id", id.toString())
                                 ldf.arguments = args
-                                (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                                (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                             }
                             true
                         }
@@ -241,7 +241,7 @@ class ProfilePostFragment : Fragment() {
                                 args.putString("type", "post")
                                 args.putString("id", id.toString())
                                 ldf.arguments = args
-                                (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                                (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                             }
                             true
                         }
@@ -258,7 +258,7 @@ class ProfilePostFragment : Fragment() {
                                 val args = Bundle()
                                 args.putString("UserId", usertoId)
                                 ldf.arguments = args
-                                (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                                (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                             }
                         }
                         "clan" -> {
@@ -269,7 +269,7 @@ class ProfilePostFragment : Fragment() {
                                 val args = Bundle()
                                 args.putString("ClanId", usertoId)
                                 ldf.arguments = args
-                                (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                                (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                             }
                         }
                         "event" -> {
@@ -369,7 +369,7 @@ class ProfilePostFragment : Fragment() {
                     args.putString("query", "post")
                     args.putString("queryID", id.toString())
                     asf.arguments = args
-                    val fragmentTransaction = (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction()
+                    val fragmentTransaction = (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                     fragmentTransaction.replace(R.id.fragment_container, asf)
                     fragmentTransaction.addToBackStack(null)
                     fragmentTransaction.commit()
@@ -389,7 +389,7 @@ class ProfilePostFragment : Fragment() {
                     val args = Bundle()
                     args.putString("UserId", userId)
                     ldf.arguments = args
-                    (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 likeView!!.setOnClickListener {
                     likeView!!.visibility = View.GONE
@@ -504,7 +504,7 @@ class ProfilePostFragment : Fragment() {
                         val args = Bundle()
                         args.putString("image", image)
                         asf.arguments = args
-                        val fragmentTransaction = (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction()
+                        val fragmentTransaction = (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                         fragmentTransaction.replace(R.id.fragment_container, asf)
                         fragmentTransaction.addToBackStack(null)
                         fragmentTransaction.commit()

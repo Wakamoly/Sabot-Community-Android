@@ -54,7 +54,7 @@ class ConvosFragment : Fragment() {
         }
         messagesNew?.setOnClickListener {
             val ldf = NewMessageFragment()
-            (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
+            (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
         }
         fetchConvos()
         return convosRootView

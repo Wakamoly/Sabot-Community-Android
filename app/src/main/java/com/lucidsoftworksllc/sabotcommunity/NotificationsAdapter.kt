@@ -179,7 +179,7 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationsR
                         val args = Bundle()
                         args.putString("id", linkID)
                         ldf.arguments = args
-                        (context as FragmentActivity).supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                        (context as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                     }
                 } else if (notification.link.contains("publics_topic.php?id=")) {
                     val linkID = notification.link.replace("publics_topic.php?id=", "")
@@ -188,7 +188,7 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationsR
                         val args = Bundle()
                         args.putString("PublicsId", linkID)
                         ldf.arguments = args
-                        (context as FragmentActivity).supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                        (context as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                     }
                 } else if (notification.link.contains("clan=")) {
                     val linkID = notification.link.replace("clan=", "")
@@ -197,7 +197,7 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationsR
                         val args = Bundle()
                         args.putString("ClanId", linkID)
                         ldf.arguments = args
-                        (context as FragmentActivity).supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                        (context as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                     }
                 } else if (notification.link.contains("user=")) {
                     val linkID = notification.user_id
@@ -206,7 +206,7 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationsR
                         val args = Bundle()
                         args.putString("UserId", linkID)
                         ldf.arguments = args
-                        (context as FragmentActivity).supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                        (context as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                     }
                 } else if (notification.link.contains("ptopic=")) {
                     val linkID = notification.link.replace("ptopic=", "")
@@ -215,7 +215,7 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationsR
                         val args = Bundle()
                         args.putString("PublicsId", linkID)
                         ldf.arguments = args
-                        (context as FragmentActivity).supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                        (context as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                     }
                 } else if (notification.link.contains("review")) {
                     if (context is FragmentContainer) {
@@ -223,7 +223,7 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationsR
                         val args = Bundle()
                         args.putString("UserId", userid)
                         ldf.arguments = args
-                        (context as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).commit()
+                        (context as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).commit()
                     }
                 }
             }

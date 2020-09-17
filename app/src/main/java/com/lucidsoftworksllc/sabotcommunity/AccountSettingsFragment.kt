@@ -223,7 +223,7 @@ class AccountSettingsFragment : Fragment() {
                     .setPositiveButton(R.string.yes) { saveChangesClick("toProfilePicture") }
                     .setNegativeButton(R.string.no) {
                         val asf: Fragment = UploadProfilePhotoFragment()
-                        val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                        val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                         fragmentTransaction.replace(R.id.fragment_container, asf)
                         fragmentTransaction.addToBackStack(null)
                         fragmentTransaction.commit()
@@ -367,12 +367,12 @@ class AccountSettingsFragment : Fragment() {
                             if (jsonObject.getString("error") == "false") {
                                 if (action == "toProfile") {
                                     val asf: Fragment = FragmentProfile()
-                                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                                     fragmentTransaction.replace(R.id.fragment_container, asf)
                                     fragmentTransaction.commit()
                                 } else if (action == "toProfilePicture") {
                                     val asf: Fragment = UploadProfilePhotoFragment()
-                                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                                     fragmentTransaction.replace(R.id.fragment_container, asf)
                                     fragmentTransaction.commit()
                                 }

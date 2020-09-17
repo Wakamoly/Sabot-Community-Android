@@ -119,7 +119,7 @@ class PlayerReviewFragment : Fragment() {
             args.putString("profile_pic", profilePic)
             args.putString("last_online", lastOnline)
             ldf.arguments = args
-            (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+            (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
         }
         usernameReviewed!!.text = String.format("@%s", username)
         nicknameReviewed!!.text = nickname

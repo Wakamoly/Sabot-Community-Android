@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
@@ -72,7 +73,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
                     val args = Bundle()
                     args.putString("id", linkID)
                     ldf.arguments = args
-                    this.supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 link.contains("publics_topic.php?id=") -> {
                     val linkID = link.replace("publics_topic.php?id=", "")
@@ -80,7 +81,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
                     val args = Bundle()
                     args.putString("PublicsId", linkID)
                     ldf.arguments = args
-                    this.supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 link.contains("clan=") -> {
                     val linkID = link.replace("clan=", "")
@@ -88,7 +89,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
                     val args = Bundle()
                     args.putString("ClanId", linkID)
                     ldf.arguments = args
-                    this.supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 link.contains("user=") -> {
                     val linkID = link.replace("user=", "")
@@ -96,7 +97,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
                     val args = Bundle()
                     args.putString("Username", linkID)
                     ldf.arguments = args
-                    this.supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 link.contains("ptopic=") -> {
                     val linkID = link.replace("ptopic=", "")
@@ -104,7 +105,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
                     val args = Bundle()
                     args.putString("PublicsId", linkID)
                     ldf.arguments = args
-                    this.supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 link.contains("pchatroom=") -> {
                     val linkID = link.replace("pchatroom=", "")
@@ -112,7 +113,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
                     val args = Bundle()
                     args.putString("GameId", linkID)
                     ldf.arguments = args
-                    this.supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 link.contains("review") -> {
                     val ldf = FragmentProfile()
@@ -131,7 +132,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.fragment_container)
-        setSupportActionBar(findViewById(R.id.fragment_container_toolbar))
+        //setSupportActionBar(findViewById(R.id.fragment_container_toolbar))
         navView = findViewById(R.id.nav_view)
         navView?.setOnNavigationItemSelectedListener(this)
         dashContainer = findViewById(R.id.dashContainer)
@@ -162,7 +163,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
                 val args = Bundle()
                 args.putString("UserId", userTo)
                 ldf.arguments = args
-                supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).commit()
+                supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).commit()
             }
         } else if (intent.hasExtra("link") && intent.getStringExtra("link") != null) {
             val link = intent.getStringExtra("link")
@@ -174,7 +175,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
                         val args = Bundle()
                         args.putString("id", linkID)
                         ldf.arguments = args
-                        this.supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                        this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                     }
                     link.contains("publics_topic.php?id=") -> {
                         val linkID = link.replace("publics_topic.php?id=", "")
@@ -182,7 +183,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
                         val args = Bundle()
                         args.putString("PublicsId", linkID)
                         ldf.arguments = args
-                        this.supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                        this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                     }
                     link.contains("clan=") -> {
                         val linkID = link.replace("clan=", "")
@@ -190,7 +191,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
                         val args = Bundle()
                         args.putString("ClanId", linkID)
                         ldf.arguments = args
-                        this.supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                        this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                     }
                     link.contains("user=") -> {
                         val linkID = link.replace("user=", "")
@@ -198,7 +199,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
                         val args = Bundle()
                         args.putString("Username", linkID)
                         ldf.arguments = args
-                        this.supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                        this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                     }
                     link.contains("ptopic=") -> {
                         val linkID = link.replace("ptopic=", "")
@@ -206,7 +207,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
                         val args = Bundle()
                         args.putString("PublicsId", linkID)
                         ldf.arguments = args
-                        this.supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                        this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                     }
                     link.contains("pchatroom=") -> {
                         val linkID = link.replace("pchatroom=", "")
@@ -214,7 +215,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
                         val args = Bundle()
                         args.putString("GameId", linkID)
                         ldf.arguments = args
-                        this.supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                        this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                     }
                     link.contains("review") -> {
                         val ldf = FragmentProfile()
@@ -254,49 +255,49 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
                 }
                 R.id.nav_settings -> {
                     val asf: Fragment = AccountSettingsFragment()
-                    val fragmentTransaction = supportFragmentManager.beginTransaction()
+                    val fragmentTransaction = supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).setCustomAnimations(R.anim.slide_in,R.anim.fade_out)
                     fragmentTransaction.replace(R.id.fragment_container, asf)
                     fragmentTransaction.addToBackStack(null)
                     fragmentTransaction.commit()
                 }
                 R.id.nav_profile -> {
                     val asf: Fragment = FragmentProfile()
-                    val fragmentTransaction = supportFragmentManager.beginTransaction()
+                    val fragmentTransaction = supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).setCustomAnimations(R.anim.slide_in,R.anim.fade_out)
                     fragmentTransaction.replace(R.id.fragment_container, asf)
                     fragmentTransaction.addToBackStack(null)
                     fragmentTransaction.commit()
                 }
                 R.id.nav_publics -> {
                     val asf: Fragment = PublicsFragment()
-                    val fragmentTransaction = supportFragmentManager.beginTransaction()
+                    val fragmentTransaction = supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).setCustomAnimations(R.anim.slide_in,R.anim.fade_out)
                     fragmentTransaction.replace(R.id.fragment_container, asf)
                     fragmentTransaction.addToBackStack(null)
                     fragmentTransaction.commit()
                 }
                 R.id.nav_clans -> {
                     val asf: Fragment = ClansListFragment()
-                    val fragmentTransaction = supportFragmentManager.beginTransaction()
+                    val fragmentTransaction = supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).setCustomAnimations(R.anim.slide_in,R.anim.fade_out)
                     fragmentTransaction.replace(R.id.fragment_container, asf)
                     fragmentTransaction.addToBackStack(null)
                     fragmentTransaction.commit()
                 }
                 R.id.nav_about -> {
                     val asf: Fragment = AboutFragment()
-                    val fragmentTransaction = supportFragmentManager.beginTransaction()
+                    val fragmentTransaction = supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).setCustomAnimations(R.anim.slide_in,R.anim.fade_out)
                     fragmentTransaction.replace(R.id.fragment_container, asf)
                     fragmentTransaction.addToBackStack(null)
                     fragmentTransaction.commit()
                 }
                 R.id.nav_contact_us -> {
                     val asf: Fragment = ContactUsFragment()
-                    val fragmentTransaction = supportFragmentManager.beginTransaction()
+                    val fragmentTransaction = supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).setCustomAnimations(R.anim.slide_in,R.anim.fade_out)
                     fragmentTransaction.replace(R.id.fragment_container, asf)
                     fragmentTransaction.addToBackStack(null)
                     fragmentTransaction.commit()
                 }
                 R.id.nav_merch -> {
                     val asf: Fragment = MerchFragment()
-                    val fragmentTransaction = supportFragmentManager.beginTransaction()
+                    val fragmentTransaction = supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                     fragmentTransaction.replace(R.id.fragment_container, asf)
                     fragmentTransaction.addToBackStack(null)
                     fragmentTransaction.commit()
@@ -374,7 +375,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
     private fun loadFragment(fragment: Fragment?): Boolean {
         if (fragment != null) {
             supportFragmentManager
-                    .beginTransaction()
+                    .beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out)
                     .replace(R.id.fragment_container, fragment)
                     .commit()
             return true
@@ -411,7 +412,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
             }
             if (item.itemId == R.id.menuSettings) {
                 val asf: Fragment = AccountSettingsFragment()
-                val fragmentTransaction = supportFragmentManager.beginTransaction()
+                val fragmentTransaction = supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                 fragmentTransaction.replace(R.id.fragment_container, asf)
                 fragmentTransaction.addToBackStack(null)
                 fragmentTransaction.commit()

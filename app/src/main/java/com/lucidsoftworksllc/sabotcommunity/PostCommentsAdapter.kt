@@ -132,7 +132,7 @@ class PostCommentsAdapter(private val mCtx: Context, private val postCommentsLis
                 args.putString("UserId", comment.user_id)
                 args.putString("Username", comment.username)
                 ldf.arguments = args
-                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
             }
         }
         if (comment.likedbyuseryes == "yes") {
@@ -245,7 +245,7 @@ class PostCommentsAdapter(private val mCtx: Context, private val postCommentsLis
             args.putString("query", "comment")
             args.putString("queryID", comment.id)
             asf.arguments = args
-            val fragmentTransaction = (mCtx as FragmentActivity).supportFragmentManager.beginTransaction()
+            val fragmentTransaction = (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
             fragmentTransaction.add(R.id.fragment_container, asf)
             fragmentTransaction.addToBackStack(null)
             fragmentTransaction.commit()

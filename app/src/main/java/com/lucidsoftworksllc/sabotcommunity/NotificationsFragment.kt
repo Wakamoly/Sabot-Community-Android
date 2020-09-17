@@ -70,7 +70,7 @@ class NotificationsFragment : Fragment() {
         notificationSwipe?.setOnRefreshListener {
             val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
             if (currentFragment is NotificationsFragment) {
-                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                 fragTransaction.detach(currentFragment)
                 fragTransaction.attach(currentFragment)
                 fragTransaction.commit()
@@ -89,7 +89,7 @@ class NotificationsFragment : Fragment() {
                             if (!obj.getBoolean("error")) {
                                 val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
                                 if (currentFragment is NotificationsFragment) {
-                                    val fragTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                                    val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                                     fragTransaction.detach(currentFragment)
                                     fragTransaction.attach(currentFragment)
                                     fragTransaction.commit()

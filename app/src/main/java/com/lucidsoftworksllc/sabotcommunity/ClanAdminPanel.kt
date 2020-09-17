@@ -173,7 +173,7 @@ class ClanAdminPanel : Fragment() {
                         args.putString("Clanname", clanname)
                         args.putString("Clantag", clantag)
                         ldf.arguments = args
-                        (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                        (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                     }
                 }
             } catch (e: JSONException) {
@@ -332,7 +332,7 @@ class ClanAdminPanel : Fragment() {
                         if (jsonObject.getString("error") == "false") {
                             val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
                             if (currentFragment is ClanAdminPanel) {
-                                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                                 fragTransaction.detach(currentFragment)
                                 fragTransaction.attach(currentFragment)
                                 fragTransaction.commit()
@@ -374,7 +374,7 @@ class ClanAdminPanel : Fragment() {
                         if (jsonObject.getString("error") == "false") {
                             val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
                             if (currentFragment is ClanAdminPanel) {
-                                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                                 fragTransaction.detach(currentFragment)
                                 fragTransaction.attach(currentFragment)
                                 fragTransaction.commit()

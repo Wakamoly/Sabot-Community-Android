@@ -95,7 +95,7 @@ class PublicsFragment : Fragment() {
             val args = Bundle()
             args.putString("newpublics", "Add game: ")
             ldf.arguments = args
-            (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+            (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
         }
         mProgressBar?.visibility = View.VISIBLE
         publicsView.setHasFixedSize(true)

@@ -248,7 +248,7 @@ class FragmentProfile : Fragment() {
         profileRefreshLayout?.setOnRefreshListener {
             val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
             if (currentFragment is FragmentProfile) {
-                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                 fragTransaction.detach(currentFragment)
                 fragTransaction.attach(currentFragment)
                 fragTransaction.commit()
@@ -274,21 +274,21 @@ class FragmentProfile : Fragment() {
         }
         editProfileButton?.setOnClickListener {
             val asf: Fragment = AccountSettingsFragment()
-            val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+            val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
             fragmentTransaction.replace(R.id.fragment_container, asf)
             fragmentTransaction.addToBackStack(null)
             fragmentTransaction.commit()
         }
         setProfileCoverButton?.setOnClickListener {
             val asf: Fragment = UploadCoverFragment()
-            val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+            val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
             fragmentTransaction.replace(R.id.fragment_container, asf)
             fragmentTransaction.addToBackStack(null)
             fragmentTransaction.commit()
         }
         setProfilePhotoButton?.setOnClickListener {
             val asf: Fragment = UploadProfilePhotoFragment()
-            val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+            val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
             fragmentTransaction.replace(R.id.fragment_container, asf)
             fragmentTransaction.addToBackStack(null)
             fragmentTransaction.commit()
@@ -307,7 +307,7 @@ class FragmentProfile : Fragment() {
                     }
                     val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
                     if (currentFragment is FragmentProfile) {
-                        val fragTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                        val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                         fragTransaction.detach(currentFragment)
                         fragTransaction.attach(currentFragment)
                         fragTransaction.commit()
@@ -467,7 +467,7 @@ class FragmentProfile : Fragment() {
                     val args = Bundle()
                     args.putString("image", coverPic)
                     asf.arguments = args
-                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                     fragmentTransaction.replace(R.id.fragment_container, asf)
                     fragmentTransaction.addToBackStack(null)
                     fragmentTransaction.commit()
@@ -477,7 +477,7 @@ class FragmentProfile : Fragment() {
                     val args = Bundle()
                     args.putString("image", profilePic)
                     asf.arguments = args
-                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                     fragmentTransaction.replace(R.id.fragment_container, asf)
                     fragmentTransaction.addToBackStack(null)
                     fragmentTransaction.commit()
@@ -612,7 +612,7 @@ class FragmentProfile : Fragment() {
                     args.putString("all_friend_array", connections)
                     args.putString("last_online", lastOnline)
                     ldf.arguments = args
-                    requireActivity().supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 moreButtonLayout!!.setOnClickListener { view: View? ->
                     val popup = PopupMenu(mContext, view)
@@ -630,7 +630,7 @@ class FragmentProfile : Fragment() {
                             args.putString("all_friend_array", connections)
                             args.putString("last_online", lastOnline)
                             ldf.arguments = args
-                            requireActivity().supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                            requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                         }
                         if (item.itemId == R.id.menuPlayerReport) {
                             val ldf = ReportFragment()
@@ -639,7 +639,7 @@ class FragmentProfile : Fragment() {
                             args.putString("type", "user")
                             args.putString("id", id)
                             ldf.arguments = args
-                            requireActivity().supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                            requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                         }
                         if (item.itemId == R.id.menuPlayerBlock) {
                             if (deviceUsername != profileUsername) {
@@ -649,7 +649,7 @@ class FragmentProfile : Fragment() {
                                             SharedPrefManager.getInstance(mContext!!)!!.blockUser(username)
                                             val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
                                             if (currentFragment is FragmentProfile) {
-                                                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                                                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                                                 fragTransaction.detach(currentFragment)
                                                 fragTransaction.attach(currentFragment)
                                                 fragTransaction.commit()
@@ -759,7 +759,7 @@ class FragmentProfile : Fragment() {
                     args.putString("query", "followers")
                     args.putString("queryID", profileUsername)
                     asf.arguments = args
-                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                     fragmentTransaction.replace(R.id.fragment_container, asf)
                     fragmentTransaction.addToBackStack(null)
                     fragmentTransaction.commit()
@@ -770,7 +770,7 @@ class FragmentProfile : Fragment() {
                     args.putString("query", "following")
                     args.putString("queryID", profileUsername)
                     asf.arguments = args
-                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                     fragmentTransaction.replace(R.id.fragment_container, asf)
                     fragmentTransaction.addToBackStack(null)
                     fragmentTransaction.commit()
@@ -781,7 +781,7 @@ class FragmentProfile : Fragment() {
                     args.putString("query", "connections")
                     args.putString("queryID", profileUsername)
                     asf.arguments = args
-                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                     fragmentTransaction.replace(R.id.fragment_container, asf)
                     fragmentTransaction.addToBackStack(null)
                     fragmentTransaction.commit()
@@ -880,7 +880,7 @@ class FragmentProfile : Fragment() {
                     args.putString("queryidextra", userProfileID)
                     args.putString("method", "posts")
                     ldf.arguments = args
-                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 profileClansButton!!.setOnClickListener { postsQueryButtonClicked(profileClansButton) }
                 publicsPostsButton!!.setOnClickListener { postsQueryButtonClicked(publicsPostsButton) }
@@ -924,7 +924,7 @@ class FragmentProfile : Fragment() {
                     args.putString("queryid", profileUsername)
                     args.putString("method", "publics")
                     ldf.arguments = args
-                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 if (profilepublicsnews.length() == 0) {
                     postsNoPosts!!.visibility = View.VISIBLE

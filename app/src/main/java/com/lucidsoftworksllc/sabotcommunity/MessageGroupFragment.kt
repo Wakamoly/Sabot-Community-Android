@@ -401,7 +401,7 @@ class MessageGroupFragment : Fragment() {
                             args.putString("owner", owner)
                             args.putString("canRemove", finalCanRemoveUsers)
                             asf.arguments = args
-                            val fragmentTransaction = (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction()
+                            val fragmentTransaction = (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                             fragmentTransaction.replace(R.id.chat_fragment_container, asf)
                             fragmentTransaction.addToBackStack(null)
                             fragmentTransaction.commit()
@@ -412,7 +412,7 @@ class MessageGroupFragment : Fragment() {
                                 val args = Bundle()
                                 args.putString("group_id", group_id)
                                 asf.arguments = args
-                                val fragmentTransaction = (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction()
+                                val fragmentTransaction = (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                                 fragmentTransaction.replace(R.id.chat_fragment_container, asf)
                                 fragmentTransaction.addToBackStack(null)
                                 fragmentTransaction.commit()
@@ -426,7 +426,7 @@ class MessageGroupFragment : Fragment() {
                             args.putString("canChangeOptions", finalCanChangeOptions)
                             args.putString("group_id", group_id)
                             asf.arguments = args
-                            val fragmentTransaction = (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction()
+                            val fragmentTransaction = (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                             fragmentTransaction.replace(R.id.chat_fragment_container, asf)
                             fragmentTransaction.addToBackStack(null)
                             fragmentTransaction.commit()
@@ -518,7 +518,7 @@ class MessageGroupFragment : Fragment() {
                         if (jsonObject.getString("error") == "false") {
                             Toast.makeText(mCtx, jsonObject.getString("message"), Toast.LENGTH_SHORT).show()
                             val ldf = ConvosFragment()
-                            (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.chat_fragment_container, ldf).commit()
+                            (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.chat_fragment_container, ldf).commit()
                         } else {
                             Toast.makeText(mCtx, jsonObject.getString("message"), Toast.LENGTH_SHORT).show()
                         }

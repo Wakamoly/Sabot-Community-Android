@@ -28,7 +28,7 @@ class UserListAdapter(private val users: List<UserListRecycler>, private val con
             val args = Bundle()
             args.putString("UserId", user.user_id)
             ldf.arguments = args
-            (context as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+            (context as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
         }
         if (user.online == "yes") {
             holder.online.visibility = View.VISIBLE

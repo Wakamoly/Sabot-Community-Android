@@ -145,7 +145,7 @@ class FragmentPublicsCat : Fragment() {
                     val args = Bundle()
                     args.putString("image", image)
                     asf.arguments = args
-                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                     fragmentTransaction.replace(R.id.fragment_container, asf)
                     fragmentTransaction.addToBackStack(null)
                     fragmentTransaction.commit()
@@ -155,7 +155,7 @@ class FragmentPublicsCat : Fragment() {
                     val args = Bundle()
                     args.putString("image", backImage)
                     asf.arguments = args
-                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                     fragmentTransaction.replace(R.id.fragment_container, asf)
                     fragmentTransaction.addToBackStack(null)
                     fragmentTransaction.commit()
@@ -270,7 +270,7 @@ class FragmentPublicsCat : Fragment() {
                     args.putString("GameId", id)
                     args.putString("gamename", name)
                     ldf.arguments = args
-                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 chatRoomButton!!.setOnClickListener {
                     val ldf = PublicsChatRoom()
@@ -279,7 +279,7 @@ class FragmentPublicsCat : Fragment() {
                     args.putString("GameId", id)
                     args.putString("gamename", name)
                     ldf.arguments = args
-                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 previousPublics!!.setOnClickListener {
                     val ldf = PublicsPrevious()
@@ -287,7 +287,7 @@ class FragmentPublicsCat : Fragment() {
                     args.putString("GameId", id)
                     args.putString("gamename", name)
                     ldf.arguments = args
-                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 publicsReviewsContainer!!.setOnClickListener {
                     val ldf = GameReviewFragment()
@@ -297,7 +297,7 @@ class FragmentPublicsCat : Fragment() {
                     args.putString("gametag", catTag)
                     args.putString("game_pic", image)
                     ldf.arguments = args
-                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 publicsRatingContainer!!.setOnClickListener {
                     val ldf = GameReviewFragment()
@@ -307,7 +307,7 @@ class FragmentPublicsCat : Fragment() {
                     args.putString("gametag", catTag)
                     args.putString("game_pic", image)
                     ldf.arguments = args
-                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 followToPostButton!!.setOnClickListener {
                     gameActionBtn!!.visibility = View.GONE
@@ -394,7 +394,7 @@ class FragmentPublicsCat : Fragment() {
                             args.putString("type", "publics_cat")
                             args.putString("id", id)
                             ldf.arguments = args
-                            (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                            (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                         }
                         if (item.itemId == R.id.menuCatReview) {
                             val ldf = GameReviewFragment()
@@ -404,7 +404,7 @@ class FragmentPublicsCat : Fragment() {
                             args.putString("gametag", catTag)
                             args.putString("game_pic", image)
                             ldf.arguments = args
-                            (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                            (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                         }
                         if (item.itemId == R.id.menuCatNewPublicsTopic) {
                             val ldf = NewPublicsTopic()
@@ -413,7 +413,7 @@ class FragmentPublicsCat : Fragment() {
                             args.putString("gamename", name)
                             args.putString("gameimage", image)
                             ldf.arguments = args
-                            (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                            (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                         }
                         true
                     }
@@ -426,7 +426,7 @@ class FragmentPublicsCat : Fragment() {
                     args.putString("gamename", name)
                     args.putString("gameimage", image)
                     ldf.arguments = args
-                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 relLayout2!!.visibility = View.VISIBLE
                 mProgressBar!!.visibility = View.GONE

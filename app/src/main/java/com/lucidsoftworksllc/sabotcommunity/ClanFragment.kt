@@ -239,7 +239,7 @@ class ClanFragment : Fragment() {
                                 val args = Bundle()
                                 args.putString("ClanId", clanID)
                                 asf.arguments = args
-                                val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                                val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                                 fragmentTransaction.replace(R.id.fragment_container, asf)
                                 fragmentTransaction.addToBackStack(null)
                                 fragmentTransaction.commit()
@@ -273,7 +273,7 @@ class ClanFragment : Fragment() {
                                 val args = Bundle()
                                 args.putString("ClanId", id)
                                 ldf.arguments = args
-                                requireActivity().supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                                requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                             }
                         }
                         listOf(*array).contains(username) -> {
@@ -442,7 +442,7 @@ class ClanFragment : Fragment() {
                         args.putString("Clan_pic", insignia)
                         args.putString("Clan_members", members)
                         ldf.arguments = args
-                        (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                        (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                     }
                     clanRatingContainer!!.setOnClickListener {
                         val ldf = ClanReviewFragment()
@@ -453,7 +453,7 @@ class ClanFragment : Fragment() {
                         args.putString("Clan_pic", insignia)
                         args.putString("Clan_members", members)
                         ldf.arguments = args
-                        (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                        (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                     }
                     clanActionBtn!!.setOnClickListener {
                         clanActionBtn!!.visibility = View.GONE
@@ -490,7 +490,7 @@ class ClanFragment : Fragment() {
                                 args.putString("Clan_pic", insignia)
                                 args.putString("Clan_members", members)
                                 ldf.arguments = args
-                                (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                                (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                             }
                             if (item.itemId == R.id.menuClanReport) {
                                 val ldf = ReportFragment()
@@ -499,7 +499,7 @@ class ClanFragment : Fragment() {
                                 args.putString("type", "clan")
                                 args.putString("id", id)
                                 ldf.arguments = args
-                                (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                                (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                             }
                             true
                         }
@@ -533,7 +533,7 @@ class ClanFragment : Fragment() {
                     }
                     val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
                     if (currentFragment is DashboardFragment) {
-                        val fragTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                        val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                         fragTransaction.detach(currentFragment)
                         fragTransaction.attach(currentFragment)
                         fragTransaction.commit()
@@ -637,7 +637,7 @@ class ClanFragment : Fragment() {
                     args.putString("queryid", clanID)
                     args.putString("method", "clan_posts")
                     ldf.arguments = args
-                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
             } catch (e: JSONException) {
                 e.printStackTrace()
@@ -828,7 +828,7 @@ class ClanFragment : Fragment() {
     private fun resetFragment() {
         val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
         if (currentFragment is ClanFragment) {
-            val fragTransaction = requireActivity().supportFragmentManager.beginTransaction()
+            val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
             fragTransaction.detach(currentFragment)
             fragTransaction.attach(currentFragment)
             fragTransaction.commit()

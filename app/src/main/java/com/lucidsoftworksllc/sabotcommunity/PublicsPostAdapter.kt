@@ -173,7 +173,7 @@ class PublicsPostAdapter(private val mCtx: Context, private val publicsPostList:
                 val args = Bundle()
                 args.putString("UserId", publics.user_id)
                 ldf.arguments = args
-                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
             }
         }
         if (publics.voted == "up") {

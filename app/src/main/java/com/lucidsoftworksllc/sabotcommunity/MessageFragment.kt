@@ -290,13 +290,13 @@ class MessageFragment : Fragment() {
                                 args.putString("type", "user")
                                 args.putString("id", userToId)
                                 ldf.arguments = args
-                                (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.chat_fragment_container, ldf).addToBackStack(null).commit()
+                                (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.chat_fragment_container, ldf).addToBackStack(null).commit()
                             }
                             if (item.itemId == R.id.menuPlayerBlock) {
                                 SharedPrefManager.getInstance(mCtx!!)!!.blockUser(user_to)
                                 val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
                                 if (currentFragment is MessageFragment) {
-                                    val fragTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                                    val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                                     fragTransaction.detach(currentFragment)
                                     fragTransaction.attach(currentFragment)
                                     fragTransaction.commit()

@@ -60,7 +60,7 @@ class ClansListFragment : Fragment() {
             popup.setOnMenuItemClickListener { item: MenuItem ->
                 if (item.itemId == R.id.menuNewClan) {
                     val ldf = NewClanFragment()
-                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 true
             }
@@ -69,7 +69,7 @@ class ClansListFragment : Fragment() {
         clansSwipe?.setOnRefreshListener {
             val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
             if (currentFragment is ClansListFragment) {
-                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                 fragTransaction.detach(currentFragment)
                 fragTransaction.attach(currentFragment)
                 fragTransaction.commit()
@@ -103,7 +103,7 @@ class ClansListFragment : Fragment() {
                             noClans!!.visibility = View.VISIBLE
                             noClans!!.setOnClickListener {
                                 val ldf = NewClanFragment()
-                                (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                                (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                             }
                         }
                         dialog!!.dismiss()

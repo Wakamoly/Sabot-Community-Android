@@ -74,21 +74,21 @@ class SearchAdapter(private val users: MutableList<User>, context: Context) : Re
                     val args = Bundle()
                     args.putString("UserId", user.id)
                     ldf.arguments = args
-                    (context as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    (context as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 if (user.type == "publics_cat") {
                     val ldf = FragmentPublicsCat()
                     val args = Bundle()
                     args.putString("PublicsId", user.id)
                     ldf.arguments = args
-                    (context as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    (context as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 if (user.type == "clans") {
                     val ldf = ClanFragment()
                     val args = Bundle()
                     args.putString("ClanId", user.id)
                     ldf.arguments = args
-                    (context as FragmentActivity).supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    (context as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 if (user.type != "users") newSearchCount(user.type!!, user.id!!)
             }

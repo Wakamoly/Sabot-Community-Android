@@ -56,7 +56,7 @@ class ConvosThreadAdapter(private val mCtx: Context, private val convosList: Lis
                 val args = Bundle()
                 args.putString("user_to", convos.sent_by)
                 ldf.arguments = args
-                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
                 if (convos.viewed != "yes" && convos.sent_by != deviceUsername) {
                     val stringRequest: StringRequest = object : StringRequest(Method.POST, SET_READ, Response.Listener { response: String? ->
                         try {
@@ -116,7 +116,7 @@ class ConvosThreadAdapter(private val mCtx: Context, private val convosList: Lis
                 val args = Bundle()
                 args.putString("group_id", convos.group_id)
                 ldf.arguments = args
-                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
             }
             if (convos.last_online == "yes") {
                 holder.lastOnline.visibility = View.VISIBLE

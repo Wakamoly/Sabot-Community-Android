@@ -54,17 +54,23 @@ class LoginActivity : FragmentActivity(), View.OnClickListener {
                 userLoginRegistered(email, password)
             }
         }
-        object : CountDownTimer(10000, 5000) {
-            override fun onTick(millisUntilFinished: Long) {
-                bookITextView!!.visibility = View.GONE
-                loadingProgressBar!!.visibility = View.GONE
-                rootView!!.setBackgroundColor(ContextCompat.getColor(this@LoginActivity, R.color.colorPrimary))
-                // logoImageView.setImageResource(R.drawable.logo);
-                startAnimation()
-            }
+    }
 
-            override fun onFinish() {}
-        }.start()
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if(hasFocus){
+            object : CountDownTimer(10000, 5000) {
+                override fun onTick(millisUntilFinished: Long) {
+                    bookITextView!!.visibility = View.GONE
+                    loadingProgressBar!!.visibility = View.GONE
+                    rootView!!.setBackgroundColor(ContextCompat.getColor(this@LoginActivity, R.color.colorPrimary))
+                    // logoImageView.setImageResource(R.drawable.logo);
+                    startAnimation()
+                }
+
+                override fun onFinish() {}
+            }.start()
+        }
     }
 
     private fun initViews() {

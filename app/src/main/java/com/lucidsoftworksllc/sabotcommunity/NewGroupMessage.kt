@@ -284,7 +284,7 @@ class NewGroupMessage : Fragment(), NewGroupMessageUserAdapter.AdapterCallback, 
                         uploadInsigniaImage(newGroupInsigniabitmap!!, groupId, etNewGroupMessageName!!.text.toString())
                     }
                     val ldf = ConvosFragment()
-                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().replace(R.id.chat_fragment_container, ldf).commit()
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.chat_fragment_container, ldf).commit()
                 } else {
                     Toast.makeText(mContext, "Network Error!", Toast.LENGTH_SHORT).show()
                     btnSubmit!!.visibility = View.VISIBLE

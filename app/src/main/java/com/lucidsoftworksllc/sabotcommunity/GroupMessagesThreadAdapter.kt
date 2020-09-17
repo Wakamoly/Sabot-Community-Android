@@ -49,7 +49,7 @@ class GroupMessagesThreadAdapter(private val context: Context, private val messa
                 val args = Bundle()
                 args.putString("image", message.image)
                 asf.arguments = args
-                val fragmentTransaction = (context as FragmentActivity).supportFragmentManager.beginTransaction()
+                val fragmentTransaction = (context as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
                 fragmentTransaction.replace(R.id.chat_fragment_container, asf)
                 fragmentTransaction.addToBackStack(null)
                 fragmentTransaction.commit()

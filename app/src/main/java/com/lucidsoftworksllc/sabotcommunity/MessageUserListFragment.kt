@@ -39,7 +39,7 @@ class MessageUserListFragment : Fragment(), MessageUserListAdapter.AdapterCallba
     override fun onMethodCallback() {
         val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.chat_fragment_container)
         if (currentFragment is MessageUserListFragment) {
-            val fragTransaction = requireActivity().supportFragmentManager.beginTransaction()
+            val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
             fragTransaction.detach(currentFragment)
             fragTransaction.attach(currentFragment)
             fragTransaction.commit()
