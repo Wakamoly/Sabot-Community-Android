@@ -131,6 +131,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.fragment_container)
+        setSupportActionBar(findViewById(R.id.fragment_container_toolbar))
         navView = findViewById(R.id.nav_view)
         navView?.setOnNavigationItemSelectedListener(this)
         dashContainer = findViewById(R.id.dashContainer)
