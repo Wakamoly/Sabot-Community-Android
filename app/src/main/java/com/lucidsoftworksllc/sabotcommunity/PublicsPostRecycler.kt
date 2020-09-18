@@ -1,0 +1,22 @@
+package com.lucidsoftworksllc.sabotcommunity
+
+class PublicsPostRecycler(val id: String,
+                          val subject: String,
+                          val date: String,
+                          val cat: String,
+                          val topic_by: String,
+                          val post_id: String,
+                          val post_topic: String,
+                          val post_content: String,
+                          val post_date: String,
+                          val post_by: String,
+                          val user_id: String,
+                          val profile_pic: String,
+                          val nickname: String,
+                          val username: String,
+                          val voted: String,
+                          val votes: String,
+                          val replies: String,
+                          val online: String,
+                          val verified: String,
+                          val clantag: String)

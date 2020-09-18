@@ -19,8 +19,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
 import com.iarcuschin.simpleratingbar.SimpleRatingBar;
@@ -41,7 +39,7 @@ public class GameReviewFragment extends Fragment {
     private ProgressBar reviews5, reviews4, reviews3, reviews2, reviews1, player_review_progress;
     private SimpleRatingBar reviewStarRating;
     private RecyclerView gamereviewsView;
-    private List<GameReview_Recycler> gamereviewRecyclerList;
+    private List<GameReviewRecycler> gamereviewRecyclerList;
     private Button reviewButton, followToReview;
     private GameReviewAdapter reviewAdapter;
     private static final String Game_Reviewed_TOP_URL = Constants.ROOT_URL+"gamereviewsTopGet_api.php";
@@ -175,7 +173,7 @@ public class GameReviewFragment extends Fragment {
                     String profile_pic = profilenewsObject.getString("profile_pic");
                     String nickname = profilenewsObject.getString("nickname");
                     String userid = profilenewsObject.getString("userid");
-                    GameReview_Recycler gamenewsResult = new GameReview_Recycler(ratingnumber, title, comments, reply, time, profile_pic, nickname,userid);
+                    GameReviewRecycler gamenewsResult = new GameReviewRecycler(ratingnumber, title, comments, reply, time, profile_pic, nickname,userid);
                     gamereviewRecyclerList.add(gamenewsResult);
                 }
                 if (profilenews.length()==0){
