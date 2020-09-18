@@ -9,6 +9,7 @@ import org.acra.annotation.AcraHttpSender
 import org.acra.data.StringFormat
 import org.acra.sender.HttpSender
 
+/*
 @AcraCore(buildConfigClass = BuildConfig::class, reportFormat = StringFormat.JSON, additionalSharedPreferences = ["SharedPrefManager"])
 @AcraHttpSender(uri = "http://www.sabotcommunity.com/acra.php", httpMethod = HttpSender.Method.POST, basicAuthLogin = "yeetskeet", basicAuthPassword = "sabot")
 class ACRAApplication : Application() {
@@ -16,4 +17,4 @@ class ACRAApplication : Application() {
         super.attachBaseContext(base)
         ACRA.init(this)
     }
-}
+}*/

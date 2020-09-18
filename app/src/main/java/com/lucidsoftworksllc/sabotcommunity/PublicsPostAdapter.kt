@@ -131,14 +131,14 @@ class PublicsPostAdapter(private val mCtx: Context, private val publicsPostList:
             }, 3000)
         }) {
             override fun getParams(): Map<String, String> {
-                val parms: MutableMap<String, String> = HashMap()
-                parms["post_id"] = layout_id
-                parms["method"] = method
-                parms["layout"] = "post"
-                parms["user_to"] = user_to
-                parms["user_id"] = holder.userID
-                parms["username"] = holder.deviceusername
-                return parms
+                val params: MutableMap<String, String> = HashMap()
+                params["post_id"] = layout_id
+                params["method"] = method
+                params["layout"] = "post"
+                params["user_to"] = user_to
+                params["user_id"] = holder.userID
+                params["username"] = holder.deviceusername
+                return params
             }
         }
         (mCtx as FragmentContainer).addToRequestQueue(stringRequest)

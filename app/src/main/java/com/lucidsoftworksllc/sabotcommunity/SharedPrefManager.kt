@@ -163,6 +163,24 @@ class SharedPrefManager private constructor(private val mCtx: Context) {
         return sharedPreferences.getString(KEY_USERS_FRIENDS, null);
     }*/
 
+    var firstPublicsFragment: String?
+        get() {
+            val sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_USER, Context.MODE_PRIVATE)
+            if (sharedPreferences.getString(KEY_FIRST_PUBLICS_FRAG, null) == null) {
+                val editor = sharedPreferences.edit()
+                editor.putString(KEY_FIRST_PUBLICS_FRAG, "show")
+                editor.apply()
+            }
+            return sharedPreferences.getString(KEY_FIRST_PUBLICS_FRAG, null)
+        }
+        set(show) {
+            val sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_USER, Context.MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+            editor.putString(KEY_FIRST_PUBLICS_FRAG, show)
+            editor.apply()
+            sharedPreferences.getString(KEY_FIRST_PUBLICS_FRAG, null)
+        }
+
     val email: String?
         get() {
             val sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_USER, Context.MODE_PRIVATE)
@@ -361,6 +379,7 @@ class SharedPrefManager private constructor(private val mCtx: Context) {
         //private static final String KEY_ADS_VIEWED = "adsviewed";
         //private static final String KEY_ADS_CLICKED = "adsclicked";
         private const val KEY_DASH_CURRENT_PUBLICS = "currentpublics"
+        private const val KEY_FIRST_PUBLICS_FRAG = "firstpublics"
         private const val KEY_NOTI_FREQUENCY = "notifrequency"
         private const val KEY_LAST_NOTI = "lastnoti"
         private const val KEY_SHIPMENT_INFO = "shipmentinfo"

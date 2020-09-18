@@ -2,10 +2,13 @@ package com.lucidsoftworksllc.sabotcommunity
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -15,8 +18,10 @@ import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.yarolegovich.lovelydialog.LovelyChoiceDialog
+import com.yarolegovich.lovelydialog.LovelyStandardDialog
 import org.json.JSONArray
 import org.json.JSONException
+import org.json.JSONObject
 import java.util.*
 
 class PublicsFragment : Fragment() {
@@ -114,6 +119,21 @@ class PublicsFragment : Fragment() {
             override var isLastPage: Boolean = false
             override var isLoading: Boolean = false
         })
+
+        if(SharedPrefManager.getInstance(mContext!!)!!.firstPublicsFragment == "show"){
+            LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
+                    .setTopColorRes(R.color.green)
+                    .setButtonsColorRes(R.color.white)
+                    .setIcon(R.drawable.ic_check)
+                    .setTitle(R.string.first_publics_frag_title)
+                    .setMessage(mContext!!.resources.getString(R.string.first_publics_frag))
+                    .setPositiveButton(android.R.string.ok){}
+                    .setNegativeButton(R.string.dont_show_again) {
+                        SharedPrefManager.getInstance(mContext!!)!!.firstPublicsFragment = "never"
+                    }
+                    .show()
+        }
+
         return publicsRootView
     }
 

@@ -226,7 +226,8 @@ class LoginActivity : FragmentActivity(), View.OnClickListener {
         }
         /*if (view == threeminutewalkthrough) {
             startActivity(new Intent(this, Walkthrough.class));
-        }*/if (view === registerButton) {
+        }*/
+        if (view === registerButton) {
             startActivity(Intent(this, MainActivity::class.java))
         }
         if (view === forgotPassButton) {

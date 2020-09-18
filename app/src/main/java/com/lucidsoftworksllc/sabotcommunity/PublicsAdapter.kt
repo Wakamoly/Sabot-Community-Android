@@ -2,9 +2,12 @@ package com.lucidsoftworksllc.sabotcommunity
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
@@ -104,19 +107,24 @@ class PublicsAdapter(private val mCtx: Context, private val publicsList: Mutable
                 profileRating.visibility = View.INVISIBLE
             }
             publicsActionBtn.setOnClickListener {
+                publicsActionBtn.isEnabled = false
                 publicsActionBtn.visibility = View.GONE
-                followProgress.visibility = View.VISIBLE
+                val buttonAppear: Animation = AnimationUtils.loadAnimation(mCtx, R.anim.expand_in)
+                publicsActionBtnFollowed.visibility = View.VISIBLE
+                publicsActionBtnFollowed.startAnimation(buttonAppear)
+                publics.followed = "yes"
+                Handler().postDelayed({ publicsActionBtnFollowed.isEnabled = true }, 3500)
+
                 val userID = SharedPrefManager.getInstance(mCtx)!!.userID
                 val username = SharedPrefManager.getInstance(mCtx)!!.username
                 val stringRequest: StringRequest = object : StringRequest(Method.POST, FOLLOW_GAME_URL, Response.Listener { response: String? ->
                     try {
                         val jsonObject = JSONObject(response!!)
-                        if (jsonObject.getString("error") == "false") {
-                            publicsActionBtnFollowed.visibility = View.VISIBLE
-                            followProgress.visibility = View.GONE
-                            publics.followed = "yes"
-                        } else {
-                            Toast.makeText(mCtx, jsonObject.getString("message"), Toast.LENGTH_LONG).show()
+                        if (jsonObject.getString("error") != "false") {
+                            publicsActionBtn.isEnabled = true
+                            publicsActionBtn.visibility = View.VISIBLE
+                            publicsActionBtnFollowed.visibility = View.GONE
+                            publics.followed = "no"
                         }
                     } catch (e: JSONException) {
                         e.printStackTrace()
@@ -135,8 +143,6 @@ class PublicsAdapter(private val mCtx: Context, private val publicsList: Mutable
                 (mCtx as FragmentContainer).addToRequestQueue(stringRequest)
             }
             publicsActionBtnFollowed.setOnClickListener {
-                publicsActionBtnFollowed.visibility = View.GONE
-                followProgress.visibility = View.VISIBLE
                 LovelyStandardDialog(mCtx, LovelyStandardDialog.ButtonLayout.VERTICAL)
                         .setTopColorRes(R.color.green)
                         .setButtonsColorRes(R.color.white)
@@ -144,17 +150,24 @@ class PublicsAdapter(private val mCtx: Context, private val publicsList: Mutable
                         .setTitle(R.string.game_unfollow)
                         .setMessage(mCtx.resources.getString(R.string.unfollow) + " " + publics.title + "?")
                         .setPositiveButton(android.R.string.ok) {
+                            publicsActionBtnFollowed.isEnabled = false
+                            publicsActionBtnFollowed.visibility = View.GONE
+                            val buttonAppear: Animation = AnimationUtils.loadAnimation(mCtx, R.anim.expand_in)
+                            publicsActionBtn.visibility = View.VISIBLE
+                            publicsActionBtn.startAnimation(buttonAppear)
+                            publics.followed = "no"
+                            Handler().postDelayed({ publicsActionBtn.isEnabled = true }, 3500)
+
                             val userID = SharedPrefManager.getInstance(mCtx)!!.userID
                             val username = SharedPrefManager.getInstance(mCtx)!!.username
                             val stringRequest: StringRequest = object : StringRequest(Method.POST, FOLLOW_GAME_URL, Response.Listener { response: String? ->
                                 try {
                                     val jsonObject = JSONObject(response!!)
-                                    if (jsonObject.getString("error") == "false") {
-                                        publicsActionBtn.visibility = View.VISIBLE
-                                        followProgress.visibility = View.GONE
-                                        publics.followed = "no"
-                                    } else {
-                                        Toast.makeText(mCtx, jsonObject.getString("message"), Toast.LENGTH_LONG).show()
+                                    if (jsonObject.getString("error") != "false") {
+                                        publicsActionBtnFollowed.isEnabled = true
+                                        publicsActionBtnFollowed.visibility = View.VISIBLE
+                                        publicsActionBtn.visibility = View.GONE
+                                        publics.followed = "yes"
                                     }
                                 } catch (e: JSONException) {
                                     e.printStackTrace()

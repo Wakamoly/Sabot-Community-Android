@@ -337,7 +337,6 @@ class ProfilenewsAdapter(private val mCtx: Context, private val profilenewsList:
             likedView.setOnClickListener {
                 likedView.isEnabled = false
                 likedView.visibility = View.GONE
-                //val unlikeAnim:Animation = AnimationUtils.loadAnimation(mCtx, R.anim.fade_out)
                 val likedAppear:Animation = AnimationUtils.loadAnimation(mCtx, R.anim.expand_in)
 
                 val newValue = (textViewLikes.text.toString().toInt() - 1).toString()

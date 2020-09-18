@@ -6,10 +6,13 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -21,8 +24,10 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.bumptech.glide.Glide
 import com.iarcuschin.simpleratingbar.SimpleRatingBar
+import com.yarolegovich.lovelydialog.LovelyStandardDialog
 import org.json.JSONArray
 import org.json.JSONException
+import org.json.JSONObject
 import java.util.*
 
 class FragmentPublicsCat : Fragment() {
@@ -145,7 +150,7 @@ class FragmentPublicsCat : Fragment() {
                     val args = Bundle()
                     args.putString("image", image)
                     asf.arguments = args
-                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
+                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
                     fragmentTransaction.replace(R.id.fragment_container, asf)
                     fragmentTransaction.addToBackStack(null)
                     fragmentTransaction.commit()
@@ -155,7 +160,7 @@ class FragmentPublicsCat : Fragment() {
                     val args = Bundle()
                     args.putString("image", backImage)
                     asf.arguments = args
-                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out)
+                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
                     fragmentTransaction.replace(R.id.fragment_container, asf)
                     fragmentTransaction.addToBackStack(null)
                     fragmentTransaction.commit()
@@ -270,7 +275,7 @@ class FragmentPublicsCat : Fragment() {
                     args.putString("GameId", id)
                     args.putString("gamename", name)
                     ldf.arguments = args
-                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 chatRoomButton!!.setOnClickListener {
                     val ldf = PublicsChatRoom()
@@ -279,7 +284,7 @@ class FragmentPublicsCat : Fragment() {
                     args.putString("GameId", id)
                     args.putString("gamename", name)
                     ldf.arguments = args
-                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 previousPublics!!.setOnClickListener {
                     val ldf = PublicsPrevious()
@@ -287,7 +292,7 @@ class FragmentPublicsCat : Fragment() {
                     args.putString("GameId", id)
                     args.putString("gamename", name)
                     ldf.arguments = args
-                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 publicsReviewsContainer!!.setOnClickListener {
                     val ldf = GameReviewFragment()
@@ -297,7 +302,7 @@ class FragmentPublicsCat : Fragment() {
                     args.putString("gametag", catTag)
                     args.putString("game_pic", image)
                     ldf.arguments = args
-                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 publicsRatingContainer!!.setOnClickListener {
                     val ldf = GameReviewFragment()
@@ -307,7 +312,7 @@ class FragmentPublicsCat : Fragment() {
                     args.putString("gametag", catTag)
                     args.putString("game_pic", image)
                     ldf.arguments = args
-                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.fade_out,R.anim.fade_in,R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 followToPostButton!!.setOnClickListener {
                     gameActionBtn!!.visibility = View.GONE
@@ -334,18 +339,29 @@ class FragmentPublicsCat : Fragment() {
                     }
                     (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest1)
                 }
-                gameActionBtn!!.setOnClickListener {
-                    gameActionBtn!!.visibility = View.GONE
-                    followProgressCat!!.visibility = View.VISIBLE
-                    val stringRequest1: StringRequest = object : StringRequest(Method.POST, FOLLOW_GAME_URL, Response.Listener {
-                        //TODO: get verified response
-                        gameActionBtnFollowed!!.visibility = View.VISIBLE
-                        followProgressCat!!.visibility = View.GONE
-                        buttonLayout!!.visibility = View.VISIBLE
-                        recyclerPublicsCatBottom!!.visibility = View.VISIBLE
-                        followToPostButton!!.visibility = View.VISIBLE
-                        loadPublicsCatBottom()
-                        followToPostButton!!.visibility = View.GONE
+
+
+                gameActionBtn?.setOnClickListener {
+                    gameActionBtn?.isEnabled = false
+                    gameActionBtn?.visibility = View.GONE
+                    val buttonAppear: Animation = AnimationUtils.loadAnimation(mContext, R.anim.expand_in)
+                    gameActionBtnFollowed?.visibility = View.VISIBLE
+                    gameActionBtnFollowed?.startAnimation(buttonAppear)
+                    Handler().postDelayed({ gameActionBtnFollowed?.isEnabled = true }, 3500)
+
+                    val userID = SharedPrefManager.getInstance(mContext!!)!!.userID
+                    val username = SharedPrefManager.getInstance(mContext!!)!!.username
+                    val stringRequest: StringRequest = object : StringRequest(Method.POST, FOLLOW_GAME_URL, Response.Listener { response: String? ->
+                        try {
+                            val jsonObject = JSONObject(response!!)
+                            if (jsonObject.getString("error") != "false") {
+                                gameActionBtn?.isEnabled = true
+                                gameActionBtn?.visibility = View.VISIBLE
+                                gameActionBtnFollowed?.visibility = View.GONE
+                            }
+                        } catch (e: JSONException) {
+                            e.printStackTrace()
+                        }
                     }, Response.ErrorListener { Toast.makeText(mContext, "Could not follow, please try again later...", Toast.LENGTH_LONG).show() }) {
                         override fun getParams(): MutableMap<String, String?> {
                             val params: MutableMap<String, String?> = HashMap()
@@ -357,31 +373,56 @@ class FragmentPublicsCat : Fragment() {
                             return params
                         }
                     }
-                    (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest1)
+                    (mContext as FragmentContainer).addToRequestQueue(stringRequest)
                 }
-                gameActionBtnFollowed!!.setOnClickListener {
-                    gameActionBtnFollowed!!.visibility = View.GONE
-                    followProgressCat!!.visibility = View.VISIBLE
-                    val stringRequest1: StringRequest = object : StringRequest(Method.POST, FOLLOW_GAME_URL, Response.Listener {
-                        //TODO: get verified response
-                        gameActionBtn!!.visibility = View.VISIBLE
-                        followToPostButton!!.visibility = View.VISIBLE
-                        followProgressCat!!.visibility = View.GONE
-                        buttonLayout!!.visibility = View.GONE
-                        recyclerPublicsCatBottom!!.visibility = View.GONE
-                    }, Response.ErrorListener { Toast.makeText(mContext, "Could not unfollow, please try again later...", Toast.LENGTH_LONG).show() }) {
-                        override fun getParams(): MutableMap<String, String?> {
-                            val params: MutableMap<String, String?> = HashMap()
-                            params["game_id"] = id
-                            params["game_name"] = name
-                            params["method"] = "unfollow"
-                            params["user_id"] = userID
-                            params["username"] = username
-                            return params
-                        }
-                    }
-                    (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest1)
+
+
+                gameActionBtnFollowed?.setOnClickListener {
+                    LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
+                            .setTopColorRes(R.color.green)
+                            .setButtonsColorRes(R.color.white)
+                            .setIcon(R.drawable.ic_check)
+                            .setTitle(R.string.game_unfollow)
+                            .setMessage(mContext?.resources?.getString(R.string.unfollow) + " " + name + "?")
+                            .setPositiveButton(android.R.string.ok) {
+                                gameActionBtnFollowed?.isEnabled = false
+                                gameActionBtnFollowed?.visibility = View.GONE
+                                val buttonAppear: Animation = AnimationUtils.loadAnimation(mContext, R.anim.expand_in)
+                                gameActionBtn?.visibility = View.VISIBLE
+                                gameActionBtn?.startAnimation(buttonAppear)
+                                Handler().postDelayed({ gameActionBtn?.isEnabled = true }, 3500)
+
+                                val userID = SharedPrefManager.getInstance(mContext!!)!!.userID
+                                val username = SharedPrefManager.getInstance(mContext!!)!!.username
+                                val stringRequest: StringRequest = object : StringRequest(Method.POST, FOLLOW_GAME_URL, Response.Listener { response: String? ->
+                                    try {
+                                        val jsonObject = JSONObject(response!!)
+                                        if (jsonObject.getString("error") != "false") {
+                                            gameActionBtnFollowed?.isEnabled = true
+                                            gameActionBtnFollowed?.visibility = View.VISIBLE
+                                            gameActionBtn?.visibility = View.GONE
+                                        }
+                                    } catch (e: JSONException) {
+                                        e.printStackTrace()
+                                    }
+                                }, Response.ErrorListener { Toast.makeText(mContext, "Could not unfollow, please try again later...", Toast.LENGTH_LONG).show() }) {
+                                    override fun getParams(): MutableMap<String, String?> {
+                                        val params: MutableMap<String, String?> = HashMap()
+                                        params["game_id"] = id
+                                        params["game_name"] = name
+                                        params["method"] = "unfollow"
+                                        params["user_id"] = userID
+                                        params["username"] = username
+                                        return params
+                                    }
+                                }
+                                (mContext as FragmentContainer).addToRequestQueue(stringRequest)
+                            }
+                            .setNegativeButton(android.R.string.no){}
+                            .show()
                 }
+
+
                 publicsClickMenu!!.setOnClickListener { view: View? ->
                     val popup = PopupMenu(mContext, view)
                     val inflater = popup.menuInflater
