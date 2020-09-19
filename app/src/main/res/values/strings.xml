@@ -261,6 +261,8 @@
     <string name="sold_out_text">Sold out!</string>
     <string name="first_publics_frag">Tap on any game and then \"New Publics\" to make a post looking for other players!\n\nFollow any games you want to be notified about when others are searching (notification settings can be changed in your Account Settings).\n\nBe sure to follow all of your favorite games!</string>
     <string name="first_publics_frag_title">How this works:</string>
+    <string name="new_message_text">New Message</string>
+    <string name="new_group_message_beta_text">New Group Message (beta)</string>
     <string-array name="contact_array">
         <item>Complaint</item>
         <item>Report a problem</item>

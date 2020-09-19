@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="10dp"
-        tools:context="com.lucidsoftworksllc.sabotcommunity.PlayerRatingFragment">
+        tools:context="com.lucidsoftworksllc.sabotcommunity.fragments.PlayerRatingFragment">
 
         <LinearLayout
             android:id="@+id/newReviewProgressBar"

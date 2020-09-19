@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
     android:windowSoftInputMode="adjustPan|adjustResize"
-    tools:context=".ConvosFragment">
+    tools:context=".fragments.ConvosFragment">
 
     <RelativeLayout
         android:id="@+id/chatConvoLayout"
