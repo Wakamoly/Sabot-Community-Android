@@ -15,9 +15,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.lucidsoftworksllc.sabotcommunity.Constants
+import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.R
-import com.lucidsoftworksllc.sabotcommunity.SharedPrefManager.Companion.getInstance
+import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager.Companion.getInstance
 import com.lucidsoftworksllc.sabotcommunity.adapters.UserListAdapter
 import com.lucidsoftworksllc.sabotcommunity.models.UserListRecycler
 import org.json.JSONArray

@@ -35,13 +35,14 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import com.lucidsoftworksllc.sabotcommunity.*
 import com.lucidsoftworksllc.sabotcommunity.R
-import com.lucidsoftworksllc.sabotcommunity.Constants.ROOT_URL
+import com.lucidsoftworksllc.sabotcommunity.others.Constants.ROOT_URL
 import com.lucidsoftworksllc.sabotcommunity.activities.ChatActivity
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.adapters.MessagesThreadAdapter
 import com.lucidsoftworksllc.sabotcommunity.models.MessagesHelper
+import com.lucidsoftworksllc.sabotcommunity.others.Constants
+import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import com.theartofdev.edmodo.cropper.CropImage
 import de.hdodenhof.circleimageview.CircleImageView
 import org.json.JSONException

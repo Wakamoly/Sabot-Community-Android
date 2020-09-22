@@ -41,7 +41,7 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.lucidsoftworksllc.sabotcommunity.*
-import com.lucidsoftworksllc.sabotcommunity.Constants.ROOT_URL
+import com.lucidsoftworksllc.sabotcommunity.others.Constants.ROOT_URL
 import com.lucidsoftworksllc.sabotcommunity.activities.ChatActivity
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.adapters.JoinedClansAdapter
@@ -50,6 +50,8 @@ import com.lucidsoftworksllc.sabotcommunity.adapters.PublicsTopicAdapter
 import com.lucidsoftworksllc.sabotcommunity.models.ClansRecycler
 import com.lucidsoftworksllc.sabotcommunity.models.ProfilenewsRecycler
 import com.lucidsoftworksllc.sabotcommunity.models.PublicsTopicRecycler
+import com.lucidsoftworksllc.sabotcommunity.others.Constants
+import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import com.theartofdev.edmodo.cropper.CropImage
 import com.yarolegovich.lovelydialog.LovelyStandardDialog
 import de.hdodenhof.circleimageview.CircleImageView

@@ -15,11 +15,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
-import com.lucidsoftworksllc.sabotcommunity.Constants.ROOT_URL
+import com.lucidsoftworksllc.sabotcommunity.others.Constants.ROOT_URL
 import com.lucidsoftworksllc.sabotcommunity.adapters.MessageRequestsAdapter
 import com.lucidsoftworksllc.sabotcommunity.models.MessageRequestsHelper
 import com.lucidsoftworksllc.sabotcommunity.R
-import com.lucidsoftworksllc.sabotcommunity.SharedPrefManager
+import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import com.lucidsoftworksllc.sabotcommunity.activities.ChatActivity
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import org.json.JSONException

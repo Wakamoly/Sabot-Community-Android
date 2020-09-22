@@ -14,7 +14,7 @@ import android.net.Uri
 import android.os.Build
 import android.text.Html
 import androidx.core.app.NotificationCompat
-import com.lucidsoftworksllc.sabotcommunity.Constants
+import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.activities.ChatActivity
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer

@@ -17,13 +17,17 @@ import com.lucidsoftworksllc.sabotcommunity.*
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.adapters.PublicsAdapter
 import com.lucidsoftworksllc.sabotcommunity.models.PublicsRecycler
+import com.lucidsoftworksllc.sabotcommunity.others.CoFragment
+import com.lucidsoftworksllc.sabotcommunity.others.Constants
+import com.lucidsoftworksllc.sabotcommunity.others.PaginationOnScroll
+import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import com.yarolegovich.lovelydialog.LovelyChoiceDialog
 import com.yarolegovich.lovelydialog.LovelyStandardDialog
 import org.json.JSONArray
 import org.json.JSONException
 import java.util.*
 
-class PublicsFragment : Fragment() {
+class PublicsFragment : CoFragment() {
     private var mProgressBar: ProgressBar? = null
     private var currentPage = PaginationOnScroll.PAGE_START
     private var isLastPage = false

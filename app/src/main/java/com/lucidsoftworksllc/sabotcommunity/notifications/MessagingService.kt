@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.lucidsoftworksllc.sabotcommunity.SharedPrefManager
+import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import com.lucidsoftworksllc.sabotcommunity.activities.MainActivity
 import org.json.JSONArray
 import org.json.JSONException

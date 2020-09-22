@@ -11,10 +11,10 @@ import android.widget.*
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.lucidsoftworksllc.sabotcommunity.Constants
-import com.lucidsoftworksllc.sabotcommunity.PayPalConfig
+import com.lucidsoftworksllc.sabotcommunity.others.Constants
+import com.lucidsoftworksllc.sabotcommunity.others.PayPalConfig
 import com.lucidsoftworksllc.sabotcommunity.R
-import com.lucidsoftworksllc.sabotcommunity.SharedPrefManager
+import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import com.lucidsoftworksllc.sabotcommunity.adapters.MerchListAdapter.MerchListHolder
 import com.lucidsoftworksllc.sabotcommunity.models.MerchList
 import com.paypal.android.sdk.payments.PayPalConfiguration

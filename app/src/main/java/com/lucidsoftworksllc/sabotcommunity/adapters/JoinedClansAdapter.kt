@@ -13,7 +13,7 @@ import com.balysv.materialripple.MaterialRippleLayout
 import com.bumptech.glide.Glide
 import com.iarcuschin.simpleratingbar.SimpleRatingBar
 import com.lucidsoftworksllc.sabotcommunity.models.ClansRecycler
-import com.lucidsoftworksllc.sabotcommunity.Constants
+import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.fragments.ClanFragment
 

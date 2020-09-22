@@ -45,6 +45,8 @@ import com.lucidsoftworksllc.sabotcommunity.*
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.adapters.ProfilenewsAdapter
 import com.lucidsoftworksllc.sabotcommunity.models.ProfilenewsRecycler
+import com.lucidsoftworksllc.sabotcommunity.others.Constants
+import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import com.theartofdev.edmodo.cropper.CropImage
 import org.json.JSONArray
 import org.json.JSONException

@@ -19,6 +19,8 @@ import com.lucidsoftworksllc.sabotcommunity.*
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.adapters.JoinedClansAdapter
 import com.lucidsoftworksllc.sabotcommunity.models.ClansRecycler
+import com.lucidsoftworksllc.sabotcommunity.others.Constants
+import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*

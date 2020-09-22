@@ -1,4 +1,4 @@
-package com.lucidsoftworksllc.sabotcommunity
+package com.lucidsoftworksllc.sabotcommunity.others
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView

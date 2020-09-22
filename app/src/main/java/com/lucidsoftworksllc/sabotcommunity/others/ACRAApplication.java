@@ -1,7 +1,9 @@
-package com.lucidsoftworksllc.sabotcommunity;
+package com.lucidsoftworksllc.sabotcommunity.others;
 
 import android.app.Application;
 import android.content.Context;
+
+import com.lucidsoftworksllc.sabotcommunity.BuildConfig;
 
 import org.acra.*;
 import org.acra.annotation.*;

@@ -20,10 +20,12 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.bumptech.glide.Glide
 import com.lucidsoftworksllc.sabotcommunity.*
-import com.lucidsoftworksllc.sabotcommunity.Constants.ROOT_URL
+import com.lucidsoftworksllc.sabotcommunity.others.Constants.ROOT_URL
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.adapters.ChatroomMessagesAdapter
 import com.lucidsoftworksllc.sabotcommunity.models.ChatroomMessagesHelper
+import com.lucidsoftworksllc.sabotcommunity.others.Constants
+import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import com.yarolegovich.lovelydialog.LovelyStandardDialog
 import org.json.JSONException
 import org.json.JSONObject
