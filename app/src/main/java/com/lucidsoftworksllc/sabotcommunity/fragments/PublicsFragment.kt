@@ -7,56 +7,63 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.android.volley.Response
+import androidx.sqlite.db.SimpleSQLiteQuery
+import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
-import com.lucidsoftworksllc.sabotcommunity.*
+import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
-import com.lucidsoftworksllc.sabotcommunity.adapters.PublicsAdapter
-import com.lucidsoftworksllc.sabotcommunity.models.PublicsRecycler
-import com.lucidsoftworksllc.sabotcommunity.others.CoFragment
-import com.lucidsoftworksllc.sabotcommunity.others.Constants
-import com.lucidsoftworksllc.sabotcommunity.others.PaginationOnScroll
-import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
+import com.lucidsoftworksllc.sabotcommunity.adapters.PublicsRoomAdapter
+import com.lucidsoftworksllc.sabotcommunity.db.PublicsDao
+import com.lucidsoftworksllc.sabotcommunity.db.PublicsEntity
+import com.lucidsoftworksllc.sabotcommunity.db.SabotDatabase
+import com.lucidsoftworksllc.sabotcommunity.others.*
 import com.yarolegovich.lovelydialog.LovelyChoiceDialog
 import com.yarolegovich.lovelydialog.LovelyStandardDialog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONException
-import java.util.*
+import kotlin.math.ceil
 
 class PublicsFragment : CoFragment() {
     private var mProgressBar: ProgressBar? = null
-    private var currentPage = PaginationOnScroll.PAGE_START
-    private var isLastPage = false
-    private val pageSize = PaginationOnScroll.PAGE_SIZE
-    private var isLoading = false
-    private var adapter: PublicsAdapter? = null
+    private var adapter: PublicsRoomAdapter? = null
     private var publicsViewManager: LinearLayoutManager? = null
-    private var publicsRecyclerList: MutableList<PublicsRecycler>? = null
+    private var isLastPageFrag = false
+    private var isLoadingFrag = false
+    private var currentPage = PaginationOnScroll.PAGE_START
+    private val pageSize = PaginationOnScroll.PAGE_SIZE
+    //private var publicsRecyclerList: MutableList<PublicsRecycler>? = null
     private var publicsPlatformFilter: ImageView? = null
     private var publicsNewGame: ImageView? = null
-    private var filter: String? = null
     private var username: String? = null
     private var sortBy: String? = null
     private var mContext: Context? = null
     private var sortByButton: LinearLayout? = null
     private var sortByText: TextView? = null
+    private var publicsDao: PublicsDao? = null
+    private var games: List<PublicsEntity>? = null
+    private var publicsView: RecyclerView? = null
+    private var platform: String? = null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val publicsRootView = inflater.inflate(R.layout.fragment_publics, null)
         mProgressBar = publicsRootView.findViewById(R.id.progressBar)
-        val publicsView: RecyclerView = publicsRootView.findViewById(R.id.recyclerPublics)
+        publicsView = publicsRootView.findViewById(R.id.recyclerPublics)
         publicsPlatformFilter = publicsRootView.findViewById(R.id.publicsPlatformFilter)
         sortByButton = publicsRootView.findViewById(R.id.sortByButton)
         sortByText = publicsRootView.findViewById(R.id.sortByText)
         publicsNewGame = publicsRootView.findViewById(R.id.publicsNewGame)
         mContext = activity
+        publicsDao = SabotDatabase(mContext!!).getPublicsDao()
+        platform = SharedPrefManager.getInstance(mContext!!)!!.currentPublics
         username = SharedPrefManager.getInstance(mContext!!)!!.username
-        filter = SharedPrefManager.getInstance(mContext!!)!!.currentPublics
         sortBy = SharedPrefManager.getInstance(mContext!!)!!.publicsSortBy
-        setPlatformImage(filter)
+        setPlatformImage(platform)
         sortByText?.text = sortBy
         publicsPlatformFilter?.setOnClickListener {
             val items = resources.getStringArray(R.array.platform_array_w_all)
@@ -64,17 +71,17 @@ class PublicsFragment : CoFragment() {
                     .setTopColorRes(R.color.colorPrimary)
                     .setTitle(R.string.platform_filter)
                     .setIcon(R.drawable.icons8_workstation_48)
-                    .setMessage(resources.getString(R.string.selected_platform) + " " + filter)
+                    .setMessage(resources.getString(R.string.selected_platform) + " " + platform)
                     .setItems(items) { _: Int, item: String? ->
                         SharedPrefManager.getInstance(mContext!!)!!.currentPublics = item
                         setPlatformImage(item)
-                        filter = item
                         mProgressBar?.visibility = View.VISIBLE
-                        publicsRecyclerList!!.clear()
+                        adapter?.clear()
                         currentPage = PaginationOnScroll.PAGE_START
-                        isLastPage = false
-                        isLoading = false
-                        loadPublics(1)
+                        isLastPageFrag = false
+                        isLoadingFrag = false
+                        platform = item
+                        databaseQuery(sortBy!!, currentPage, pageSize, platform!!)
                     }
                     .show()
         }
@@ -87,13 +94,13 @@ class PublicsFragment : CoFragment() {
             popup.setOnMenuItemClickListener { item: MenuItem ->
                 SharedPrefManager.getInstance(mContext!!)!!.publicsSortBy = item.toString()
                 mProgressBar?.visibility = View.VISIBLE
-                publicsRecyclerList!!.clear()
+                adapter?.clear()
                 currentPage = PaginationOnScroll.PAGE_START
-                isLastPage = false
-                isLoading = false
+                isLastPageFrag = false
+                isLoadingFrag = false
                 sortBy = item.toString()
                 sortByText?.text = item.toString()
-                loadPublics(1)
+                databaseQuery(sortBy!!, currentPage, pageSize, platform!!)
                 true
             }
             popup.show()
@@ -106,21 +113,35 @@ class PublicsFragment : CoFragment() {
             (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
         }
         mProgressBar?.visibility = View.VISIBLE
-        publicsView.setHasFixedSize(true)
+        publicsView?.setHasFixedSize(true)
         publicsViewManager = LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false)
-        publicsView.layoutManager = publicsViewManager
-        publicsRecyclerList = ArrayList()
-        adapter = PublicsAdapter(mContext!!, publicsRecyclerList)
-        publicsView.adapter = adapter
-        loadPublics(currentPage)
-        publicsView.addOnScrollListener(object : PaginationOnScroll(publicsViewManager!!) {
-            override fun loadMoreItems() {
-                isLoading = true
-                currentPage++
-                loadPublics(currentPage)
+        publicsView?.layoutManager = publicsViewManager
+
+
+        launch {
+            if (publicsDao?.numRowsAll()?.equals(0)!!){
+                getAllPublics("yes")
+            }else {
+                getAllPublics("no")
             }
-            override var isLastPage: Boolean = false
-            override var isLoading: Boolean = false
+        }
+        databaseQuery(sortBy!!, currentPage, pageSize, platform!!)
+
+        publicsView?.addOnScrollListener(object : PaginationOnScroll(publicsViewManager!!) {
+            override fun loadMoreItems() {
+                isLoadingFrag = true
+                currentPage++
+                //println("Loading more items! $currentPage isloadingFrag:$isLoadingFrag isloading:$isLoading islastpagefrag:$isLastPageFrag islastpage:$isLastPage")
+                databaseQuery(sortBy!!, currentPage, pageSize, platform!!)
+            }
+
+            override fun isLastPage(): Boolean {
+                return isLastPageFrag
+            }
+
+            override fun isLoading(): Boolean {
+                return isLoadingFrag
+            }
         })
 
         if(SharedPrefManager.getInstance(mContext!!)!!.firstPublicsFragment == "show"){
@@ -140,7 +161,185 @@ class PublicsFragment : CoFragment() {
         return publicsRootView
     }
 
-    private fun loadPublics(page: Int) {
+    private fun databaseQuery(sortBy: String, page: Int, limit: Int, platform: String){
+        println("sort:$sortBy page:$page limit:$limit plat:$platform")
+        var start = 0
+        val finalPlatform = "%,$platform,%"
+        var isAtPageLimit = false
+        var total: Int
+        var pageLimit: Int
+
+        // Query string
+        var queryString = String()
+        // List of bind parameters
+        val args: MutableList<Any> = ArrayList()
+        var platformCondition = false
+
+        // Beginning of query string
+        queryString += "SELECT * FROM publicsentity"
+
+        launch {
+            if (finalPlatform == "%,All,%" ||finalPlatform == "%,all,%"){
+                async { total = publicsDao?.numRowsAll()!!
+                    pageLimit = ceil((total.div(limit)).toDouble()).toInt()
+                    println("INIT pagelimit: $pageLimit total: $total limit: $limit page: $page")
+                    if(page <= pageLimit) {
+                        isAtPageLimit = page == pageLimit
+                        start = if (page == 1) {
+                            0
+                        } else {
+                            (page - 1) * limit
+                        }
+                    }else{
+                        isAtPageLimit = true
+                    }
+                }.await()
+            }else{
+                platformCondition = true
+                val platformArgs: MutableList<Any> = ArrayList()
+                val filterNumRaw = "SELECT COUNT(id) FROM publicsentity WHERE platforms LIKE ?"
+                platformArgs.add(finalPlatform)
+                val filterNumQuery = SimpleSQLiteQuery(filterNumRaw, platformArgs.toTypedArray())
+                async { total = publicsDao?.getNumGamesFilterRaw(filterNumQuery)!!
+                    pageLimit = ceil((total.div(limit)).toDouble()).toInt()
+                    println("INIT FILTER pagelimit: $pageLimit total: $total limit: $limit page: $page")
+                    if(page <= pageLimit) {
+                        isAtPageLimit = page == pageLimit
+                        start = if (page == 1) {
+                            0
+                        } else {
+                            (page - 1) * limit
+                        }
+                    }else{
+                        isAtPageLimit = true
+                    }
+                }.await()
+            }
+
+            if (platformCondition){
+                queryString += " WHERE platforms LIKE ?"
+                args.add(finalPlatform)
+            }
+
+            var sortByFinal = ""
+            when (sortBy) {
+                "" -> {
+                    sortByFinal = " ORDER BY followers DESC"
+                }
+                "Followers" -> {
+                    sortByFinal = " ORDER BY followers DESC"
+                }
+                "Recently Added" -> {
+                    sortByFinal = " ORDER BY id DESC"
+                }
+                "Oldest Added" -> {
+                    sortByFinal = " ORDER BY id ASC"
+                }
+                "A-Z" -> {
+                    sortByFinal = " ORDER BY title ASC"
+                }
+                "Open Posts" -> {
+                    sortByFinal = " ORDER BY postcount DESC"
+                }
+                "Reviews" -> {
+                    sortByFinal = " ORDER BY numratings DESC"
+                }
+            }
+            queryString += sortByFinal
+            queryString += " LIMIT $start, $limit"
+            // End of query string
+            queryString += ";"
+            val rawQuery = SimpleSQLiteQuery(queryString, args.toTypedArray())
+
+            if (games.isNullOrEmpty()){
+                games = publicsDao?.getGamesRaw(rawQuery)
+                if (games?.isNotEmpty()!!){
+                    CoroutineScope(Main).launch {
+                        mProgressBar!!.visibility = View.GONE
+                    }
+                }
+                adapter = PublicsRoomAdapter(mContext!!, games!! as MutableList<PublicsEntity>)
+                CoroutineScope(Main).launch {
+                    addGamesINIT(isAtPageLimit)
+                }
+            }else{
+                val items = publicsDao?.getGamesRaw(rawQuery)
+                CoroutineScope(Main).launch {
+                    addGamesToList(isAtPageLimit, items!!)
+                }
+            }
+
+        }
+    }
+
+    private fun addGamesINIT(isAtPageLimit: Boolean){
+        publicsView?.adapter = adapter
+        //if (currentPage != PaginationOnScroll.PAGE_START) adapter?.removeLoading()
+        mProgressBar!!.visibility = View.GONE
+        if (!isAtPageLimit) {
+            adapter?.addLoading()
+        } else {
+            isLastPageFrag = true
+            adapter?.removeLoading()
+        }
+        isLoadingFrag = false
+    }
+
+    private fun addGamesToList(isAtPageLimit: Boolean, items: List<PublicsEntity>){
+        adapter?.removeLoading()
+        adapter?.addItems(items)
+        mProgressBar!!.visibility = View.GONE
+        if (!isAtPageLimit) {
+            adapter?.addLoading()
+        } else {
+            isLastPageFrag = true
+        }
+        isLoadingFrag = false
+    }
+
+    private fun getAllPublics(init: String) {
+            val stringRequest = StringRequest(Request.Method.GET, "$Publics_GET_URL?username=$username", { response: String? ->
+                try {
+                    val publics = JSONArray(response)
+                    for (i in 0 until publics.length()) {
+                        val publicsObject = publics.getJSONObject(i)
+                        val mGame = PublicsEntity(publicsObject.getInt("id"),
+                                publicsObject.getString("title"),
+                                publicsObject.getString("genre"),
+                                publicsObject.getString("image"),
+                                publicsObject.getInt("numratings"),
+                                publicsObject.getString("avgrating"),
+                                publicsObject.getString("tag"),
+                                publicsObject.getInt("postcount"),
+                                publicsObject.getString("followed"),
+                                publicsObject.getInt("followers"),
+                                publicsObject.getString("platforms")
+                        )
+                        launch {
+                            mContext?.let {
+                                if (publicsDao!!.isRowIsExist(publicsObject.getInt("id"))) {
+                                    publicsDao!!.updateGame(mGame)
+                                } else {
+                                    publicsDao!!.addGame(mGame)
+                                    CoroutineScope(Main).launch {
+                                        mContext!!.toast("Game added!")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (init == "yes") {
+                        databaseQuery(sortBy!!, currentPage, pageSize, platform!!)
+                    }
+                    mProgressBar!!.visibility = View.GONE
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                }
+            }) { Toast.makeText(mContext, "Network error!", Toast.LENGTH_SHORT).show() }
+            (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
+    }
+
+    /*private fun loadPublics(page: Int) {
         val thisThread: Thread = object : Thread() {
             //create thread
             override fun run() {
@@ -193,7 +392,7 @@ class PublicsFragment : CoFragment() {
             }
         }
         thisThread.start() // start thread
-    }
+    }*/
 
     private fun setPlatformImage(item: String?) {
         when (item) {
@@ -211,5 +410,6 @@ class PublicsFragment : CoFragment() {
 
     companion object {
         private const val Publics_URL = Constants.ROOT_URL + "publics_api.php"
+        private const val Publics_GET_URL = Constants.ROOT_URL + "publics_getall.php"
     }
 }

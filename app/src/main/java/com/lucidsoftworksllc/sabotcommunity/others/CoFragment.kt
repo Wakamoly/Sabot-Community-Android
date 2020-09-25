@@ -12,7 +12,7 @@ abstract class CoFragment : Fragment(), CoroutineScope {
     private lateinit var job: Job
 
     override val coroutineContext: CoroutineContext
-        get() = job + Dispatchers.Main
+        get() = job + Dispatchers.IO
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

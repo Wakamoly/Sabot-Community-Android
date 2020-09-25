@@ -10,4 +10,5 @@ class PublicsRecycler {
     var tag: String? = null
     var postcount: String? = null
     var followed: String? = null
+    var followers: String? = null
 }

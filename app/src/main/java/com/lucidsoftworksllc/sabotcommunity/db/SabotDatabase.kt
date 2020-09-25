@@ -4,10 +4,11 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 
 @Database(
         entities = [PublicsEntity::class],
-        version = 1)
+        version = 2)
 abstract class SabotDatabase: RoomDatabase() {
 
     abstract fun getPublicsDao() : PublicsDao
@@ -30,7 +31,7 @@ abstract class SabotDatabase: RoomDatabase() {
                 context.applicationContext,
                 SabotDatabase::class.java,
                 "sabotdatabase"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
 
     }
 }

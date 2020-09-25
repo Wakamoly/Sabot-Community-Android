@@ -10,19 +10,20 @@ abstract class PaginationOnScroll(private val layoutManager: LinearLayoutManager
         val totalItemCount = layoutManager.itemCount
         val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
         val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
-        if (!isLoading && !isLastPage && lastVisibleItem == totalItemCount - 1) {
+        if (!isLoading() && !isLastPage() && lastVisibleItem == totalItemCount - 1) {
             if (visibleItemCount + firstVisibleItemPosition >= totalItemCount && firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE) {
                 loadMoreItems()
+                println("TOTALITEMCOUNT $totalItemCount")
             }
         }
     }
 
     protected abstract fun loadMoreItems()
-    abstract val isLastPage: Boolean
-    abstract val isLoading: Boolean
+    abstract fun isLastPage(): Boolean
+    abstract fun isLoading(): Boolean
 
     companion object {
         const val PAGE_START = 1
-        const val PAGE_SIZE = 10
+        const val PAGE_SIZE = 15
     }
 }
