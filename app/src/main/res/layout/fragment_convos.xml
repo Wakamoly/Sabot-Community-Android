@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/convo_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
     android:windowSoftInputMode="adjustPan|adjustResize"
-    tools:context=".ConvosFragment">
+    tools:context=".fragments.ConvosFragment">
 
     <RelativeLayout
         android:id="@+id/chatConvoLayout"
@@ -19,8 +20,9 @@
             android:id="@+id/chatConvos"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollbars="vertical">
-        </androidx.recyclerview.widget.RecyclerView>
+            android:scrollbars="vertical"
+            android:layoutAnimation="@anim/recycler_animation"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
         <TextView
             android:id="@+id/noPosts"

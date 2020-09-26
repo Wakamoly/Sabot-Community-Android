@@ -181,9 +181,9 @@
                                         android:layout_height="12dp"
                                         android:layout_marginStart="4dp"
                                         android:src="@drawable/ic_online"
-                                        android:tint="@color/green"
                                         android:visibility="gone"
-                                        tools:visibility="visible" />
+                                        tools:visibility="visible"
+                                        app:tint="@color/green" />
 
                                 </LinearLayout>
 
@@ -1555,9 +1555,9 @@
                                 android:id="@+id/recyclerProfilenews"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:scrollbars="vertical">
-
-                            </androidx.recyclerview.widget.RecyclerView>
+                                android:scrollbars="vertical"
+                                android:layoutAnimation="@anim/recycler_animation"
+                                app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
                             <TextView
                                 android:id="@+id/postsNoPosts"

@@ -1,0 +1,22 @@
+package com.lucidsoftworksllc.sabotcommunity.models
+
+class ProfilenewsRecycler(val id: Int,
+                          val type: String,
+                          val likes: String,
+                          val body: String,
+                          val added_by: String,
+                          val user_to: String,
+                          val date_added: String,
+                          val user_closed: String,
+                          val deleted: String,
+                          val image: String,
+                          val user_id: String,
+                          val profile_pic: String,
+                          val verified: String,
+                          val online: String,
+                          val nickname: String,
+                          val username: String,
+                          val commentcount: String,
+                          val likedbyuseryes: String,
+                          val form: String,
+                          val isEdited: String)

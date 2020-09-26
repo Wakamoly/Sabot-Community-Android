@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        tools:context="com.lucidsoftworksllc.sabotcommunity.PlayerRatingFragment">
+        tools:context="com.lucidsoftworksllc.sabotcommunity.fragments.PlayerRatingFragment">
 
         <LinearLayout
             android:id="@+id/newClanDetails"

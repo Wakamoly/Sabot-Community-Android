@@ -1,5 +1,7 @@
 package com.lucidsoftworksllc.sabotcommunity
 
+import com.lucidsoftworksllc.sabotcommunity.others.Constants
+
 class SliderUtilsDash {
     var sliderImageUrl: String? = null
         get() = Constants.BASE_URL + field

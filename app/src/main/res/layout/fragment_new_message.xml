@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
     android:windowSoftInputMode="adjustPan|adjustResize"
-    tools:context=".ConvosFragment">
+    tools:context=".fragments.ConvosFragment">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -36,7 +36,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="5dp"
                 android:layout_toEndOf="@id/backArrow"
-                android:text="New Message"
+                android:text="@string/new_message_text"
                 android:textColor="@color/white"
                 android:textSize="20sp" />
 
@@ -58,10 +58,11 @@
         <ImageView
             android:src="@drawable/ic_plus"
             android:layout_width="30dp"
-            android:layout_height="30dp"/>
+            android:layout_height="30dp"
+            android:contentDescription="@string/new_message_text" />
 
         <TextView
-            android:text="New Group Message (beta)"
+            android:text="@string/new_group_message_beta_text"
             android:textStyle="bold"
             android:layout_marginEnd="5dp"
             android:layout_width="wrap_content"

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@layout/header_gradient"
-    tools:context="com.lucidsoftworksllc.sabotcommunity.MainActivity">
+    tools:context="com.lucidsoftworksllc.sabotcommunity.activities.MainActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
