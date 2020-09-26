@@ -8,7 +8,7 @@ import androidx.room.migration.Migration
 
 @Database(
         entities = [PublicsEntity::class],
-        version = 2)
+        version = 1)
 abstract class SabotDatabase: RoomDatabase() {
 
     abstract fun getPublicsDao() : PublicsDao

@@ -176,7 +176,7 @@ class PublicsFragment : CoFragment() {
         var platformCondition = false
 
         // Beginning of query string
-        queryString += "SELECT * FROM publicsentity"
+        queryString += "SELECT * FROM publicsentity WHERE active = 'yes'"
 
         launch {
             if (finalPlatform == "%,All,%" ||finalPlatform == "%,all,%"){
@@ -184,7 +184,7 @@ class PublicsFragment : CoFragment() {
                     pageLimit = ceil((total.div(limit)).toDouble()).toInt()
                     println("INIT pagelimit: $pageLimit total: $total limit: $limit page: $page")
                     if(page <= pageLimit) {
-                        isAtPageLimit = page == pageLimit
+                        //isAtPageLimit = page == pageLimit
                         start = if (page == 1) {
                             0
                         } else {
@@ -197,14 +197,14 @@ class PublicsFragment : CoFragment() {
             }else{
                 platformCondition = true
                 val platformArgs: MutableList<Any> = ArrayList()
-                val filterNumRaw = "SELECT COUNT(id) FROM publicsentity WHERE platforms LIKE ?"
+                val filterNumRaw = "SELECT COUNT(id) FROM publicsentity WHERE active = 'yes' AND platforms LIKE ?"
                 platformArgs.add(finalPlatform)
                 val filterNumQuery = SimpleSQLiteQuery(filterNumRaw, platformArgs.toTypedArray())
                 async { total = publicsDao?.getNumGamesFilterRaw(filterNumQuery)!!
                     pageLimit = ceil((total.div(limit)).toDouble()).toInt()
                     println("INIT FILTER pagelimit: $pageLimit total: $total limit: $limit page: $page")
                     if(page <= pageLimit) {
-                        isAtPageLimit = page == pageLimit
+                        //isAtPageLimit = page == pageLimit
                         start = if (page == 1) {
                             0
                         } else {
@@ -217,7 +217,7 @@ class PublicsFragment : CoFragment() {
             }
 
             if (platformCondition){
-                queryString += " WHERE platforms LIKE ?"
+                queryString += " AND platforms LIKE ?"
                 args.add(finalPlatform)
             }
 
@@ -249,6 +249,7 @@ class PublicsFragment : CoFragment() {
             queryString += " LIMIT $start, $limit"
             // End of query string
             queryString += ";"
+            println("STRING QUERY: $queryString")
             val rawQuery = SimpleSQLiteQuery(queryString, args.toTypedArray())
 
             if (games.isNullOrEmpty()){
@@ -300,23 +301,24 @@ class PublicsFragment : CoFragment() {
     private fun getAllPublics(init: String) {
             val stringRequest = StringRequest(Request.Method.GET, "$Publics_GET_URL?username=$username", { response: String? ->
                 try {
-                    val publics = JSONArray(response)
-                    for (i in 0 until publics.length()) {
-                        val publicsObject = publics.getJSONObject(i)
-                        val mGame = PublicsEntity(publicsObject.getInt("id"),
-                                publicsObject.getString("title"),
-                                publicsObject.getString("genre"),
-                                publicsObject.getString("image"),
-                                publicsObject.getInt("numratings"),
-                                publicsObject.getString("avgrating"),
-                                publicsObject.getString("tag"),
-                                publicsObject.getInt("postcount"),
-                                publicsObject.getString("followed"),
-                                publicsObject.getInt("followers"),
-                                publicsObject.getString("platforms")
-                        )
-                        launch {
-                            mContext?.let {
+                    launch {
+                        val publics = JSONArray(response)
+                        for (i in 0 until publics.length()) {
+                            val publicsObject = publics.getJSONObject(i)
+                            val mGame = PublicsEntity(publicsObject.getInt("id"),
+                                    publicsObject.getString("title"),
+                                    publicsObject.getString("genre"),
+                                    publicsObject.getString("image"),
+                                    publicsObject.getInt("numratings"),
+                                    publicsObject.getString("avgrating"),
+                                    publicsObject.getString("tag"),
+                                    publicsObject.getInt("postcount"),
+                                    publicsObject.getString("followed"),
+                                    publicsObject.getInt("followers"),
+                                    publicsObject.getString("platforms"),
+                                    publicsObject.getString("active")
+                            )
+                            async {
                                 if (publicsDao!!.isRowIsExist(publicsObject.getInt("id"))) {
                                     publicsDao!!.updateGame(mGame)
                                 } else {
@@ -325,13 +327,14 @@ class PublicsFragment : CoFragment() {
                                         mContext!!.toast("Game added!")
                                     }
                                 }
-                            }
+                            }.await()
+
+                        }
+                        if (init == "yes") {
+                            databaseQuery(sortBy!!, currentPage, pageSize, platform!!)
                         }
                     }
-                    if (init == "yes") {
-                        databaseQuery(sortBy!!, currentPage, pageSize, platform!!)
-                    }
-                    mProgressBar!!.visibility = View.GONE
+
                 } catch (e: JSONException) {
                     e.printStackTrace()
                 }

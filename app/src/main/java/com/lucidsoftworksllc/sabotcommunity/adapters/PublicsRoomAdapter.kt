@@ -202,7 +202,7 @@ class PublicsRoomAdapter(private val mCtx: Context, private val games: MutableLi
     fun addLoading() {
         println("Added loading! Adapter")
         isLoaderVisible = true
-        games.add(PublicsEntity(0, "","","",0,"","",0,"",0,""))
+        games.add(PublicsEntity(0, "","","",0,"","",0,"",0,"", ""))
         notifyItemInserted(games.size - 1)
     }
 

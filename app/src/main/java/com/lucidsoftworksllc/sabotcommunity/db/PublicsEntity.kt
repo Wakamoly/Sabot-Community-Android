@@ -15,5 +15,6 @@ data class PublicsEntity (
     var postcount: Int,
     var followed: String,
     var followers: Int,
-    var platforms: String
+    var platforms: String,
+    var active: String
 )

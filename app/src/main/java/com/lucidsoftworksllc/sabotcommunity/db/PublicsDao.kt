@@ -12,7 +12,7 @@ interface PublicsDao {
     /*@Query("SELECT * FROM publicsentity ORDER BY :sortBy ASC LIMIT :start, :limit")
     suspend fun getAllGamesByASC(start: Int, limit: Int) : List<PublicsEntity>*/
 
-    @Query("SELECT * FROM publicsentity ORDER BY title ASC LIMIT :start, :limit")
+    /*@Query("SELECT * FROM publicsentity ORDER BY title ASC LIMIT :start, :limit")
     suspend fun getAllGamesByASCTitle(start: Int, limit: Int) : List<PublicsEntity>
 
     @Query("SELECT * FROM publicsentity ORDER BY id ASC LIMIT :start, :limit")
@@ -20,8 +20,8 @@ interface PublicsDao {
 
 
 
-    /*@Query("SELECT * FROM publicsentity ORDER BY :sortBy DESC LIMIT :start, :limit")
-    suspend fun getAllGamesDESC(start: Int, limit: Int, sortBy: String) : List<PublicsEntity>*/
+    *//*@Query("SELECT * FROM publicsentity ORDER BY :sortBy DESC LIMIT :start, :limit")
+    suspend fun getAllGamesDESC(start: Int, limit: Int, sortBy: String) : List<PublicsEntity>*//*
 
     @Query("SELECT * FROM publicsentity ORDER BY followers DESC LIMIT :start, :limit")
     suspend fun getAllGamesDESCFollowers(start: Int, limit: Int) : List<PublicsEntity>
@@ -41,7 +41,7 @@ interface PublicsDao {
     suspend fun getAllGamesByASCPlatform(start: Int, limit: Int, sortBy: String, platform: String) : List<PublicsEntity>
 
     @Query("SELECT * FROM publicsentity WHERE platforms LIKE '%'+:platform+'%' ORDER BY :sortBy DESC LIMIT :start, :limit")
-    suspend fun getAllGamesDESCPlatform(start: Int, limit: Int, sortBy: String, platform: String) : List<PublicsEntity>
+    suspend fun getAllGamesDESCPlatform(start: Int, limit: Int, sortBy: String, platform: String) : List<PublicsEntity>*/
 
 
     @RawQuery
@@ -66,6 +66,6 @@ interface PublicsDao {
     @Query("SELECT COUNT(id) FROM publicsentity WHERE platforms LIKE '%'+:filter+'%'")
     suspend fun numRowsFilter(filter: String) : Int
 
-    @Query("SELECT COUNT(id) FROM publicsentity")
+    @Query("SELECT COUNT(id) FROM publicsentity WHERE active = 'yes'")
     suspend fun numRowsAll() : Int
 }
