@@ -13,9 +13,6 @@ abstract class PaginationOnScroll(private val layoutManager: LinearLayoutManager
         if (!isLoading() && !isLastPage() && lastVisibleItem == totalItemCount - 1) {
             if (visibleItemCount + firstVisibleItemPosition >= totalItemCount && firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE) {
                 loadMoreItems()
-
-                //TODO somehow doesn't show results after many pages?
-                //println("TOTALITEMCOUNT $totalItemCount")
             }
         }
     }

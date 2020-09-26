@@ -69,9 +69,8 @@ class NotificationsFragment : Fragment() {
                 currentPage++
                 loadNotifications(currentPage)
             }
-
-            override var isLastPage: Boolean = false
-            override var isLoading: Boolean = false
+            override fun isLastPage(): Boolean { return isLastPage }
+            override fun isLoading(): Boolean { return isLoading }
         })
         notificationSwipe?.setOnRefreshListener {
             val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)

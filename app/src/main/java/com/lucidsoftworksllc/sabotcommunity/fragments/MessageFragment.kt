@@ -12,6 +12,7 @@ import android.graphics.ImageDecoder
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
@@ -41,17 +42,21 @@ import com.lucidsoftworksllc.sabotcommunity.activities.ChatActivity
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.adapters.MessagesThreadAdapter
 import com.lucidsoftworksllc.sabotcommunity.models.MessagesHelper
+import com.lucidsoftworksllc.sabotcommunity.others.CoFragment
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import com.theartofdev.edmodo.cropper.CropImage
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.*
 
-class MessageFragment : Fragment() {
+class MessageFragment : CoFragment() {
     private var mCtx: Context? = null
     private var thisUserID: String? = null
     private var thisUsername: String? = null
@@ -115,7 +120,7 @@ class MessageFragment : Fragment() {
             openCropper()
         }
         loadUserInfo(userTo)
-        getMessages()
+        launch { getMessages() }
         return messageRootView
     }
 
@@ -124,79 +129,78 @@ class MessageFragment : Fragment() {
                 .start(requireContext(), this)
     }
 
-    private fun getMessages() {
+    private suspend fun getMessages() {
         val stringRequest = StringRequest(Request.Method.GET, "$URL_FETCH_MESSAGES?this_user=$thisUsername&username=$userTo&userid=$thisUserID",
                 { response: String? ->
-                    try {
-                        val res = JSONObject(response!!)
-                        val thread = res.getJSONArray("messages")
-                        for (i in 0 until thread.length()) {
-                            val obj = thread.getJSONObject(i)
-                            val id = obj.getString("id")
-                            val userTo1 = obj.getString("user_to")
-                            val userFrom = obj.getString("user_from")
-                            val body = obj.getString("body")
-                            val date = obj.getString("date")
-                            val image = obj.getString("image")
-                            val messageObject = MessagesHelper(id, userTo1, userFrom, body, date, image)
-                            messages!!.add(messageObject)
-                            lastId = id
+                    launch {
+                        try {
+                            val res = JSONObject(response!!)
+                            val thread = res.getJSONArray("messages")
+                            for (i in 0 until thread.length()) {
+                                val obj = thread.getJSONObject(i)
+                                val id = obj.getString("id")
+                                val userTo1 = obj.getString("user_to")
+                                val userFrom = obj.getString("user_from")
+                                val body = obj.getString("body")
+                                val date = obj.getString("date")
+                                val image = obj.getString("image")
+                                val messageObject = MessagesHelper(id, userTo1, userFrom, body, date, image)
+                                messages!!.add(messageObject)
+                                lastId = id
+                            }
+                            newChats()
+                            withContext(Main){
+                                messageProgress!!.visibility = View.GONE
+                                messagesRecyclerView!!.visibility = View.VISIBLE
+                                adapter = MessagesThreadAdapter(mCtx!!, messages!!, thisUsername!!)
+                                messagesRecyclerView!!.adapter = adapter
+                                scrollToBottomNow()
+                            }
+                        } catch (e: JSONException) {
+                            e.printStackTrace()
                         }
-                        newChats()
-                        messageProgress!!.visibility = View.GONE
-                        messagesRecyclerView!!.visibility = View.VISIBLE
-                        adapter = MessagesThreadAdapter(mCtx!!, messages!!, thisUsername!!)
-                        messagesRecyclerView!!.adapter = adapter
-                        scrollToBottomNow()
-                    } catch (e: JSONException) {
-                        e.printStackTrace()
                     }
                 }
         ) { }
         (mCtx as ChatActivity?)!!.addToRequestQueue(stringRequest)
     }
 
-    //create thread
-    // start thread
-    private val messagesFromID: Unit
-        get() {
-            val messagesIDThread: Thread = object : Thread() {
-                //create thread
-                override fun run() {
-                    val stringRequest = StringRequest(Request.Method.GET, "$URL_FETCH_MORE_MESSAGES?this_user=$thisUsername&username=$userTo&userid=$thisUserID&last_id=$lastId",
-                            { response: String? ->
-                                try {
-                                    val res = JSONObject(response!!)
-                                    val lastOnline1 = res.getString("userLastOnline")
-                                    if (lastOnline1 != "null") {
-                                        lastOnline!!.text = lastOnline1
-                                        if (lastOnline1 == "Online now") {
-                                            onlineView!!.visibility = View.VISIBLE
-                                        } else {
-                                            onlineView!!.visibility = View.GONE
-                                        }
+    private suspend fun messagesFromID(){
+        val stringRequest = StringRequest(Request.Method.GET, "$URL_FETCH_MORE_MESSAGES?this_user=$thisUsername&username=$userTo&userid=$thisUserID&last_id=$lastId",
+                { response: String? ->
+                    launch {
+                        try {
+                            val res = JSONObject(response!!)
+                            val lastOnline1 = res.getString("userLastOnline")
+                            if (lastOnline1 != "null") {
+                                withContext(Main){
+                                    lastOnline!!.text = lastOnline1
+                                    if (lastOnline1 == "Online now") {
+                                        onlineView!!.visibility = View.VISIBLE
+                                    } else {
+                                        onlineView!!.visibility = View.GONE
                                     }
-                                    val thread = res.getJSONArray("messages")
-                                    for (i in 0 until thread.length()) {
-                                        val obj = thread.getJSONObject(i)
-                                        val id = obj.getString("id")
-                                        val userFrom = obj.getString("user_from")
-                                        val body = obj.getString("body")
-                                        val image = obj.getString("image")
-                                        processMessage(userFrom, body, image)
-                                        lastId = id
-                                    }
-                                    newChats()
-                                } catch (e: JSONException) {
-                                    e.printStackTrace()
                                 }
                             }
-                    ) { }
-                    (mCtx as ChatActivity?)!!.addToRequestQueue(stringRequest)
+                            val thread = res.getJSONArray("messages")
+                            for (i in 0 until thread.length()) {
+                                val obj = thread.getJSONObject(i)
+                                val id = obj.getString("id")
+                                val userFrom = obj.getString("user_from")
+                                val body = obj.getString("body")
+                                val image = obj.getString("image")
+                                processMessage(userFrom, body, image)
+                                lastId = id
+                            }
+                            newChats()
+                        } catch (e: JSONException) {
+                            e.printStackTrace()
+                        }
+                    }
                 }
-            }
-            messagesIDThread.start() // start thread
-        }
+        ) { }
+        (mCtx as ChatActivity?)!!.addToRequestQueue(stringRequest)
+    }
 
     private fun processMessage(user_string: String, message: String, image: String) {
         val m = MessagesHelper(null.toString(), thisUsername!!, user_string, message, "Just now", image)
@@ -329,7 +333,7 @@ class MessageFragment : Fragment() {
         (mCtx as ChatActivity?)!!.addToRequestQueue(stringRequest)
     }
 
-    fun scrollToBottom() {
+    private fun scrollToBottom() {
         adapter!!.notifyDataSetChanged()
         if (adapter!!.itemCount > 1) Objects.requireNonNull(messagesRecyclerView!!.layoutManager!!).smoothScrollToPosition(messagesRecyclerView, null, adapter!!.itemCount - 1)
     }
@@ -432,15 +436,15 @@ class MessageFragment : Fragment() {
                 .check()
     }
 
-    fun newChats() {
+    private suspend fun newChats() {
         if (!shouldGetNotification(mCtx)) {
-            val chatHandler = Handler()
-            val runnableCode = Runnable { messagesFromID }
-            chatHandler.postDelayed(runnableCode, 5000)
+            val chatHandler = Handler(Looper.getMainLooper())
+            val runnableCode = Runnable { launch { messagesFromID() } }
+            chatHandler.postDelayed(runnableCode, 3000)
         } else {
-            val chatHandler = Handler()
-            val runnableCode = Runnable { newChats() }
-            chatHandler.postDelayed(runnableCode, 10000)
+            val chatHandler = Handler(Looper.getMainLooper())
+            val runnableCode = Runnable { launch { newChats() } }
+            chatHandler.postDelayed(runnableCode, 3000)
         }
     }
 
@@ -448,8 +452,8 @@ class MessageFragment : Fragment() {
         const val URL_FETCH_MESSAGES: String = ROOT_URL + "messages.php/messages"
         const val URL_FETCH_MORE_MESSAGES: String = ROOT_URL + "messages.php/get_new_messages"
         const val URL_SEND_MESSAGE: String = ROOT_URL + "messages.php/send"
-        private const val URL_USER_INFO = Constants.ROOT_URL + "messages.php/user"
-        private const val UPLOAD_IMAGE_URL = Constants.ROOT_URL + "message_image_upload.php"
+        private const val URL_USER_INFO = ROOT_URL + "messages.php/user"
+        private const val UPLOAD_IMAGE_URL = ROOT_URL + "message_image_upload.php"
         fun hideKeyboardFrom(context: Context?, view: View) {
             val imm = context!!.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(view.windowToken, 0)

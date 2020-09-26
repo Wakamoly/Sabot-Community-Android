@@ -12,6 +12,7 @@ import android.graphics.ImageDecoder
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
@@ -40,22 +41,28 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.lucidsoftworksllc.sabotcommunity.R
-import com.lucidsoftworksllc.sabotcommunity.others.Constants.ROOT_URL
 import com.lucidsoftworksllc.sabotcommunity.activities.ChatActivity
 import com.lucidsoftworksllc.sabotcommunity.adapters.GroupMessagesThreadAdapter
 import com.lucidsoftworksllc.sabotcommunity.models.GroupMessagesHelper
+import com.lucidsoftworksllc.sabotcommunity.others.CoFragment
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
+import com.lucidsoftworksllc.sabotcommunity.others.Constants.ROOT_URL
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import com.theartofdev.edmodo.cropper.CropImage
 import com.yarolegovich.lovelydialog.LovelyStandardDialog
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.*
 
-class MessageGroupFragment : Fragment() {
+class MessageGroupFragment : CoFragment() {
     private var mCtx: Context? = null
     private var thisUserID: String? = null
     private var thisUsername: String? = null
@@ -140,27 +147,31 @@ class MessageGroupFragment : Fragment() {
         val stringRequest = StringRequest(Request.Method.GET, "$URL_FETCH_MESSAGES?this_user=$thisUsername&group_id=$groupId&userid=$thisUserID",
                 { response: String? ->
                     try {
-                        val res = JSONObject(response!!)
-                        val thread = res.getJSONArray("messages")
-                        for (i in 0 until thread.length()) {
-                            val obj = thread.getJSONObject(i)
-                            val id = obj.getString("id")
-                            val userTo = obj.getString("user_to")
-                            val userFrom = obj.getString("user_from")
-                            val body = obj.getString("body")
-                            val date = obj.getString("date")
-                            val image = obj.getString("image")
-                            val profilePic1 = obj.getString("profile_pic")
-                            val messageObject = GroupMessagesHelper(id, userTo, userFrom, body, date, image, profilePic1)
-                            messages!!.add(messageObject)
-                            lastId = id
+                        launch {
+                            val res = JSONObject(response!!)
+                            val thread = res.getJSONArray("messages")
+                            for (i in 0 until thread.length()) {
+                                val obj = thread.getJSONObject(i)
+                                val id = obj.getString("id")
+                                val userTo = obj.getString("user_to")
+                                val userFrom = obj.getString("user_from")
+                                val body = obj.getString("body")
+                                val date = obj.getString("date")
+                                val image = obj.getString("image")
+                                val profilePic1 = obj.getString("profile_pic")
+                                val messageObject = GroupMessagesHelper(id, userTo, userFrom, body, date, image, profilePic1)
+                                messages!!.add(messageObject)
+                                lastId = id
+                            }
+                            newChats()
+                            withContext(Main){
+                                messageProgress!!.visibility = View.GONE
+                                messagesRecyclerView!!.visibility = View.VISIBLE
+                                adapter = GroupMessagesThreadAdapter(mCtx!!, messages!!, thisUsername!!)
+                                messagesRecyclerView!!.adapter = adapter
+                                scrollToBottomNow()
+                            }
                         }
-                        newChats()
-                        messageProgress!!.visibility = View.GONE
-                        messagesRecyclerView!!.visibility = View.VISIBLE
-                        adapter = GroupMessagesThreadAdapter(mCtx!!, messages!!, thisUsername!!)
-                        messagesRecyclerView!!.adapter = adapter
-                        scrollToBottomNow()
                     } catch (e: JSONException) {
                         e.printStackTrace()
                     }
@@ -169,50 +180,46 @@ class MessageGroupFragment : Fragment() {
         (mCtx as ChatActivity?)!!.addToRequestQueue(stringRequest)
     }
 
-    //TODO fix this v
-    // start thread
-    // create thread
-    private val messagesFromID: Unit
-        get() {
-            val messagesIDThread: Thread = object : Thread() {
-                //create thread
-                override fun run() {
-                    val stringRequest = StringRequest(Request.Method.GET, "$URL_FETCH_MORE_MESSAGES?this_user=$thisUsername&group_id=$groupId&userid=$thisUserID&last_id=$lastId",
-                            { response: String? ->
-                                try {
-                                    val res = JSONObject(response!!)
-                                    val lastReply1 = res.getString("last_reply")
-                                    if (lastReply1 == "removed") {
-                                        Toast.makeText(mCtx, "Removed from group!", Toast.LENGTH_SHORT).show()
-                                        cannotRespondLayout!!.visibility = View.VISIBLE
-                                        //TODO fix this v
-                                        (mCtx as FragmentActivity?)!!.supportFragmentManager.popBackStackImmediate()
-                                    } else {
-                                        lastReply!!.text = lastReply1
-                                    }
-                                    val thread = res.getJSONArray("messages")
-                                    for (i in 0 until thread.length()) {
-                                        val obj = thread.getJSONObject(i)
-                                        val id = obj.getString("id")
-                                        val userFrom = obj.getString("user_from")
-                                        val body = obj.getString("body")
-                                        val image = obj.getString("image")
-                                        val time = obj.getString("time")
-                                        val profilePic1 = obj.getString("profile_pic")
-                                        processMessage(userFrom, body, image, time, profilePic1)
-                                        lastId = id
-                                    }
-                                    newChats()
-                                } catch (e: JSONException) {
-                                    e.printStackTrace()
+    private fun messagesFromID(){
+        val stringRequest = StringRequest(Request.Method.GET, "$URL_FETCH_MORE_MESSAGES?this_user=$thisUsername&group_id=$groupId&userid=$thisUserID&last_id=$lastId",
+                { response: String? ->
+                    try {
+                        launch {
+                            val res = JSONObject(response!!)
+                            val lastReply1 = res.getString("last_reply")
+                            if (lastReply1 == "removed") {
+                                withContext(Main){
+                                    Toast.makeText(mCtx, "Removed from group!", Toast.LENGTH_SHORT).show()
+                                    cannotRespondLayout!!.visibility = View.VISIBLE
+                                    (mCtx as FragmentActivity?)!!.supportFragmentManager.popBackStackImmediate()
+                                }
+                            } else {
+                                withContext(Main){
+                                    lastReply!!.text = lastReply1
                                 }
                             }
-                    ) { }
-                    (mCtx as ChatActivity?)!!.addToRequestQueue(stringRequest)
+                            val thread = res.getJSONArray("messages")
+                            for (i in 0 until thread.length()) {
+                                val obj = thread.getJSONObject(i)
+                                val id = obj.getString("id")
+                                val userFrom = obj.getString("user_from")
+                                val body = obj.getString("body")
+                                val image = obj.getString("image")
+                                val time = obj.getString("time")
+                                val profilePic1 = obj.getString("profile_pic")
+                                processMessage(userFrom, body, image, time, profilePic1)
+                                lastId = id
+                            }
+                            newChats()
+                        }
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
+                    }
                 }
-            }
-            messagesIDThread.start() // start thread
-        }
+        ) { }
+        (mCtx as ChatActivity?)!!.addToRequestQueue(stringRequest)
+
+    }
 
     private fun processMessage(user_string: String, message: String, image: String, time: String, profile_pic: String) {
         val m = GroupMessagesHelper(null, thisUsername!!, user_string, message, time, image, profile_pic)
@@ -655,15 +662,15 @@ class MessageGroupFragment : Fragment() {
                 .check()
     }
 
-    fun newChats() {
+    private fun newChats() {
         if (!shouldGetNotification(mCtx)) {
-            val chatHandler = Handler()
-            val runnableCode = Runnable { messagesFromID }
+            val chatHandler = Handler(Looper.getMainLooper())
+            val runnableCode = Runnable { launch { messagesFromID() } }
             chatHandler.postDelayed(runnableCode, 3000)
         } else {
-            val chatHandler = Handler()
-            val runnableCode = Runnable { newChats() }
-            chatHandler.postDelayed(runnableCode, 10000)
+            val chatHandler = Handler(Looper.getMainLooper())
+            val runnableCode = Runnable { launch { newChats() } }
+            chatHandler.postDelayed(runnableCode, 3000)
         }
     }
 

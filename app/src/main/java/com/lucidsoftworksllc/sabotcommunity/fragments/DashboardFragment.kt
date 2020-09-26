@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,8 +26,10 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.StringRequest
 import com.google.android.material.tabs.TabLayout
-import com.lucidsoftworksllc.sabotcommunity.*
+import com.lucidsoftworksllc.sabotcommunity.DashSliderRequest
+import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.R.drawable
+import com.lucidsoftworksllc.sabotcommunity.SliderUtilsDash
 import com.lucidsoftworksllc.sabotcommunity.activities.ChatActivity
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.adapters.DashCurrentPublicsAdapter
@@ -79,6 +82,7 @@ class DashboardFragment : Fragment() {
     private var filter: String? = null
     private var adNotified: ArrayList<String>? = null
     private var dashScroll: ScrollView? = null
+    private var dashboardfeedView: RecyclerView? = null
     private var currentPage = PaginationOnScroll.PAGE_START
     private var isLastPage = false
     private val pageSize = PaginationOnScroll.PAGE_SIZE
@@ -98,7 +102,7 @@ class DashboardFragment : Fragment() {
         allPostsButton = dashboardRootView.findViewById(R.id.allPostsButton)
         userID = SharedPrefManager.getInstance(mContext!!)!!.userID
         username = SharedPrefManager.getInstance(mContext!!)!!.username
-        val dashboardfeedView: RecyclerView = dashboardRootView.findViewById(R.id.dashboardfeedView)
+        dashboardfeedView = dashboardRootView.findViewById(R.id.dashboardfeedView)
         dashboardRefreshLayout = dashboardRootView.findViewById(R.id.dashSwipe)
         dashboardMenu = dashboardRootView.findViewById(R.id.dashboardMenu)
         dashboardToMessages = dashboardRootView.findViewById(R.id.dashboardToMessages)
@@ -117,13 +121,13 @@ class DashboardFragment : Fragment() {
         newsTextView = dashboardRootView.findViewById(R.id.newsTextView)
         newsTextView2 = dashboardRootView.findViewById(R.id.newsTextView2)
         dashScroll = dashboardRootView.findViewById(R.id.dashScroll)
-        //adView = dashboardRootView.findViewById(R.id.adView);
         dashboardfeedRecyclerList = ArrayList()
-        //dashboardfeedView.setHasFixedSize(true);
-        dashboardfeedView.layoutManager = LinearLayoutManager(mContext)
-        ViewCompat.setNestedScrollingEnabled(dashboardfeedView, false)
+        /*val sCrashString: String? = null
+        Log.e("MyApp", sCrashString!!.toString() )*/
+        dashboardfeedView?.layoutManager = LinearLayoutManager(mContext)
+        ViewCompat.setNestedScrollingEnabled(dashboardfeedView!!, false)
         dashboardfeedadapter = ProfilenewsAdapter(mContext!!, dashboardfeedRecyclerList)
-        dashboardfeedView.adapter = dashboardfeedadapter
+        dashboardfeedView?.adapter = dashboardfeedadapter
         dashScroll?.viewTreeObserver?.addOnScrollChangedListener {
             if (dashScroll?.getChildAt(0)?.bottom!! <= dashScroll?.height!! + dashScroll?.scrollY!!) {
                 if (!isLoading && !isLastPage) {
@@ -423,6 +427,9 @@ class DashboardFragment : Fragment() {
                             if (currentPage != PaginationOnScroll.PAGE_START) dashboardfeedadapter!!.removeLoading()
                             postsProgress!!.visibility = View.GONE
                             dashboardfeedadapter!!.addItems(items)
+                            if (page == 1) {
+                                dashboardfeedView?.scheduleLayoutAnimation()
+                            }
                             // check whether is last page or not
                             if (dashboardfeed.length() == pageSize) {
                                 dashboardfeedadapter!!.addLoading()
@@ -443,8 +450,7 @@ class DashboardFragment : Fragment() {
                         noPosts!!.visibility = View.VISIBLE
                         postsProgress!!.visibility = View.GONE
                     }
-                },
-                        Response.ErrorListener { Toast.makeText(mContext, "Couldn't get dashboard feed!", Toast.LENGTH_SHORT).show() }) {
+                }, Response.ErrorListener { Toast.makeText(mContext, "Couldn't get dashboard feed!", Toast.LENGTH_SHORT).show() }) {
                     override fun getParams(): Map<String, String> {
                         val params: MutableMap<String, String> = HashMap()
                         params["page"] = page.toString()

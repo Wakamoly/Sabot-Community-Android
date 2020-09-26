@@ -11,8 +11,8 @@ import org.acra.data.StringFormat;
 import org.acra.sender.HttpSender;
 
 @AcraCore(buildConfigClass = BuildConfig.class,
-        reportFormat = StringFormat.JSON,additionalSharedPreferences={"SharedPrefManager"})
-@AcraHttpSender(uri = "http://www.sabotcommunity.com/acra.php",httpMethod = HttpSender.Method.POST,basicAuthLogin = "yeetskeet",basicAuthPassword = "sabot")
+        reportFormat = StringFormat.JSON)
+@AcraHttpSender(uri = "https://collector.tracepot.com/e9d39a3e",httpMethod = HttpSender.Method.POST)
 public class ACRAApplication extends Application {
     @Override
     protected void attachBaseContext(Context base) {

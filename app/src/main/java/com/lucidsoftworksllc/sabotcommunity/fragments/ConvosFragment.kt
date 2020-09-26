@@ -96,6 +96,7 @@ class ConvosFragment : Fragment() {
                         }
                         adapter = ConvosThreadAdapter(mCtx!!, messages!!)
                         recyclerView!!.adapter = adapter
+                        recyclerView?.scheduleLayoutAnimation()
                     } catch (e: JSONException) {
                         e.printStackTrace()
                     }

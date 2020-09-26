@@ -556,7 +556,9 @@
                 android:id="@+id/recyclerProfilenews"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scrollbars="vertical">
+                android:scrollbars="vertical"
+                android:layoutAnimation="@anim/recycler_animation"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             </androidx.recyclerview.widget.RecyclerView>
 

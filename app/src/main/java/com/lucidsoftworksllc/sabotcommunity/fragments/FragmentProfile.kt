@@ -881,6 +881,7 @@ class FragmentProfile : Fragment() {
                 }
                 newsadapter = ProfilenewsAdapter(mContext!!, profilenewsRecyclerList)
                 profilenewsView!!.adapter = newsadapter
+                profilenewsView?.scheduleLayoutAnimation()
                 profilenewsView!!.isNestedScrollingEnabled = false
                 profileLayout!!.visibility = View.VISIBLE
                 mProgressBar!!.visibility = View.GONE
@@ -945,6 +946,7 @@ class FragmentProfile : Fragment() {
                 }
                 publicsnewsadapter = PublicsTopicAdapter(mContext!!, profilepublicsnewsRecyclerList!!)
                 profilenewsView!!.adapter = publicsnewsadapter
+                profilenewsView?.scheduleLayoutAnimation()
                 profilenewsView!!.isNestedScrollingEnabled = false
                 profileClansButton!!.setOnClickListener { postsQueryButtonClicked(profileClansButton) }
                 profilePostsButton!!.setOnClickListener { postsQueryButtonClicked(profilePostsButton) }
@@ -981,6 +983,7 @@ class FragmentProfile : Fragment() {
                         mProgressBar!!.visibility = View.GONE
                         clansAdapter = JoinedClansAdapter(mContext!!, clans!!)
                         profilenewsView!!.adapter = clansAdapter
+                        profilenewsView?.scheduleLayoutAnimation()
                         profilenewsView!!.isNestedScrollingEnabled = false
                         publicsPostsButton!!.setOnClickListener { postsQueryButtonClicked(publicsPostsButton) }
                         profilePostsButton!!.setOnClickListener { postsQueryButtonClicked(profilePostsButton) }

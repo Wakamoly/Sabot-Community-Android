@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ProgressBar
         android:indeterminate="true"
@@ -50,7 +51,9 @@
                     android:id="@+id/recyclerMembers"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_below="@id/memberRequestsTV" />
+                    android:layout_below="@id/memberRequestsTV"
+                    android:layoutAnimation="@anim/recycler_animation"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
                 <TextView
                     android:id="@+id/noMemberRequests"
@@ -87,7 +90,9 @@
                     android:id="@+id/recyclerMembersJoined"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_below="@id/membersTV" />
+                    android:layout_below="@id/membersTV"
+                    android:layoutAnimation="@anim/recycler_animation"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
                 <TextView
                     android:id="@+id/noMembers"

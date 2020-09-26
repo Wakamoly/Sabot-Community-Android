@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/colorPrimary">
 
     <ProgressBar
@@ -71,7 +72,9 @@
             android:id="@+id/recyclerPopular"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/colorView" />
+            android:layout_below="@id/colorView"
+            android:layoutAnimation="@anim/recycler_animation"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     </RelativeLayout>
 

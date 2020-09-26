@@ -11,6 +11,7 @@ import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
+import androidx.sqlite.db.SimpleSQLiteQuery
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.bumptech.glide.Glide
@@ -18,12 +19,16 @@ import com.iarcuschin.simpleratingbar.SimpleRatingBar
 import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.db.PublicsEntity
+import com.lucidsoftworksllc.sabotcommunity.db.SabotDatabase
 import com.lucidsoftworksllc.sabotcommunity.fragments.FragmentPublicsCat
 import com.lucidsoftworksllc.sabotcommunity.models.PublicsRecycler
 import com.lucidsoftworksllc.sabotcommunity.others.BaseViewHolder
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import com.yarolegovich.lovelydialog.LovelyStandardDialog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.HashMap
@@ -93,6 +98,9 @@ class PublicsRoomAdapter(private val mCtx: Context, private val games: MutableLi
                 publicsActionBtnFollowed.startAnimation(buttonAppear)
                 publics.followed = "yes"
                 Handler().postDelayed({ publicsActionBtnFollowed.isEnabled = true }, 3500)
+                CoroutineScope(IO).launch{
+                    SabotDatabase(mCtx).getPublicsDao().followGame(publics.id)
+                }
 
                 val userID = SharedPrefManager.getInstance(mCtx)!!.userID
                 val username = SharedPrefManager.getInstance(mCtx)!!.username
@@ -104,6 +112,9 @@ class PublicsRoomAdapter(private val mCtx: Context, private val games: MutableLi
                             publicsActionBtn.visibility = View.VISIBLE
                             publicsActionBtnFollowed.visibility = View.GONE
                             publics.followed = "no"
+                            CoroutineScope(IO).launch{
+                                SabotDatabase(mCtx).getPublicsDao().unfollowGame(publics.id)
+                            }
                         }
                     } catch (e: JSONException) {
                         e.printStackTrace()
@@ -136,6 +147,9 @@ class PublicsRoomAdapter(private val mCtx: Context, private val games: MutableLi
                             publicsActionBtn.startAnimation(buttonAppear)
                             publics.followed = "no"
                             Handler().postDelayed({ publicsActionBtn.isEnabled = true }, 3500)
+                            CoroutineScope(IO).launch{
+                                SabotDatabase(mCtx).getPublicsDao().unfollowGame(publics.id)
+                            }
 
                             val userID = SharedPrefManager.getInstance(mCtx)!!.userID
                             val username = SharedPrefManager.getInstance(mCtx)!!.username
@@ -147,6 +161,9 @@ class PublicsRoomAdapter(private val mCtx: Context, private val games: MutableLi
                                         publicsActionBtnFollowed.visibility = View.VISIBLE
                                         publicsActionBtn.visibility = View.GONE
                                         publics.followed = "yes"
+                                        CoroutineScope(IO).launch{
+                                            SabotDatabase(mCtx).getPublicsDao().followGame(publics.id)
+                                        }
                                     }
                                 } catch (e: JSONException) {
                                     e.printStackTrace()
@@ -200,7 +217,6 @@ class PublicsRoomAdapter(private val mCtx: Context, private val games: MutableLi
     }
 
     fun addLoading() {
-        println("Added loading! Adapter")
         isLoaderVisible = true
         games.add(PublicsEntity(0, "","","",0,"","",0,"",0,"", ""))
         notifyItemInserted(games.size - 1)
