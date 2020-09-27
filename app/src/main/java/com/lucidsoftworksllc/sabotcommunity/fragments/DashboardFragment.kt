@@ -87,8 +87,6 @@ class DashboardFragment : Fragment() {
     private var isLastPage = false
     private val pageSize = PaginationOnScroll.PAGE_SIZE
     private var isLoading = false
-
-    //private AdView adView;
     private var clicked: String? = null
     private var dashboardfeedRecyclerList: MutableList<ProfilenewsRecycler>? = null
     private var dashboardfeedadapter: ProfilenewsAdapter? = null
@@ -122,8 +120,6 @@ class DashboardFragment : Fragment() {
         newsTextView2 = dashboardRootView.findViewById(R.id.newsTextView2)
         dashScroll = dashboardRootView.findViewById(R.id.dashScroll)
         dashboardfeedRecyclerList = ArrayList()
-        /*val sCrashString: String? = null
-        Log.e("MyApp", sCrashString!!.toString() )*/
         dashboardfeedView?.layoutManager = LinearLayoutManager(mContext)
         ViewCompat.setNestedScrollingEnabled(dashboardfeedView!!, false)
         dashboardfeedadapter = ProfilenewsAdapter(mContext!!, dashboardfeedRecyclerList)
@@ -204,14 +200,7 @@ class DashboardFragment : Fragment() {
                     }
                     .show()
         }
-
-        /*MobileAds.initialize(mContext, new OnInitializationCompleteListener() {
-            @Override
-            public void onInitializationComplete(InitializationStatus initializationStatus) {
-            }
-        });
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);*/hideKeyboardFrom(mContext, dashboardRootView)
+        hideKeyboardFrom(mContext, dashboardRootView)
         return dashboardRootView
     }
 

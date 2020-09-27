@@ -51,15 +51,13 @@ import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import com.theartofdev.edmodo.cropper.CropImage
 import com.yarolegovich.lovelydialog.LovelyStandardDialog
 import de.hdodenhof.circleimageview.CircleImageView
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.lang.Runnable
 import java.util.*
 
 class MessageGroupFragment : CoFragment() {
@@ -222,9 +220,11 @@ class MessageGroupFragment : CoFragment() {
     }
 
     private fun processMessage(user_string: String, message: String, image: String, time: String, profile_pic: String) {
-        val m = GroupMessagesHelper(null, thisUsername!!, user_string, message, time, image, profile_pic)
-        messages!!.add(m)
-        scrollToBottom()
+        CoroutineScope(Main).launch {
+            val m = GroupMessagesHelper(null, thisUsername!!, user_string, message, time, image, profile_pic)
+            messages!!.add(m)
+            scrollToBottom()
+        }
     }
 
     private fun sendMessage(group_id: String, body: String) {

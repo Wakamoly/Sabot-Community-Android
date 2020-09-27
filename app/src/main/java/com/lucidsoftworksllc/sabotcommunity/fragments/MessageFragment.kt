@@ -47,6 +47,7 @@ import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import com.theartofdev.edmodo.cropper.CropImage
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -203,9 +204,11 @@ class MessageFragment : CoFragment() {
     }
 
     private fun processMessage(user_string: String, message: String, image: String) {
-        val m = MessagesHelper(null.toString(), thisUsername!!, user_string, message, "Just now", image)
-        messages!!.add(m)
-        scrollToBottom()
+        CoroutineScope(Main).launch {
+            val m = MessagesHelper(null.toString(), thisUsername!!, user_string, message, "Just now", image)
+            messages!!.add(m)
+            scrollToBottom()
+        }
     }
 
     private fun sendMessage(user_string: String, message: String) {
