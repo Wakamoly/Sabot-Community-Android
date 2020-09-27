@@ -117,11 +117,8 @@ class AccountSettingsFragment : Fragment() {
         closeAccount?.setOnClickListener {
             val dialogClickListener = DialogInterface.OnClickListener { _: DialogInterface?, which: Int ->
                 when (which) {
-                    DialogInterface.BUTTON_POSITIVE -> if (mCtx is FragmentContainer) {
-                        closeAccountAction()
-                    }
-                    DialogInterface.BUTTON_NEGATIVE -> {
-                    }
+                    DialogInterface.BUTTON_POSITIVE -> if (mCtx is FragmentContainer) { closeAccountAction() }
+                    DialogInterface.BUTTON_NEGATIVE -> { }
                 }
             }
             val builder = AlertDialog.Builder(mCtx, R.style.AlertDialogStyle)
@@ -332,7 +329,7 @@ class AccountSettingsFragment : Fragment() {
         val bio = textViewDescription!!.text.toString().trim { it <= ' ' }
         val nickname = textViewNickname!!.text.toString().trim { it <= ' ' }
         val username = SharedPrefManager.getInstance(mCtx!!)!!.username
-        val spinnertext = clanTagSpinner!!.selectedItem.toString()
+        val spinnertext: String = clanTagSpinner!!.selectedItem.toString()
         val finalspinnertext: String
         finalspinnertext = if (spinnertext != "None" && spinnertext != "null" && spinnertext.isNotEmpty()) {
             spinnertext.substring(1, spinnertext.length - 1)
@@ -425,6 +422,7 @@ class AccountSettingsFragment : Fragment() {
                 { response: String? ->
                     try {
                         val obj = JSONObject(response!!)
+                        println(response)
                         if (obj.optString("error") == "false") {
                             clanTagModelArrayList = ArrayList()
                             if (!obj.has("tags")) {
@@ -436,19 +434,21 @@ class AccountSettingsFragment : Fragment() {
                                     val dataobj = dataArray.getJSONObject(i)
                                     if (dataobj.getString("tag") != "") {
                                         clanTagModel.tag = "[" + dataobj.getString("tag") + "]"
-                                        clanTagModelArrayList!!.add(clanTagModel)
+                                        clanTagModelArrayList?.add(clanTagModel)
                                     }
                                 }
-                                for (i in clanTagModelArrayList!!.indices) {
+                                for (i in clanTagModelArrayList?.indices!!) {
                                     tags.add(clanTagModelArrayList!![i].tag!!)
+                                    //println("TAG ADDED: ${clanTagModelArrayList!![i].tag}")
                                 }
                                 tags.add("None")
                                 tags.add("[$currentTag]")
                                 val spinnerArrayAdapter = ArrayAdapter(mCtx!!, R.layout.spinner_item, tags)
                                 spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) // The drop down view
+                                clanTagSpinner?.adapter = spinnerArrayAdapter
                                 clanTagSpinner?.setSelection(getIndex(clanTagSpinner, "[$currentTag]"))
-                                spinnerProgress!!.visibility = View.GONE
-                                clanTagSpinner!!.visibility = View.VISIBLE
+                                spinnerProgress?.visibility = View.GONE
+                                clanTagSpinner?.visibility = View.VISIBLE
                             }
                         }
                     } catch (e: JSONException) {
