@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,10 +25,10 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.StringRequest
 import com.google.android.material.tabs.TabLayout
-import com.lucidsoftworksllc.sabotcommunity.DashSliderRequest
+import com.lucidsoftworksllc.sabotcommunity.others.DashSliderRequest
 import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.R.drawable
-import com.lucidsoftworksllc.sabotcommunity.SliderUtilsDash
+import com.lucidsoftworksllc.sabotcommunity.models.SliderUtilsDash
 import com.lucidsoftworksllc.sabotcommunity.activities.ChatActivity
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.adapters.DashCurrentPublicsAdapter
@@ -147,9 +146,11 @@ class DashboardFragment : Fragment() {
         followingPostsButton?.setOnClickListener { postsQueryButtonClicked(followingPostsButton) }
         allPostsButton?.setOnClickListener { postsQueryButtonClicked(allPostsButton) }
         filter = SharedPrefManager.getInstance(mContext!!)!!.currentPublics
+
         usersOnline()
         sendRequest()
         postsQueryButtonClicked(followingPostsButton)
+
         dashboardRefreshLayout?.setOnRefreshListener {
             adNotified!!.clear()
             val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
@@ -162,6 +163,7 @@ class DashboardFragment : Fragment() {
             dashboardRefreshLayout?.isRefreshing = false
             sliderboi?.requestFocus()
         }
+
         viewPagerAdapter = DashViewPagerAdapter(sliderImg!!, mContext!!)
         viewPager?.adapter = viewPagerAdapter
         viewPager?.addOnPageChangeListener(object : OnPageChangeListener {
@@ -170,11 +172,11 @@ class DashboardFragment : Fragment() {
                 val adID = sliderImg!![position]!!.sliderAdID
                 adViewed(adID!!)
             }
-
             override fun onPageScrollStateChanged(state: Int) {
                 dashboardRefreshLayout?.isEnabled = state != ViewPager.SCROLL_STATE_DRAGGING
             }
         })
+
         currentPublicsVP?.addOnPageChangeListener(object : OnPageChangeListener {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
             override fun onPageSelected(position: Int) {}
@@ -182,7 +184,9 @@ class DashboardFragment : Fragment() {
                 dashboardRefreshLayout?.isEnabled = state != ViewPager.SCROLL_STATE_DRAGGING
             }
         })
+
         setPlatformImage(filter)
+
         currentPublicsOptions?.setOnClickListener {
             val items = resources.getStringArray(R.array.platform_array_w_all)
             LovelyChoiceDialog(mContext)
@@ -200,6 +204,7 @@ class DashboardFragment : Fragment() {
                     }
                     .show()
         }
+
         hideKeyboardFrom(mContext, dashboardRootView)
         return dashboardRootView
     }
@@ -275,20 +280,11 @@ class DashboardFragment : Fragment() {
         usersOnlineThread.start()
     }
 
-    // start thread
-/*if (currentPublicsVP!=null){
-                    currentPublicsVP.notifyAll();
-                }*/
-    //create thread
     val currentPublics: Unit
         get() {
             val getCurrentPublicsThread: Thread = object : Thread() {
-                //create thread
                 override fun run() {
                     currentPublicsList!!.clear()
-                    /*if (currentPublicsVP!=null){
-           currentPublicsVP.notifyAll();
-       }*/
                     val jsonArrayRequest = JsonArrayRequest(Request.Method.GET, "$CURRENT_PUBLICS?filter=$filter&username=$username", null, { response: JSONArray ->
                         if (response.length() == 0) {
                             noCurrentPublics!!.visibility = View.VISIBLE
@@ -456,10 +452,6 @@ class DashboardFragment : Fragment() {
         loadDashboardFeedThread.start()
     }
 
-    /*@Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        return false;
-    }*/
     private fun setPlatformImage(item: String?) {
         when (item) {
             "Xbox" -> {
@@ -506,7 +498,7 @@ class DashboardFragment : Fragment() {
         if (click === allPostsButton) {
             dashboardfeedRecyclerList!!.clear()
             if (dashboardfeedadapter != null) {
-                dashboardfeedadapter!!.notifyDataSetChanged()
+                dashboardfeedadapter?.notifyDataSetChanged()
             }
             val colorFrom = ContextCompat.getColor(mContext!!, R.color.grey_80)
             val colorTo = ContextCompat.getColor(mContext!!, R.color.green)
@@ -541,7 +533,9 @@ class DashboardFragment : Fragment() {
             currentPage = 1
             loadDashboardFeed(currentPage, clicked)
         }
-    } /*private void clearBackStack() {
+    }
+
+    /*private void clearBackStack() {
         FragmentManager manager = requireActivity().getSupportFragmentManager();
         if (manager.getBackStackEntryCount() > 0) {
             FragmentManager.BackStackEntry first = manager.getBackStackEntryAt(0);

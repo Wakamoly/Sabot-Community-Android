@@ -4,15 +4,17 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.migration.Migration
+import com.lucidsoftworksllc.sabotcommunity.db.notifications.NotificationDao
+import com.lucidsoftworksllc.sabotcommunity.db.publics.PublicsDao
+import com.lucidsoftworksllc.sabotcommunity.db.publics.PublicsEntity
 
 @Database(
         entities = [PublicsEntity::class],
-        version = 1)
+        version = 2)
 abstract class SabotDatabase: RoomDatabase() {
 
     abstract fun getPublicsDao() : PublicsDao
-    //abstract fun getNotificationsDao() : NotificationsDao
+    abstract fun getNotificationsDao() : NotificationDao
     //abstract fun getMessagesDao() : MessagesDao
     //abstract fun getUserMessagesDao() : UserMessagesDao
     //abstract fun getTypedMessageDao() : TypedMessageDao

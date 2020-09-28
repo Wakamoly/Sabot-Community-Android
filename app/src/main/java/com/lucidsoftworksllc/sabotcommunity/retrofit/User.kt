@@ -1,4 +1,4 @@
-package com.lucidsoftworksllc.sabotcommunity
+package com.lucidsoftworksllc.sabotcommunity.retrofit
 
 import com.google.gson.annotations.SerializedName
 

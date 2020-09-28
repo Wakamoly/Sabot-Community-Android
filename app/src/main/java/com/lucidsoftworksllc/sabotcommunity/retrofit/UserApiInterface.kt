@@ -1,4 +1,4 @@
-package com.lucidsoftworksllc.sabotcommunity
+package com.lucidsoftworksllc.sabotcommunity.retrofit
 
 import retrofit2.Call
 import retrofit2.http.GET

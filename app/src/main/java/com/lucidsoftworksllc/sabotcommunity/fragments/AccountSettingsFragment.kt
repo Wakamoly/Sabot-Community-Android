@@ -329,7 +329,7 @@ class AccountSettingsFragment : Fragment() {
         val bio = textViewDescription!!.text.toString().trim { it <= ' ' }
         val nickname = textViewNickname!!.text.toString().trim { it <= ' ' }
         val username = SharedPrefManager.getInstance(mCtx!!)!!.username
-        val spinnertext: String = clanTagSpinner!!.selectedItem.toString()
+        val spinnertext: String = clanTagSpinner?.selectedItem.toString()
         val finalspinnertext: String
         finalspinnertext = if (spinnertext != "None" && spinnertext != "null" && spinnertext.isNotEmpty()) {
             spinnertext.substring(1, spinnertext.length - 1)

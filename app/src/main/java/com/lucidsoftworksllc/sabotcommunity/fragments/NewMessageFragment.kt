@@ -17,6 +17,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.lucidsoftworksllc.sabotcommunity.*
 import com.lucidsoftworksllc.sabotcommunity.adapters.NewMessageSearchAdapter
 import com.lucidsoftworksllc.sabotcommunity.models.SearchRecycler
+import com.lucidsoftworksllc.sabotcommunity.retrofit.User
+import com.lucidsoftworksllc.sabotcommunity.retrofit.UserApiInterface
+import com.lucidsoftworksllc.sabotcommunity.retrofit.UsersApiClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

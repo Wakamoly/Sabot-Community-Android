@@ -1,4 +1,4 @@
-package com.lucidsoftworksllc.sabotcommunity.db
+package com.lucidsoftworksllc.sabotcommunity.db.publics
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

@@ -13,7 +13,7 @@
         android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name=".others.ACRAApplication"
+        android:name=".others.SabotApplication"
         android:requestLegacyExternalStorage="true">
 
         <activity

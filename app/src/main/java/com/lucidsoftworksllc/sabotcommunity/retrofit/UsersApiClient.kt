@@ -1,4 +1,4 @@
-package com.lucidsoftworksllc.sabotcommunity
+package com.lucidsoftworksllc.sabotcommunity.retrofit
 
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import retrofit2.Retrofit

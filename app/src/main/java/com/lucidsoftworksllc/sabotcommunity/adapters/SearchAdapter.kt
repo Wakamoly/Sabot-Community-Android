@@ -18,7 +18,7 @@ import com.bumptech.glide.Glide
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
-import com.lucidsoftworksllc.sabotcommunity.User
+import com.lucidsoftworksllc.sabotcommunity.retrofit.User
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.fragments.ClanFragment
 import com.lucidsoftworksllc.sabotcommunity.fragments.FragmentProfile
