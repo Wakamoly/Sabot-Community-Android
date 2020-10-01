@@ -13,5 +13,6 @@ data class NotificationDataModel (
         val profile_pic: String,
         val nickname: String,
         val verified: String,
-        val last_online: String
+        val last_online: String,
+        val type: String
 )

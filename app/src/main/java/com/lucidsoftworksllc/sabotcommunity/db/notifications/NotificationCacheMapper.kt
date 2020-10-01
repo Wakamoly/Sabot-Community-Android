@@ -21,7 +21,8 @@ constructor(): EntityMapper<NotificationCacheEntity, NotificationDataModel> {
                 profile_pic = entity.profile_pic,
                 nickname = entity.nickname,
                 verified = entity.verified,
-                last_online = entity.last_online
+                last_online = entity.last_online,
+                type = entity.type
         )
     }
 
@@ -39,7 +40,8 @@ constructor(): EntityMapper<NotificationCacheEntity, NotificationDataModel> {
                 profile_pic = domainModel.profile_pic,
                 nickname = domainModel.nickname,
                 verified = domainModel.verified,
-                last_online = domainModel.last_online
+                last_online = domainModel.last_online,
+                type = domainModel.type
         )
     }
 

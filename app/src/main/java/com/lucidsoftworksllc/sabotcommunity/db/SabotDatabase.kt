@@ -4,12 +4,13 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.lucidsoftworksllc.sabotcommunity.db.notifications.NotificationCacheEntity
 import com.lucidsoftworksllc.sabotcommunity.db.notifications.NotificationDao
 import com.lucidsoftworksllc.sabotcommunity.db.publics.PublicsDao
 import com.lucidsoftworksllc.sabotcommunity.db.publics.PublicsEntity
 
 @Database(
-        entities = [PublicsEntity::class],
+        entities = [PublicsEntity::class, NotificationCacheEntity::class],
         version = 2)
 abstract class SabotDatabase: RoomDatabase() {
 
@@ -20,6 +21,7 @@ abstract class SabotDatabase: RoomDatabase() {
     //abstract fun getTypedMessageDao() : TypedMessageDao
 
     companion object {
+        val DATABASE_NAME: String = "sabotdatabase"
         @Volatile private var instance : SabotDatabase? = null
         private val LOCK = Any()
 

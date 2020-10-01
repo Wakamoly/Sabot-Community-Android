@@ -42,6 +42,9 @@ data class NotificationNetworkEntity (
         @Expose val verified: String,
 
         @SerializedName("last_online")
-        @Expose val last_online: String
+        @Expose val last_online: String,
+
+        @SerializedName("type")
+        @Expose val type: String
 
 )
