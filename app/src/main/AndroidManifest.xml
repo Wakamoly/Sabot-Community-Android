@@ -16,6 +16,12 @@
         android:name=".others.ACRAApplication"
         android:requestLegacyExternalStorage="true">
 
+        <provider android:grantUriPermissions="true" android:exported="false" android:authorities="${applicationId}.provider" android:name="androidx.core.content.FileProvider">
+
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/provider_paths"/>
+
+        </provider>
+
         <activity
             android:name=".activities.LoginActivity"
             android:screenOrientation="portrait"
