@@ -48,6 +48,7 @@ import com.lucidsoftworksllc.sabotcommunity.others.CoFragment
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.others.Constants.ROOT_URL
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
+import com.lucidsoftworksllc.sabotcommunity.others.toastLong
 import com.theartofdev.edmodo.cropper.CropImage
 import com.yarolegovich.lovelydialog.LovelyStandardDialog
 import de.hdodenhof.circleimageview.CircleImageView
@@ -629,7 +630,14 @@ class MessageGroupFragment : CoFragment() {
                             e.printStackTrace()
                         }
                     }
-                    imgAttachment!!.setImageBitmap(bitmap1)
+
+                    if (Build.VERSION.SDK_INT < 29){
+                        imgAttachment!!.setImageBitmap(bitmap1)
+                    }else{
+                        imgAttachment?.setImageResource(R.drawable.icons8_question_mark_64)
+                        activity?.toastLong("Cannot display image cropped! (Android 10+ temporary issue, upload should work as usual.)")
+                    }
+
                     imageToUpload = bitmap1
                 } catch (e: IOException) {
                     e.printStackTrace()

@@ -47,6 +47,7 @@ import com.lucidsoftworksllc.sabotcommunity.adapters.ProfilenewsAdapter
 import com.lucidsoftworksllc.sabotcommunity.models.ProfilenewsRecycler
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
+import com.lucidsoftworksllc.sabotcommunity.others.toastLong
 import com.theartofdev.edmodo.cropper.CropImage
 import org.json.JSONArray
 import org.json.JSONException
@@ -798,7 +799,14 @@ class ClanFragment : Fragment() {
                             e.printStackTrace()
                         }
                     }
-                    imageUploadBtn2!!.setImageBitmap(bitmap1)
+
+                    if (Build.VERSION.SDK_INT < 29){
+                        imageUploadBtn2!!.setImageBitmap(bitmap1)
+                    }else{
+                        imageUploadBtn2?.setImageResource(R.drawable.icons8_question_mark_64)
+                        activity?.toastLong("Cannot display image cropped! (Android 10+ temporary issue, upload should work as usual.)")
+                    }
+
                     imageToUpload = bitmap1
                 } catch (e: IOException) {
                     e.printStackTrace()
