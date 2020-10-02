@@ -16,8 +16,8 @@ import com.android.volley.toolbox.StringRequest
 import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.adapters.PublicsRoomAdapter
-import com.lucidsoftworksllc.sabotcommunity.db.PublicsDao
-import com.lucidsoftworksllc.sabotcommunity.db.PublicsEntity
+import com.lucidsoftworksllc.sabotcommunity.db.publics.PublicsDao
+import com.lucidsoftworksllc.sabotcommunity.db.publics.PublicsEntity
 import com.lucidsoftworksllc.sabotcommunity.db.SabotDatabase
 import com.lucidsoftworksllc.sabotcommunity.others.*
 import com.yarolegovich.lovelydialog.LovelyChoiceDialog

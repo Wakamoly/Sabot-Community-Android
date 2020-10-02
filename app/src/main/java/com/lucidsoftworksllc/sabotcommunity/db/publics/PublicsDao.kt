@@ -1,4 +1,4 @@
-package com.lucidsoftworksllc.sabotcommunity.db
+package com.lucidsoftworksllc.sabotcommunity.db.publics
 
 import androidx.room.*
 import androidx.sqlite.db.SimpleSQLiteQuery

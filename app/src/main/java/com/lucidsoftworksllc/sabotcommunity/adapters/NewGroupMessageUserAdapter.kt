@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.R
-import com.lucidsoftworksllc.sabotcommunity.User
+import com.lucidsoftworksllc.sabotcommunity.retrofit.User
 import de.hdodenhof.circleimageview.CircleImageView
 import java.util.*
 

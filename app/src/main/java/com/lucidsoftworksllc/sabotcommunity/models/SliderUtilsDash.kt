@@ -1,4 +1,4 @@
-package com.lucidsoftworksllc.sabotcommunity
+package com.lucidsoftworksllc.sabotcommunity.models
 
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 

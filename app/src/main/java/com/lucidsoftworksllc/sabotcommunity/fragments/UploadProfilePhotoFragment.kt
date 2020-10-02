@@ -31,6 +31,7 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager.Companion.getInstance
+import com.lucidsoftworksllc.sabotcommunity.others.toastLong
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import org.json.JSONException
@@ -87,7 +88,14 @@ class UploadProfilePhotoFragment : Fragment() {
                             e.printStackTrace()
                         }
                     }
-                    imageView!!.setImageBitmap(bitmap1)
+
+                    if (Build.VERSION.SDK_INT < 29){
+                        imageView!!.setImageBitmap(bitmap1)
+                    }else{
+                        imageView?.setImageResource(R.drawable.icons8_question_mark_64)
+                        activity?.toastLong("Cannot display image cropped! (Android 10+ temporary issue, upload should work as usual.)")
+                    }
+
                     buttonUpload!!.visibility = View.VISIBLE
                     buttonUpload!!.setOnClickListener {
                         uploadImage(bitmap1!!)

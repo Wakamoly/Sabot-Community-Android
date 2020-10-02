@@ -19,7 +19,7 @@ import com.bumptech.glide.request.target.Target
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
-import com.lucidsoftworksllc.sabotcommunity.SliderUtilsDash
+import com.lucidsoftworksllc.sabotcommunity.models.SliderUtilsDash
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.fragments.FragmentPublicsCat
 import com.lucidsoftworksllc.sabotcommunity.fragments.MerchFragment

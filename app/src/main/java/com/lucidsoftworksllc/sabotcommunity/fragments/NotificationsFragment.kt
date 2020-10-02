@@ -20,11 +20,13 @@ import com.lucidsoftworksllc.sabotcommunity.models.NotificationsRecycler
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.others.PaginationOnScroll
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
+import dagger.hilt.android.AndroidEntryPoint
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
 
+@AndroidEntryPoint
 class NotificationsFragment : Fragment() {
     private var currentPage = PaginationOnScroll.PAGE_START
     private var isLastPage = false

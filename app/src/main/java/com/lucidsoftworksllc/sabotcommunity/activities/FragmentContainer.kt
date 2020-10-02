@@ -40,6 +40,7 @@ import com.paypal.android.sdk.payments.PayPalConfiguration
 import com.paypal.android.sdk.payments.PaymentActivity
 import com.paypal.android.sdk.payments.PaymentConfirmation
 import com.yarolegovich.lovelydialog.LovelyStandardDialog
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -48,6 +49,7 @@ import org.json.JSONObject
 import java.lang.Runnable
 import java.util.*
 
+@AndroidEntryPoint
 class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
     private var mDrawerLayout: DrawerLayout? = null
     private var navView: BottomNavigationView? = null
