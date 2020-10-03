@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 class NotificationViewModel
 @ViewModelInject
 constructor(
-        private val mainRepository: NotificationRepository,
+        private val notiRepository: NotificationRepository,
         @Assisted private val savedStateHandle: SavedStateHandle
 ): ViewModel(){
 
@@ -25,7 +25,7 @@ constructor(
         viewModelScope.launch {
             when(mainStateEvent){
                 is MainStateEvent.GetNotiEvents -> {
-                    mainRepository.getNotification(mContext)
+                    notiRepository.getNotification(mContext)
                             .onEach { dataState ->
                                 _dataState.value = dataState
                             }

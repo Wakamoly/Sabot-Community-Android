@@ -1,15 +1,17 @@
 package com.lucidsoftworksllc.sabotcommunity.db.notifications
 
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
-import retrofit2.http.Query
 
 interface NotificationRetrofit {
 
+    @FormUrlEncoded
     @POST("get_notifications.php")
-    suspend fun get(
-            @Query("page") page: Int?,
-            @Query("items") items: Int?,
-            @Query("username") username: String?,
-            @Query("userid") userid: String?
+    suspend fun getNotifications(
+            @Field("page") page: Int?,
+            @Field("items") items: Int?,
+            @Field("username") username: String?,
+            @Field("userid") userid: String?
     ): List<NotificationNetworkEntity>
 }

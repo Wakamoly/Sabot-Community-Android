@@ -3,9 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.lucidsoftworksllc.sabotcommunity">
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <application
-        android:launchMode="singleTop"
+        android:launchMode="standard"
         android:allowBackup="true"
         android:hardwareAccelerated="false"
         android:icon="@mipmap/ic_launcher_white"
@@ -13,13 +17,13 @@
         android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name=".others.SabotApplication"
-        android:requestLegacyExternalStorage="true">
+        android:name=".others.SabotApplication">
+
+
+<!--        android:requestLegacyExternalStorage="true"-->
 
         <provider android:grantUriPermissions="true" android:exported="false" android:authorities="${applicationId}.provider" android:name="androidx.core.content.FileProvider">
-
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/provider_paths"/>
-
         </provider>
 
         <activity
@@ -52,7 +56,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.ForgotPassActivity" />
-        <!--<activity android:name=".Walkthrough" />-->
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
@@ -69,9 +72,5 @@
         <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat"/>
     </application>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.VIBRATE" />
 
 </manifest>

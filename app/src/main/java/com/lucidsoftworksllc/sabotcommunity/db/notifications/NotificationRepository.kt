@@ -19,15 +19,29 @@ constructor(
 ){
     suspend fun getNotification(mContext: Context): Flow<DataState<List<NotificationDataModel>>> = flow {
         emit(DataState.Loading)
-        delay(1000)
         try {
-            val networkNotis = notificationRetrofit.get(1,200,mContext.deviceUsername,mContext.deviceUserID)
-            val notis = networkMapper.mapFromEntityList(networkNotis)
-            for (noti in notis){
-                notificationDao.insert(cacheMapper.mapToEntity(noti))
-            }
             val cachedNotis = notificationDao.get()
-            emit(DataState.Success(cacheMapper.mapFromEntityList(cachedNotis)))
+            if (cachedNotis.isEmpty()){
+                val networkNotis = notificationRetrofit.getNotifications(1,200,mContext.deviceUsername,mContext.deviceUserID)
+                val notis = networkMapper.mapFromEntityList(networkNotis)
+                for (noti in notis){
+                    notificationDao.insert(cacheMapper.mapToEntity(noti))
+                }
+                emit(DataState.Success(cacheMapper.mapFromEntityList(notificationDao.get())))
+            }else{
+                emit(DataState.Success(cacheMapper.mapFromEntityList(cachedNotis)))
+                val networkNotis = notificationRetrofit.getNotifications(1,200,mContext.deviceUsername,mContext.deviceUserID)
+                val notis = networkMapper.mapFromEntityList(networkNotis)
+                for (noti in notis){
+                    notificationDao.insert(cacheMapper.mapToEntity(noti))
+                }
+                val newCachedNotis = notificationDao.getUnopened()
+                if (newCachedNotis.isNotEmpty()){
+                    emit(DataState.UpdateSuccess(cacheMapper.mapFromEntityList(newCachedNotis)))
+                }
+
+            }
+
         }catch (e: Exception){
             emit(DataState.Error(e))
         }

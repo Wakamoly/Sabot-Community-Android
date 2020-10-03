@@ -39,7 +39,6 @@ class PublicsFragment : CoFragment() {
     private var isLoadingFrag = false
     private var currentPage = PaginationOnScroll.PAGE_START
     private val pageSize = PaginationOnScroll.PAGE_SIZE
-    //private var publicsRecyclerList: MutableList<PublicsRecycler>? = null
     private var publicsPlatformFilter: ImageView? = null
     private var publicsNewGame: ImageView? = null
     private var username: String? = null

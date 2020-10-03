@@ -10,7 +10,7 @@ fun Context.toastLong(message:String) =
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
 
 val Context.deviceUserID: String?
-    get() { return SharedPrefManager.getInstance(this)!!.username }
+    get() { return SharedPrefManager.getInstance(this)!!.userID }
 
 val Context.deviceUsername: String?
     get() { return SharedPrefManager.getInstance(this)!!.username }

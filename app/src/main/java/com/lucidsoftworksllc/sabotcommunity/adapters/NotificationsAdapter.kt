@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -15,14 +17,13 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.balysv.materialripple.MaterialRippleLayout
 import com.bumptech.glide.Glide
-import com.lucidsoftworksllc.sabotcommunity.*
+import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.db.notifications.NotificationDataModel
 import com.lucidsoftworksllc.sabotcommunity.fragments.ClanFragment
 import com.lucidsoftworksllc.sabotcommunity.fragments.FragmentProfile
 import com.lucidsoftworksllc.sabotcommunity.fragments.ProfilePostFragment
 import com.lucidsoftworksllc.sabotcommunity.fragments.PublicsTopicFragment
-import com.lucidsoftworksllc.sabotcommunity.models.NotificationsRecycler
 import com.lucidsoftworksllc.sabotcommunity.others.BaseViewHolder
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
@@ -30,6 +31,7 @@ import de.hdodenhof.circleimageview.CircleImageView
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
+
 
 class NotificationsAdapter(private val notifications: MutableList<NotificationDataModel>, private val context: Context) : RecyclerView.Adapter<BaseViewHolder>() {
     private var isLoaderVisible = false
@@ -67,9 +69,14 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationDa
         notifyDataSetChanged()
     }
 
+    fun addItemsToTop(items: List<NotificationDataModel>) {
+        notifications.addAll(0, items)
+        notifyDataSetChanged()
+    }
+
     fun addLoading() {
         isLoaderVisible = true
-        notifications.add(NotificationDataModel(0, null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString()))
+        notifications.add(NotificationDataModel(0, null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString()))
         notifyItemInserted(notifications.size - 1)
     }
 
@@ -80,6 +87,13 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationDa
             //val item = getItem(position)
             notifications.removeAt(position)
             notifyItemRemoved(position)
+        }
+    }
+
+    private fun setAnimation(viewToAnimate: View, position: Int) {
+        if (position >= 0) {
+            val animation: Animation = AnimationUtils.loadAnimation(context, R.anim.slide_in)
+            viewToAnimate.startAnimation(animation)
         }
     }
 
@@ -242,6 +256,7 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationDa
                     }
                 }
             }
+            setAnimation(itemView, position)
         }
 
         init {

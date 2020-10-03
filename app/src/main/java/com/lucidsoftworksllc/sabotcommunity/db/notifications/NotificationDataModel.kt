@@ -14,5 +14,6 @@ data class NotificationDataModel (
         val nickname: String,
         val verified: String,
         val last_online: String,
-        val type: String
+        val type: String,
+        val deleted: String
 )

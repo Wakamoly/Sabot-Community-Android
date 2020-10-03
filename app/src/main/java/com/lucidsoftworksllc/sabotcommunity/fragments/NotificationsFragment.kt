@@ -89,6 +89,11 @@ class NotificationsFragment : Fragment() {
                     println("Loading!")
                     displayProgressbar(true)
                 }
+                is DataState.UpdateSuccess<List<NotificationDataModel>> -> {
+                    println("Update Success!")
+                    displayProgressbar(false)
+                    appendNotifications(dataState.data)
+                }
             }
         })
     }
@@ -97,7 +102,7 @@ class NotificationsFragment : Fragment() {
         none?.visibility = View.VISIBLE
         if(message != null){
             println("Error message: $message")
-            mContext?.toastShort("Error!: $message")
+            mContext?.toastLong("Error!: $message")
         }else{
             mContext?.toastShort("Error!")
         }
@@ -110,34 +115,15 @@ class NotificationsFragment : Fragment() {
 
     private fun appendNotifications(notis: List<NotificationDataModel>){
         println("Appending notifications")
-        //val items = ArrayList<NotificationsRecycler>()
         if (notis.isEmpty()) {
             none!!.visibility = View.VISIBLE
             progressBar!!.visibility = View.GONE
         }
-        /*for (noti in notis) {
-            val id = noti.id
-            val userTo = noti.user_to
-            val userFrom = noti.user_from
-            if (SharedPrefManager.getInstance(mContext!!)!!.isUserBlocked(userFrom)) continue
-            val message = noti.message
-            val type = noti.type
-            val link = noti.link
-            val datetime = noti.datetime
-            val opened = noti.opened
-            val viewed = noti.viewed
-            val userId = noti.user_id
-            val profilePic = notificationsObject.getString("profile_pic")
-            val nickname = notificationsObject.getString("nickname")
-            val verified = notificationsObject.getString("verified")
-            val lastOnline = notificationsObject.getString("last_online")
-            val notificationsResult = NotificationsRecycler(id, userTo, userFrom, message, type, link, datetime, opened, viewed, userId, profilePic, nickname, verified, lastOnline)
-            items.add(notificationsResult)
-        }*/
         notiLayout!!.visibility = View.VISIBLE
         if (currentPage != PaginationOnScroll.PAGE_START) adapter?.removeLoading()
         progressBar!!.visibility = View.GONE
-        adapter?.addItems(notis)
+        adapter?.addItemsToTop(notis)
+        //recyclerView?.scheduleLayoutAnimation()
         if (notis.size == pageSize) {
             adapter!!.addLoading()
         } else {

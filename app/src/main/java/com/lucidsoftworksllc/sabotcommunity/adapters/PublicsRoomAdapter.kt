@@ -32,10 +32,7 @@ import org.json.JSONObject
 import java.util.HashMap
 
 class PublicsRoomAdapter(private val mCtx: Context, private val games: MutableList<PublicsEntity>) : RecyclerView.Adapter<BaseViewHolder>() {
-
-    //class GameViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     private var isLoaderVisible = false
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (viewType) {
             VIEW_TYPE_NORMAL -> ViewHolder(
@@ -200,6 +197,7 @@ class PublicsRoomAdapter(private val mCtx: Context, private val games: MutableLi
                     (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
             }
+            setAnimation(itemView,position)
         }
 
     }
@@ -231,6 +229,13 @@ class PublicsRoomAdapter(private val mCtx: Context, private val games: MutableLi
 
     private fun getItem(position: Int): PublicsEntity {
         return games[position]
+    }
+
+    private fun setAnimation(viewToAnimate: View, position: Int) {
+        if (position >= 0) {
+            val animation: Animation = AnimationUtils.loadAnimation(mCtx, R.anim.slide_in)
+            viewToAnimate.startAnimation(animation)
+        }
     }
 
     companion object {

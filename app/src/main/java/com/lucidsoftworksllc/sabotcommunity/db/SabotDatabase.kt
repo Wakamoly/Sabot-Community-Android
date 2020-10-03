@@ -11,7 +11,7 @@ import com.lucidsoftworksllc.sabotcommunity.db.publics.PublicsEntity
 
 @Database(
         entities = [PublicsEntity::class, NotificationCacheEntity::class],
-        version = 2)
+        version = 4)
 abstract class SabotDatabase: RoomDatabase() {
 
     abstract fun getPublicsDao() : PublicsDao

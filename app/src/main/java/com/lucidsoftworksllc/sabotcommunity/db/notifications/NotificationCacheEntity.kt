@@ -47,6 +47,9 @@ data class NotificationCacheEntity (
         @ColumnInfo(name = "verified")
         val verified: String,
 
-        val last_online: String = "no"
+        val last_online: String = "no",
+
+        @ColumnInfo(name = "deleted")
+        val deleted: String
 
 )

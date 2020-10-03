@@ -536,7 +536,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
         }
     }
 
-    private suspend fun currentUpdate(){
+    private fun currentUpdate(){
             val stringRequest: StringRequest = object : StringRequest(Method.POST, GET_CURRENT_VERSION, Response.Listener { response: String? ->
                 try {
                     val obj = JSONObject(response!!)
@@ -552,6 +552,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
                                         .setPositiveButton(R.string.yes) {
                                             val uri = Uri.parse("https://play.google.com/store/apps/details?id=com.lucidsoftworksllc.sabotcommunity")
                                             val intent = Intent(Intent.ACTION_VIEW, uri)
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                             applicationContext.startActivity(intent)
                                         }
                                         .setNegativeButton(R.string.no, null)
