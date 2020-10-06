@@ -65,7 +65,27 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationDa
     }
 
     fun addItems(items: List<NotificationDataModel>) {
-        notifications.addAll(items)
+        if (notifications.isEmpty()){
+            notifications.addAll(items)
+        }else{
+            for (item in items.indices){
+                var addNew = true
+                for (noti in notifications.indices){
+                    if (items[item].id == notifications[noti].id){
+                        if (items[item].deleted == "yes" || notifications[noti].deleted == "yes"){
+                            notifications.removeAt(noti)
+                        }else{
+                            notifications[noti] = items[item]
+                        }
+                        addNew = false
+                        break
+                    }
+                }
+                if (addNew){
+                    notifications.add(0, items[item])
+                }
+            }
+        }
         notifyDataSetChanged()
     }
 

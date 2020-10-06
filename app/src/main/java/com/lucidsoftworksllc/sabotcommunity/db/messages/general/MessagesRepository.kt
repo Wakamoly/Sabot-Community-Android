@@ -35,7 +35,6 @@ constructor(
                 val messages = networkMapper.mapFromEntityList(networkMessages)
                 for (message in messages){
                     if (message.type != "group"){
-                        //val queryString = "SELECT id FROM messages_general WHERE sent_by = '${message.sent_by}' AND type != 'group' LIMIT 1"
                         val rowExists = messagesDao.isRowExist(message.sent_by)
                         if (rowExists.isNotEmpty()){
                             message.id = rowExists[0].id
@@ -46,7 +45,6 @@ constructor(
                             println("INSERTING USER NEW ID: ${message.id}, ${message.sent_by}")
                         }
                     }else{
-                        //val queryString = "SELECT id FROM messages_general WHERE group_id = ${message.group_id} AND type = 'group' LIMIT 1"
                         val rowExists = messagesDao.isRowExistGroup(message.group_id)
                         if (rowExists.isNotEmpty()){
                             message.id = rowExists[0].id

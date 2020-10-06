@@ -35,7 +35,7 @@ constructor(
                 for (noti in notis){
                     notificationDao.insert(cacheMapper.mapToEntity(noti))
                 }
-                val newCachedNotis = notificationDao.getUnopened()
+                val newCachedNotis = notificationDao.get()
                 if (newCachedNotis.isNotEmpty()){
                     emit(DataState.UpdateSuccess(cacheMapper.mapFromEntityList(newCachedNotis)))
                 }

@@ -14,6 +14,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
@@ -115,6 +116,7 @@ class NotificationsFragment : Fragment() {
 
     private fun appendNotifications(notis: List<NotificationDataModel>){
         println("Appending notifications")
+        (recyclerView?.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         if (notis.isEmpty()) {
             none?.visibility = View.VISIBLE
             progressBar?.visibility = View.GONE
@@ -122,7 +124,7 @@ class NotificationsFragment : Fragment() {
         notiLayout!!.visibility = View.VISIBLE
         if (currentPage != PaginationOnScroll.PAGE_START) adapter?.removeLoading()
         progressBar!!.visibility = View.GONE
-        adapter?.addItemsToTop(notis)
+        adapter?.addItems(notis)
         //recyclerView?.scheduleLayoutAnimation()
         if (notis.size == pageSize) {
             adapter!!.addLoading()

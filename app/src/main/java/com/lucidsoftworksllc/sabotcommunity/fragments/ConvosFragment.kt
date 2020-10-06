@@ -133,7 +133,7 @@ class ConvosFragment : Fragment() {
     }
 
     private fun appendMessages(messages: List<MessagesDataModel>){
-        println("Appending notifications")
+        println("Appending messages")
         if (messages.isEmpty()) {
             noPosts?.visibility = View.VISIBLE
             progressBar?.visibility = View.GONE
