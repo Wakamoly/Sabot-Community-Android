@@ -141,7 +141,7 @@ class ConvosFragment : Fragment() {
         //notiLayout!!.visibility = View.VISIBLE
         //if (currentPage != PaginationOnScroll.PAGE_START) adapter?.removeLoading()
         progressBar!!.visibility = View.GONE
-        adapter?.addItemsToTop(messages)
+        adapter?.addItems(messages)
         //recyclerView?.scheduleLayoutAnimation()
         /*if (messages.size == pageSize) {
             adapter!!.addLoading()

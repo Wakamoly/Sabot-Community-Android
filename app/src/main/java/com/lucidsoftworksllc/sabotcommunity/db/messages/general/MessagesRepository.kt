@@ -27,39 +27,39 @@ constructor(
                     messagesDao.insert(cacheMapper.mapToEntity(message))
                 }
                 messagesDao.setAllLoaded()
+                val newCachedMessages = messagesDao.get()
+                emit(DataState.UpdateSuccess(cacheMapper.mapFromEntityList(newCachedMessages)))
             }else{
                 emit(DataState.Success(cacheMapper.mapFromEntityList(cachedMessages)))
                 val networkMessages = messagesRetrofit.getMessages(mContext.deviceUsername,mContext.deviceUserID)
                 val messages = networkMapper.mapFromEntityList(networkMessages)
                 for (message in messages){
                     if (message.type != "group"){
-                        val queryString = "SELECT id FROM messages_general WHERE user_from = '${message.user_from}' AND type != 'group' LIMIT 1"
-                        val rowID = messagesDao.isRowExist(SimpleSQLiteQuery(queryString))
-                        println("ROWID: $rowID")
-                        if (rowID > 0){
-                            message.id = rowID
+                        //val queryString = "SELECT id FROM messages_general WHERE sent_by = '${message.sent_by}' AND type != 'group' LIMIT 1"
+                        val rowExists = messagesDao.isRowExist(message.sent_by)
+                        if (rowExists.isNotEmpty()){
+                            message.id = rowExists[0].id
                             messagesDao.updateRow(cacheMapper.mapToEntity(message))
-                            println("UPDATING GROUP ROW $rowID, message.id: ${message.id}")
+                            println("UPDATING USER ROW message.id: ${message.id}, ${message.sent_by}")
                         }else {
                             messagesDao.insert(cacheMapper.mapToEntity(message))
-                            println("INSERTING GROUP NEW ID: ${message.id}")
+                            println("INSERTING USER NEW ID: ${message.id}, ${message.sent_by}")
                         }
                     }else{
-                        val queryString = "SELECT id FROM messages_general WHERE group_id = ${message.group_id} AND type = 'group' LIMIT 1"
-                        val rowID = messagesDao.isRowExist(SimpleSQLiteQuery(queryString))
-                        println("ROWID: $rowID")
-                        if (rowID > 0){
-                            message.id = rowID
+                        //val queryString = "SELECT id FROM messages_general WHERE group_id = ${message.group_id} AND type = 'group' LIMIT 1"
+                        val rowExists = messagesDao.isRowExistGroup(message.group_id)
+                        if (rowExists.isNotEmpty()){
+                            message.id = rowExists[0].id
                             messagesDao.updateRow(cacheMapper.mapToEntity(message))
-                            println("UPDATING USER ROW $rowID, message.id: ${message.id}")
+                            println("UPDATING GROUP ROW message.id: ${message.id}, ${message.group_id}")
                         }else {
                             messagesDao.insert(cacheMapper.mapToEntity(message))
-                            println("INSERTING USER NEW ID: ${message.id}")
+                            println("INSERTING GROUP NEW ID: ${message.id}, ${message.group_id}")
                         }
                     }
 
                 }
-                val newCachedMessages = messagesDao.getUnopened()
+                val newCachedMessages = messagesDao.get()
                 messagesDao.setAllLoaded()
                 if (newCachedMessages.isNotEmpty()){
                     emit(DataState.UpdateSuccess(cacheMapper.mapFromEntityList(newCachedMessages)))

@@ -23,7 +23,7 @@ import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import com.lucidsoftworksllc.sabotcommunity.activities.ChatActivity
 import com.lucidsoftworksllc.sabotcommunity.db.messages.general.MessagesDataModel
-import com.lucidsoftworksllc.sabotcommunity.db.notifications.NotificationDataModel
+import kotlin.collections.indices
 import com.lucidsoftworksllc.sabotcommunity.fragments.MessageFragment
 import com.lucidsoftworksllc.sabotcommunity.fragments.MessageGroupFragment
 import de.hdodenhof.circleimageview.CircleImageView
@@ -151,7 +151,31 @@ class ConvosThreadAdapter(private val mCtx: Context, private val convosList: Mut
     }
 
     fun addItems(items: List<MessagesDataModel>) {
-        convosList.addAll(items)
+        if (convosList.isEmpty()){
+            convosList.addAll(items)
+        }else{
+            for (item in items.indices){
+                var addNew = true
+                for (convo in convosList.indices){
+                    if (convosList[convo].type == "user"){
+                        if (items[item].sent_by == convosList[convo].sent_by){
+                            convosList[convo] = items[item]
+                            addNew = false
+                            break
+                        }
+                    }else if (convosList[convo].type == "group"){
+                        if (items[item].group_id == convosList[convo].group_id){
+                            convosList[convo] = items[item]
+                            addNew = false
+                            break
+                        }
+                    }
+                }
+                if (addNew){
+                    convosList.add(0, items[item])
+                }
+            }
+        }
         notifyDataSetChanged()
     }
 

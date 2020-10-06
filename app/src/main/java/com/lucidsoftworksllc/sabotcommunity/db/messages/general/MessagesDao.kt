@@ -18,8 +18,14 @@ interface MessagesDao {
     @Query("UPDATE messages_general SET loaded = 1, viewed = 'yes' WHERE loaded = 0 AND viewed = 'no'")
     suspend fun setAllLoaded()
 
-    @RawQuery
-    suspend fun isRowExist(query: SimpleSQLiteQuery) : Int
+    @Query("SELECT * FROM messages_general WHERE sent_by = :sent_by AND type != 'group' LIMIT 1")
+    suspend fun isRowExist(sent_by: String) : List<MessagesCacheEntity>
+
+    @Query("SELECT * FROM messages_general WHERE group_id = :group_id AND type = 'group' LIMIT 1")
+    suspend fun isRowExistGroup(group_id: Int) : List<MessagesCacheEntity>
+
+    /*@RawQuery
+    suspend fun isRowExist(query: SimpleSQLiteQuery) : Int*/
 
     @RawQuery
     suspend fun getRow(query: SimpleSQLiteQuery) : Boolean
