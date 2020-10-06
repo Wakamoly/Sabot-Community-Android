@@ -1,6 +1,7 @@
 package com.lucidsoftworksllc.sabotcommunity.fragments
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -8,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,11 +23,9 @@ import com.lucidsoftworksllc.sabotcommunity.adapters.NotificationsAdapter
 import com.lucidsoftworksllc.sabotcommunity.db.notifications.MainStateEvent
 import com.lucidsoftworksllc.sabotcommunity.db.notifications.NotificationDataModel
 import com.lucidsoftworksllc.sabotcommunity.db.notifications.NotificationViewModel
-import com.lucidsoftworksllc.sabotcommunity.models.NotificationsRecycler
 import com.lucidsoftworksllc.sabotcommunity.others.*
 import com.lucidsoftworksllc.sabotcommunity.util.DataState
 import dagger.hilt.android.AndroidEntryPoint
-import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
@@ -116,8 +116,8 @@ class NotificationsFragment : Fragment() {
     private fun appendNotifications(notis: List<NotificationDataModel>){
         println("Appending notifications")
         if (notis.isEmpty()) {
-            none!!.visibility = View.VISIBLE
-            progressBar!!.visibility = View.GONE
+            none?.visibility = View.VISIBLE
+            progressBar?.visibility = View.GONE
         }
         notiLayout!!.visibility = View.VISIBLE
         if (currentPage != PaginationOnScroll.PAGE_START) adapter?.removeLoading()
@@ -207,12 +207,11 @@ class NotificationsFragment : Fragment() {
                         try {
                             val obj = JSONObject(response!!)
                             if (!obj.getBoolean("error")) {
-                                val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
-                                if (currentFragment is NotificationsFragment) {
-                                    val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                                    fragTransaction.detach(currentFragment)
-                                    fragTransaction.attach(currentFragment)
-                                    fragTransaction.commit()
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                    (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
+                                    (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
+                                } else {
+                                    (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
                                 }
                                 notificationSwipe?.isRefreshing = false
                             } else {
@@ -260,12 +259,11 @@ class NotificationsFragment : Fragment() {
 
 
         notificationSwipe?.setOnRefreshListener {
-            val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
-            if (currentFragment is NotificationsFragment) {
-                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                fragTransaction.detach(currentFragment)
-                fragTransaction.attach(currentFragment)
-                fragTransaction.commit()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
+                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
+            } else {
+                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
             }
             notificationSwipe?.isRefreshing = false
         }

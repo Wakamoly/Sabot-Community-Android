@@ -538,13 +538,6 @@ class ClanFragment : Fragment() {
                     } else {
                         resetFragment()
                     }
-                    val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
-                    if (currentFragment is DashboardFragment) {
-                        val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                        fragTransaction.detach(currentFragment)
-                        fragTransaction.attach(currentFragment)
-                        fragTransaction.commit()
-                    }
                     statusUpdate!!.setText("")
                 } else {
                     Toast.makeText(mContext, jsonObject.getString("message"), Toast.LENGTH_SHORT).show()
@@ -756,11 +749,7 @@ class ClanFragment : Fragment() {
                         resetFragment()
                     }
                 } else {
-                    Toast.makeText(
-                            mContext,
-                            obj.getString("message"),
-                            Toast.LENGTH_LONG
-                    ).show()
+                    Toast.makeText(mContext, obj.getString("message"), Toast.LENGTH_LONG).show()
                 }
             } catch (e: JSONException) {
                 e.printStackTrace()
@@ -840,12 +829,11 @@ class ClanFragment : Fragment() {
     }
 
     private fun resetFragment() {
-        val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
-        if (currentFragment is ClanFragment) {
-            val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-            fragTransaction.detach(currentFragment)
-            fragTransaction.attach(currentFragment)
-            fragTransaction.commit()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
+            (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
+        } else {
+            (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
         }
         //refresh.setRefreshing(false);
     }

@@ -4,19 +4,21 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.lucidsoftworksllc.sabotcommunity.db.messages.general.MessagesCacheEntity
+import com.lucidsoftworksllc.sabotcommunity.db.messages.general.MessagesDao
 import com.lucidsoftworksllc.sabotcommunity.db.notifications.NotificationCacheEntity
 import com.lucidsoftworksllc.sabotcommunity.db.notifications.NotificationDao
 import com.lucidsoftworksllc.sabotcommunity.db.publics.PublicsDao
 import com.lucidsoftworksllc.sabotcommunity.db.publics.PublicsEntity
 
 @Database(
-        entities = [PublicsEntity::class, NotificationCacheEntity::class],
-        version = 4)
+        entities = [PublicsEntity::class, NotificationCacheEntity::class, MessagesCacheEntity::class],
+        version = 8)
 abstract class SabotDatabase: RoomDatabase() {
 
     abstract fun getPublicsDao() : PublicsDao
     abstract fun getNotificationsDao() : NotificationDao
-    //abstract fun getMessagesDao() : MessagesDao
+    abstract fun getMessagesDao() : MessagesDao
     //abstract fun getUserMessagesDao() : UserMessagesDao
     //abstract fun getTypedMessageDao() : TypedMessageDao
 

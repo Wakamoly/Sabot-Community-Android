@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -153,12 +155,11 @@ class DashboardFragment : Fragment() {
 
         dashboardRefreshLayout?.setOnRefreshListener {
             adNotified!!.clear()
-            val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
-            if (currentFragment is DashboardFragment) {
-                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                fragTransaction.detach(currentFragment)
-                fragTransaction.attach(currentFragment)
-                fragTransaction.commit()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
+                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
+            } else {
+                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
             }
             dashboardRefreshLayout?.isRefreshing = false
             sliderboi?.requestFocus()

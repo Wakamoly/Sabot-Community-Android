@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.text.Editable
@@ -145,12 +146,11 @@ class PublicsTopicFragment : Fragment() {
         loadPublicsTopic()
         publicsSwipe = publicsRootView.findViewById(R.id.publicsPostsSwipe)
         publicsSwipe?.setOnRefreshListener {
-            val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
-            if (currentFragment is PublicsTopicFragment) {
-                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                fragTransaction.detach(currentFragment)
-                fragTransaction.attach(currentFragment)
-                fragTransaction.commit()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
+                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
+            } else {
+                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
             }
             publicsSwipe?.isRefreshing = false
         }
@@ -738,16 +738,14 @@ class PublicsTopicFragment : Fragment() {
     }
 
     private fun resetFragment() {
-        val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
-        if (currentFragment is PublicsTopicFragment) {
-            val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-            fragTransaction.detach(currentFragment)
-            fragTransaction.attach(currentFragment)
-            fragTransaction.commit()
-            publicsSwipe!!.isRefreshing = false
-            publicspostsnicknameTop!!.requestFocus()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
+            (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
+        } else {
+            (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
         }
-        //refresh.setRefreshing(false);
+        publicsSwipe!!.isRefreshing = false
+        publicspostsnicknameTop!!.requestFocus()
     }
 
     private fun submitComment(body: String, added_by: String, user_to: String, image: String, post_id: String) {

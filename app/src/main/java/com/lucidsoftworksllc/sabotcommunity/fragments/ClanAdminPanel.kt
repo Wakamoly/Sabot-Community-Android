@@ -333,12 +333,11 @@ class ClanAdminPanel : Fragment() {
                     rQueue!!.cache.clear()
                     try {
                         if (jsonObject.getString("error") == "false") {
-                            val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
-                            if (currentFragment is ClanAdminPanel) {
-                                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                                fragTransaction.detach(currentFragment)
-                                fragTransaction.attach(currentFragment)
-                                fragTransaction.commit()
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
+                                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
+                            } else {
+                                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
                             }
                         } else {
                             Toast.makeText(mContext, jsonObject.getString("message"), Toast.LENGTH_SHORT).show()
@@ -375,12 +374,11 @@ class ClanAdminPanel : Fragment() {
                     rQueue!!.cache.clear()
                     try {
                         if (jsonObject.getString("error") == "false") {
-                            val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
-                            if (currentFragment is ClanAdminPanel) {
-                                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                                fragTransaction.detach(currentFragment)
-                                fragTransaction.attach(currentFragment)
-                                fragTransaction.commit()
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
+                                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
+                            } else {
+                                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
                             }
                         } else {
                             Toast.makeText(mContext, jsonObject.getString("message"), Toast.LENGTH_SHORT).show()

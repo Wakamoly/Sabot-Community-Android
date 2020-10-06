@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.text.Editable
@@ -136,12 +137,11 @@ class ProfilePostFragment : Fragment() {
         loadprofilePostTopic()
         profilePostsSwipe = profilePostRootView.findViewById(R.id.profilePostsSwipe)
         profilePostsSwipe?.setOnRefreshListener {
-            val currentFragment = (mCtx as FragmentActivity?)!!.supportFragmentManager.findFragmentById(R.id.fragment_container)
-            if (currentFragment is ProfilePostFragment) {
-                val fragTransaction = (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                fragTransaction.detach(currentFragment)
-                fragTransaction.attach(currentFragment)
-                fragTransaction.commit()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
+            } else {
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
             }
             profilePostsSwipe?.isRefreshing = false
         }
@@ -151,12 +151,11 @@ class ProfilePostFragment : Fragment() {
 
     private fun submitComment(body: String, added_by: String, user_to: String, image: String, post_id: String?) {
         val stringRequest: StringRequest = object : StringRequest(Method.POST, CommentPost_URL, Response.Listener {
-            val currentFragment = (mCtx as FragmentActivity?)!!.supportFragmentManager.findFragmentById(R.id.fragment_container)
-            if (currentFragment is ProfilePostFragment) {
-                val fragTransaction = (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                fragTransaction.detach(currentFragment)
-                fragTransaction.attach(currentFragment)
-                fragTransaction.commit()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
+            } else {
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
             }
             profilePostsSwipe!!.isRefreshing = false
             profilepostpostsnicknameTop!!.requestFocus()

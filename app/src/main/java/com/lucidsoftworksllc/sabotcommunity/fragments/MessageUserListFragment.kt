@@ -1,6 +1,7 @@
 package com.lucidsoftworksllc.sabotcommunity.fragments
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
@@ -42,12 +44,11 @@ class MessageUserListFragment : Fragment(), MessageUserListAdapter.AdapterCallba
     private var userRecyclerList: MutableList<MessageUserListRecycler>? = null
     private var userlistAdapter: MessageUserListAdapter? = null
     override fun onMethodCallback() {
-        val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.chat_fragment_container)
-        if (currentFragment is MessageUserListFragment) {
-            val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-            fragTransaction.detach(currentFragment)
-            fragTransaction.attach(currentFragment)
-            fragTransaction.commit()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            requireActivity().supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
+            requireActivity().supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
+        } else {
+            requireActivity().supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
         }
     }
 

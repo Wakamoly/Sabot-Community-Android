@@ -25,6 +25,7 @@ import com.lucidsoftworksllc.sabotcommunity.*
 import com.lucidsoftworksllc.sabotcommunity.fragments.*
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
 import org.json.JSONException
@@ -32,6 +33,7 @@ import org.json.JSONObject
 import java.lang.Runnable
 import java.util.*
 
+@AndroidEntryPoint
 class ChatActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
     private var deviceUserID: String? = null
     private var deviceUsername: String? = null

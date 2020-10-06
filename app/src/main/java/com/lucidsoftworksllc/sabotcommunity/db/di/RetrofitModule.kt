@@ -2,6 +2,7 @@ package com.lucidsoftworksllc.sabotcommunity.db.di
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.lucidsoftworksllc.sabotcommunity.db.messages.general.MessagesRetrofit
 import com.lucidsoftworksllc.sabotcommunity.db.notifications.NotificationRetrofit
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import dagger.Module
@@ -34,5 +35,11 @@ object RetrofitModule {
     @Provides
     fun provideNotificationService(retrofit: Retrofit.Builder): NotificationRetrofit{
         return retrofit.build().create(NotificationRetrofit::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideGeneralMessagesService(retrofit: Retrofit.Builder): MessagesRetrofit{
+        return retrofit.build().create(MessagesRetrofit::class.java)
     }
 }
