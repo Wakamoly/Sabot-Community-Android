@@ -454,7 +454,7 @@ class DashboardFragment : CoFragment() {
                 noPosts!!.visibility = View.VISIBLE
                 postsProgress!!.visibility = View.GONE
             }
-        }, Response.ErrorListener { Toast.makeText(mContext, "Couldn't get dashboard feed!", Toast.LENGTH_SHORT).show() }) {
+        }, Response.ErrorListener { /*Toast.makeText(mContext, "Couldn't get dashboard feed!", Toast.LENGTH_SHORT).show()*/ }) {
             override fun getParams(): Map<String, String> {
                 val params: MutableMap<String, String> = HashMap()
                 params["page"] = page.toString()
