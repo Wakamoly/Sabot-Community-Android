@@ -8,6 +8,9 @@ import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.lucidsoftworksllc.sabotcommunity.db.SabotDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
@@ -49,7 +52,7 @@ class SharedPrefManager private constructor(private val mCtx: Context) {
         val editor = sharedPreferences.edit()
         editor.clear()
         editor.apply()
-        SabotDatabase(mCtx).clearAllTables()
+        CoroutineScope(IO).launch { SabotDatabase(mCtx).clearAllTables() }
     }
 
     fun updateToken(fcm_token: String) {
