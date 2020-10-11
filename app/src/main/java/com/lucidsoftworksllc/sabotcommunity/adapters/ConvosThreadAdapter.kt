@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -17,10 +19,11 @@ import com.android.volley.toolbox.StringRequest
 import com.balysv.materialripple.MaterialRippleLayout
 import com.bumptech.glide.Glide
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
-import com.lucidsoftworksllc.sabotcommunity.models.ConvosHelper
 import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import com.lucidsoftworksllc.sabotcommunity.activities.ChatActivity
+import com.lucidsoftworksllc.sabotcommunity.db.messages.general.MessagesDataModel
+import kotlin.collections.indices
 import com.lucidsoftworksllc.sabotcommunity.fragments.MessageFragment
 import com.lucidsoftworksllc.sabotcommunity.fragments.MessageGroupFragment
 import de.hdodenhof.circleimageview.CircleImageView
@@ -28,8 +31,9 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
 
-class ConvosThreadAdapter(private val mCtx: Context, private val convosList: List<ConvosHelper>) : RecyclerView.Adapter<ConvosThreadAdapter.ViewHolder>() {
+class ConvosThreadAdapter(private val mCtx: Context, private val convosList: MutableList<MessagesDataModel>) : RecyclerView.Adapter<ConvosThreadAdapter.ViewHolder>() {
     private var deviceUsername: String? = null
+    private var isLoaderVisible = false
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(mCtx)
         val view = inflater.inflate(R.layout.recycler_userslist_messages, null)
@@ -61,7 +65,7 @@ class ConvosThreadAdapter(private val mCtx: Context, private val convosList: Lis
                 val args = Bundle()
                 args.putString("user_to", convos.sent_by)
                 ldf.arguments = args
-                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in_up, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out_up).addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
                 if (convos.viewed != "yes" && convos.sent_by != deviceUsername) {
                     val stringRequest: StringRequest = object : StringRequest(Method.POST, SET_READ, Response.Listener { response: String? ->
                         try {
@@ -76,7 +80,7 @@ class ConvosThreadAdapter(private val mCtx: Context, private val convosList: Lis
                         override fun getParams(): MutableMap<String, String?> {
                             val params: MutableMap<String, String?> = HashMap()
                             params["username"] = deviceUsername
-                            params["id"] = convos.id
+                            params["id"] = convos.message_id.toString()
                             return params
                         }
                     }
@@ -119,9 +123,9 @@ class ConvosThreadAdapter(private val mCtx: Context, private val convosList: Lis
             holder.userLayout.setOnClickListener {
                 val ldf = MessageGroupFragment()
                 val args = Bundle()
-                args.putString("group_id", convos.group_id)
+                args.putString("group_id", convos.group_id.toString())
                 ldf.arguments = args
-                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in_up, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out_up).addToBackStack(null).replace(R.id.chat_fragment_container, ldf).commit()
             }
             if (convos.last_online == "yes") {
                 holder.lastOnline.visibility = View.VISIBLE
@@ -144,6 +148,72 @@ class ConvosThreadAdapter(private val mCtx: Context, private val convosList: Lis
 
     override fun getItemCount(): Int {
         return convosList.size
+    }
+
+    fun addItems(items: List<MessagesDataModel>) {
+        if (convosList.isEmpty()){
+            convosList.addAll(items)
+        }else{
+            for (item in items.indices){
+                var addNew = true
+                for (convo in convosList.indices){
+                    if (convosList[convo].type == "user"){
+                        if (items[item].sent_by == convosList[convo].sent_by){
+                            convosList[convo] = items[item]
+                            addNew = false
+                            break
+                        }
+                    }else if (convosList[convo].type == "group"){
+                        if (items[item].group_id == convosList[convo].group_id){
+                            convosList[convo] = items[item]
+                            addNew = false
+                            break
+                        }
+                    }
+                }
+                if (addNew){
+                    convosList.add(0, items[item])
+                }
+            }
+        }
+        notifyDataSetChanged()
+    }
+
+    fun addItemsToTop(items: List<MessagesDataModel>) {
+        convosList.addAll(0, items)
+        notifyDataSetChanged()
+    }
+
+    fun addLoading() {
+        isLoaderVisible = true
+        convosList.add(MessagesDataModel(0, false, null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), 0, null.toString(), null.toString(), 0))
+        notifyItemInserted(convosList.size - 1)
+    }
+
+    fun removeLoading() {
+        isLoaderVisible = false
+        if (convosList.isNotEmpty()) {
+            val position = convosList.size - 1
+            //val item = getItem(position)
+            convosList.removeAt(position)
+            notifyItemRemoved(position)
+        }
+    }
+
+    private fun setAnimation(viewToAnimate: View, position: Int) {
+        if (position >= 0) {
+            val animation: Animation = AnimationUtils.loadAnimation(mCtx, R.anim.slide_in)
+            viewToAnimate.startAnimation(animation)
+        }
+    }
+
+    fun clear() {
+        convosList.clear()
+        notifyDataSetChanged()
+    }
+
+    private fun getItem(position: Int): MessagesDataModel {
+        return convosList[position]
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

@@ -121,7 +121,7 @@ class NewMessageSearchAdapter(private val users: MutableList<User>, context: Con
         var online: CircleImageView = itemView.findViewById(R.id.online)
         var verified: CircleImageView = itemView.findViewById(R.id.verified)
         var userListLayout: RelativeLayout = itemView.findViewById(R.id.userListLayout)
-        var publicsTopicLayout: RelativeLayout = itemView.findViewById(R.id.publicsTopicList)
+        //var publicsTopicLayout: RelativeLayout = itemView.findViewById(R.id.publicsTopicList)
         var tvTotalPosts: RelativeLayout = itemView.findViewById(R.id.tvTotalPosts)
     }
 

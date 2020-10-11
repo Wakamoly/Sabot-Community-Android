@@ -1,5 +1,6 @@
 package com.lucidsoftworksllc.sabotcommunity.db.notifications
 
+import android.content.Context
 import androidx.hilt.Assisted
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
@@ -11,7 +12,7 @@ import kotlinx.coroutines.launch
 class NotificationViewModel
 @ViewModelInject
 constructor(
-        private val mainRepository: NotificationRepository,
+        private val notiRepository: NotificationRepository,
         @Assisted private val savedStateHandle: SavedStateHandle
 ): ViewModel(){
 
@@ -20,11 +21,11 @@ constructor(
     val dataState: LiveData<DataState<List<NotificationDataModel>>>
         get () = _dataState
 
-    fun setStateEvent(mainStateEvent: MainStateEvent){
+    fun setStateEvent(mainStateEvent: MainStateEvent, mContext: Context){
         viewModelScope.launch {
             when(mainStateEvent){
-                is MainStateEvent.GetBlogEvents -> {
-                    mainRepository.getNotification()
+                is MainStateEvent.GetNotiEvents -> {
+                    notiRepository.getNotification(mContext)
                             .onEach { dataState ->
                                 _dataState.value = dataState
                             }
@@ -39,6 +40,6 @@ constructor(
 }
 
 sealed class MainStateEvent{
-    object GetBlogEvents: MainStateEvent()
+    object GetNotiEvents: MainStateEvent()
     object None: MainStateEvent()
 }

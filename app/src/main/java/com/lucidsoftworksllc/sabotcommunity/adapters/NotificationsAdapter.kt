@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -15,13 +17,13 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.balysv.materialripple.MaterialRippleLayout
 import com.bumptech.glide.Glide
-import com.lucidsoftworksllc.sabotcommunity.*
+import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
+import com.lucidsoftworksllc.sabotcommunity.db.notifications.NotificationDataModel
 import com.lucidsoftworksllc.sabotcommunity.fragments.ClanFragment
 import com.lucidsoftworksllc.sabotcommunity.fragments.FragmentProfile
 import com.lucidsoftworksllc.sabotcommunity.fragments.ProfilePostFragment
 import com.lucidsoftworksllc.sabotcommunity.fragments.PublicsTopicFragment
-import com.lucidsoftworksllc.sabotcommunity.models.NotificationsRecycler
 import com.lucidsoftworksllc.sabotcommunity.others.BaseViewHolder
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
@@ -30,7 +32,8 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
 
-class NotificationsAdapter(private val notifications: MutableList<NotificationsRecycler>, private val context: Context) : RecyclerView.Adapter<BaseViewHolder>() {
+
+class NotificationsAdapter(private val notifications: MutableList<NotificationDataModel>, private val context: Context) : RecyclerView.Adapter<BaseViewHolder>() {
     private var isLoaderVisible = false
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (viewType) {
@@ -46,7 +49,7 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationsR
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         holder.onBind(position)
         //TODO Temporary v
-        holder.setIsRecyclable(false)
+        //holder.setIsRecyclable(false)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -58,17 +61,42 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationsR
     }
 
     override fun getItemCount(): Int {
-        return notifications.size ?: 0
+        return notifications.size
     }
 
-    fun addItems(items: List<NotificationsRecycler>?) {
-        notifications.addAll(items!!)
+    fun addItems(items: List<NotificationDataModel>) {
+        if (notifications.isEmpty()){
+            notifications.addAll(items)
+        }else{
+            for (item in items.indices){
+                var addNew = true
+                for (noti in notifications.indices){
+                    if (items[item].id == notifications[noti].id){
+                        if (items[item].deleted == "yes" || notifications[noti].deleted == "yes"){
+                            notifications.removeAt(noti)
+                        }else{
+                            notifications[noti] = items[item]
+                        }
+                        addNew = false
+                        break
+                    }
+                }
+                if (addNew){
+                    notifications.add(0, items[item])
+                }
+            }
+        }
+        notifyDataSetChanged()
+    }
+
+    fun addItemsToTop(items: List<NotificationDataModel>) {
+        notifications.addAll(0, items)
         notifyDataSetChanged()
     }
 
     fun addLoading() {
         isLoaderVisible = true
-        notifications.add(NotificationsRecycler(null, null, null, null, null, null, null, null, null, null, null, null, null, null))
+        notifications.add(NotificationDataModel(0, null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString()))
         notifyItemInserted(notifications.size - 1)
     }
 
@@ -76,9 +104,16 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationsR
         isLoaderVisible = false
         if (notifications.isNotEmpty()) {
             val position = notifications.size - 1
-            val item = getItem(position)
+            //val item = getItem(position)
             notifications.removeAt(position)
             notifyItemRemoved(position)
+        }
+    }
+
+    private fun setAnimation(viewToAnimate: View, position: Int) {
+        if (position >= 0) {
+            val animation: Animation = AnimationUtils.loadAnimation(context, R.anim.slide_in)
+            viewToAnimate.startAnimation(animation)
         }
     }
 
@@ -87,7 +122,7 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationsR
         notifyDataSetChanged()
     }
 
-    private fun getItem(position: Int): NotificationsRecycler {
+    private fun getItem(position: Int): NotificationDataModel {
         return notifications[position]
     }
 
@@ -133,7 +168,9 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationsR
             holder.body.setText(Html.fromHtml(bodybits, Html.FROM_HTML_MODE_LEGACY));
         } else {
             holder.body.setText(Html.fromHtml(bodybits));
-        }*/nickname.text = notification.nickname
+        }*/
+
+            nickname.text = notification.nickname
             body.text = notification.message
             datetime.text = notification.datetime
             if (notification.verified == "yes") {
@@ -157,12 +194,14 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationsR
                 "new_follower", "new_connection_request" -> notiType.setImageResource(R.drawable.notify_follower)
                 "publics_comment", "comment" -> notiType.setImageResource(R.drawable.notify_reply)
             }
-            val profilePic = notification.profile_pic!!.substring(0, notification.profile_pic.length - 4) + "_r.JPG"
+            val profilePic = notification.profile_pic.substring(0, notification.profile_pic.length - 4) + "_r.JPG"
             Glide.with(context)
                     .load(Constants.BASE_URL + profilePic)
                     .into(profilePicView)
             notiLayout.setOnClickListener {
                 if (notification.opened != "yes") {
+                    //TODO("Add opened to internal db")
+
                     val stringRequest: StringRequest = object : StringRequest(Method.POST, SET_READ, Response.Listener { response: String? ->
                         try {
                             val obj = JSONObject(response!!)
@@ -175,14 +214,14 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationsR
                     }, Response.ErrorListener { Toast.makeText(context, "Could not set notification as read, please try again later...", Toast.LENGTH_LONG).show() }) {
                         override fun getParams(): Map<String, String> {
                             val params: MutableMap<String, String> = HashMap()
-                            params["username"] = notification.user_to!!
-                            params["id"] = notification.id!!
+                            params["username"] = notification.user_to
+                            params["id"] = notification.id.toString()
                             return params
                         }
                     }
                     (context as FragmentContainer).addToRequestQueue(stringRequest)
                 }
-                if (notification.link!!.contains("post.php?id=")) {
+                if (notification.link.contains("post.php?id=")) {
                     val linkID = notification.link.replace("post.php?id=", "")
                     if (context is FragmentContainer) {
                         val ldf = ProfilePostFragment()
@@ -237,6 +276,7 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationsR
                     }
                 }
             }
+            setAnimation(itemView, position)
         }
 
         init {

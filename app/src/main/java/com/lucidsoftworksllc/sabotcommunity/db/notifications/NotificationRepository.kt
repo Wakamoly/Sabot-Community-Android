@@ -1,5 +1,9 @@
 package com.lucidsoftworksllc.sabotcommunity.db.notifications
 
+import android.content.Context
+import androidx.fragment.app.FragmentContainer
+import com.lucidsoftworksllc.sabotcommunity.others.deviceUserID
+import com.lucidsoftworksllc.sabotcommunity.others.deviceUsername
 import com.lucidsoftworksllc.sabotcommunity.util.DataState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -13,17 +17,31 @@ constructor(
         private val cacheMapper: NotificationCacheMapper,
         private val networkMapper: NotificationNetworkMapper
 ){
-    suspend fun getNotification(): Flow<DataState<List<NotificationDataModel>>> = flow {
+    suspend fun getNotification(mContext: Context): Flow<DataState<List<NotificationDataModel>>> = flow {
         emit(DataState.Loading)
-        delay(1000)
         try {
-            val networkBlogs = notificationRetrofit.get()
-            val blogs = networkMapper.mapFromEntityList(networkBlogs)
-            for (blog in blogs){
-                notificationDao.insert(cacheMapper.mapToEntity(blog))
+            val cachedNotis = notificationDao.get()
+            if (cachedNotis.isEmpty()){
+                val networkNotis = notificationRetrofit.getNotifications(1,200,mContext.deviceUsername,mContext.deviceUserID)
+                val notis = networkMapper.mapFromEntityList(networkNotis)
+                for (noti in notis){
+                    notificationDao.insert(cacheMapper.mapToEntity(noti))
+                }
+                emit(DataState.Success(cacheMapper.mapFromEntityList(notificationDao.get())))
+            }else{
+                emit(DataState.Success(cacheMapper.mapFromEntityList(cachedNotis)))
+                val networkNotis = notificationRetrofit.getNotifications(1,200,mContext.deviceUsername,mContext.deviceUserID)
+                val notis = networkMapper.mapFromEntityList(networkNotis)
+                for (noti in notis){
+                    notificationDao.insert(cacheMapper.mapToEntity(noti))
+                }
+                val newCachedNotis = notificationDao.get()
+                if (newCachedNotis.isNotEmpty()){
+                    emit(DataState.UpdateSuccess(cacheMapper.mapFromEntityList(newCachedNotis)))
+                }
+
             }
-            val cachedBlogs = notificationDao.get()
-            emit(DataState.Success(cacheMapper.mapFromEntityList(cachedBlogs)))
+
         }catch (e: Exception){
             emit(DataState.Error(e))
         }

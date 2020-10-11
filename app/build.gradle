@@ -16,13 +16,14 @@ apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: 'kotlin-kapt'
 
 android {
+    android.ndkVersion "21.3.6528147"
     compileSdkVersion 29
     defaultConfig {
         multiDexEnabled true
         applicationId "com.lucidsoftworksllc.sabotcommunity"
         minSdkVersion 18
         targetSdkVersion 29
-        versionCode 59
+        versionCode 60
         versionName "v0.5.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -31,14 +32,18 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-        /*debug {
+        debug {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }*/
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 }
 

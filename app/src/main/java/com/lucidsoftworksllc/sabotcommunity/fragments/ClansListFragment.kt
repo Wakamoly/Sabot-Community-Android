@@ -2,6 +2,7 @@ package com.lucidsoftworksllc.sabotcommunity.fragments
 
 import android.app.ProgressDialog
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -72,14 +73,13 @@ class ClansListFragment : Fragment() {
             popup.show()
         }
         clansSwipe?.setOnRefreshListener {
-            val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
-            if (currentFragment is ClansListFragment) {
-                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                fragTransaction.detach(currentFragment)
-                fragTransaction.attach(currentFragment)
-                fragTransaction.commit()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
+                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
+            } else {
+                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
             }
-            clansSwipe?.setRefreshing(false)
+            clansSwipe?.isRefreshing = false
         }
         loadJoinedClans()
         return clansRootView

@@ -23,6 +23,6 @@ abstract class PaginationOnScroll(private val layoutManager: LinearLayoutManager
 
     companion object {
         const val PAGE_START = 1
-        const val PAGE_SIZE = 15
+        const val PAGE_SIZE = 25
     }
 }

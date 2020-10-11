@@ -2,6 +2,7 @@ package com.lucidsoftworksllc.sabotcommunity.fragments
 
 import android.app.SearchManager
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.view.*
@@ -11,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -77,13 +79,13 @@ class SearchFragment : Fragment() {
         loadPopular()
         fetchUser("users", "")
         searchSwipe?.setOnRefreshListener {
-            val currentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragment_container)
-            if (currentFragment is SearchFragment) {
-                val fragTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                fragTransaction.detach(currentFragment)
-                fragTransaction.attach(currentFragment)
-                fragTransaction.commit()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
+                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
+            } else {
+                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
             }
+            searchSwipe?.isRefreshing = false
         }
         return searchRootView
     }

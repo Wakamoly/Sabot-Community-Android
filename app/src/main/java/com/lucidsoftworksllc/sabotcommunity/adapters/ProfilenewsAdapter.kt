@@ -30,6 +30,10 @@ import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import com.yarolegovich.lovelydialog.LovelyStandardDialog
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
 import org.jsoup.Jsoup
@@ -402,7 +406,11 @@ class ProfilenewsAdapter(private val mCtx: Context, private val profilenewsList:
                     val finalItem: String = if (!item.contains("http://") && !item.contains("https://")) {
                         "https://$item"
                     } else {
-                        item
+                        if (item.contains("http://")){
+                            item.replace("http://","https://")
+                        }else{
+                            item
+                        }
                     }
                     val imageUrl = arrayOfNulls<String>(1)
                     val title = arrayOfNulls<String>(1)
@@ -411,14 +419,15 @@ class ProfilenewsAdapter(private val mCtx: Context, private val profilenewsList:
                     urlImage.setOnClickListener {
                         val uri = Uri.parse(finalItem)
                         val intent = Intent(Intent.ACTION_VIEW, uri)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         mCtx.startActivity(intent)
                     }
-                    Thread( Runnable runnable@ {
+                    CoroutineScope(IO).launch {
                         try {
                             val doc = Jsoup.connect(finalItem).get()
                             val ogTags = doc.select("meta[property^=og:]")
                             if (ogTags.size <= 0) {
-                                return@runnable
+                                return@launch
                             }
                             val metaOgTitle = doc.select("meta[property=og:title]")
                             if (metaOgTitle != null) {
@@ -434,36 +443,16 @@ class ProfilenewsAdapter(private val mCtx: Context, private val profilenewsList:
                             if (metaOgImage != null) {
                                 imageUrl[0] = metaOgImage.attr("content")
                             }
+                            addPostLinkBits(imageUrl[0],title[0],desc[0])
                         } catch (e: IOException) {
                             e.printStackTrace()
                         }
-                    }).start()
-                    //Fucking code wouldn't work any other way than I'm currently capable. Fuck it, have a delay
-                    val handler = Handler()
-                    handler.postDelayed({
-                        if (imageUrl[0] != null && imageUrl[0]!!.isEmpty()) {
-                            urlImage.setImageResource(R.drawable.ic_error)
-                        } else {
-                            Glide.with(mCtx)
-                                    .load(imageUrl[0])
-                                    .error(R.drawable.ic_error)
-                                    .into(urlImage)
-                        }
-                        if (title[0] != null) {
-                            urlTitle.text = title[0]
-                        } else {
-                            urlTitle.text = mCtx.getString(R.string.no_content)
-                        }
-                        if (desc[0] != null) {
-                            urlDesc.text = desc[0]
-                        }
-                        urlProgress.visibility = View.GONE
-                        urlBits.visibility = View.VISIBLE
-                    }, 5000)
+                    }
                     break
                 } else {
                     urlPreview.visibility = View.GONE
                 }
+                break
             }
             textViewLikesText.setOnClickListener {
                 val asf: Fragment = UserListFragment()
@@ -489,6 +478,23 @@ class ProfilenewsAdapter(private val mCtx: Context, private val profilenewsList:
                 tvEdited.visibility = View.VISIBLE
             } else {
                 tvEdited.visibility = View.GONE
+            }
+        }
+
+        private fun addPostLinkBits(imageUrl: String?, title: String?, desc: String?){
+            CoroutineScope(Main).launch {
+                if (imageUrl!!.isEmpty()) {
+                    urlImage.setImageResource(R.drawable.ic_error)
+                } else {
+                    Glide.with(mCtx)
+                            .load(imageUrl)
+                            .error(R.drawable.ic_error)
+                            .into(urlImage)
+                }
+                urlTitle.text = title
+                urlDesc.text = desc
+                urlProgress.visibility = View.GONE
+                urlBits.visibility = View.VISIBLE
             }
         }
 

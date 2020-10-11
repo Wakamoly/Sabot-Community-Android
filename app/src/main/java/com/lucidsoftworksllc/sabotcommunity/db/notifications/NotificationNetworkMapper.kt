@@ -22,7 +22,8 @@ constructor() : EntityMapper<NotificationNetworkEntity, NotificationDataModel> {
                 nickname = entity.nickname,
                 verified = entity.verified,
                 last_online = entity.last_online,
-                type = entity.type
+                type = entity.type,
+                deleted = entity.deleted
         )
     }
 
@@ -41,7 +42,8 @@ constructor() : EntityMapper<NotificationNetworkEntity, NotificationDataModel> {
                 nickname = domainModel.nickname,
                 verified = domainModel.verified,
                 last_online = domainModel.last_online,
-                type = domainModel.type
+                type = domainModel.type,
+                deleted = domainModel.deleted
         )
     }
 
