@@ -16,6 +16,7 @@ apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: 'kotlin-kapt'
 
 android {
+    android.ndkVersion "21.3.6528147"
     compileSdkVersion 29
     defaultConfig {
         multiDexEnabled true

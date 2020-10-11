@@ -15,10 +15,12 @@ import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.models.MessagesHelper
 import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.activities.ChatActivity
+import com.lucidsoftworksllc.sabotcommunity.db.messages.general.MessagesDataModel
+import com.lucidsoftworksllc.sabotcommunity.db.messages.user_messages.UserMessagesEntity
 import com.lucidsoftworksllc.sabotcommunity.fragments.PhotoViewFragment
 import java.util.*
 
-class MessagesThreadAdapter(private val context: Context, private val messages: ArrayList<MessagesHelper>, private val username: String) : RecyclerView.Adapter<MessagesThreadAdapter.ViewHolder>() {
+class MessagesThreadAdapter(private val context: Context, private val messages: MutableList<UserMessagesEntity>, private val username: String) : RecyclerView.Adapter<MessagesThreadAdapter.ViewHolder>() {
     private val SELF = 786
     override fun getItemViewType(position: Int): Int {
         val message = messages[position]
@@ -54,14 +56,40 @@ class MessagesThreadAdapter(private val context: Context, private val messages: 
                 args.putString("image", message.image)
                 asf.arguments = args
                 val fragmentTransaction = (context as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                fragmentTransaction.replace(R.id.chat_fragment_container, asf)
                 fragmentTransaction.addToBackStack(null)
+                fragmentTransaction.replace(R.id.chat_fragment_container, asf)
                 fragmentTransaction.commit()
             }
         } else {
             holder.imgMsg.visibility = View.GONE
             holder.imgMsg.setImageDrawable(null)
         }
+    }
+
+    fun add(item: UserMessagesEntity){
+        messages.add(0,item)
+        notifyDataSetChanged()
+    }
+
+    fun addItems(items: List<UserMessagesEntity>) {
+        if (messages.isEmpty()){
+            messages.addAll(items)
+        }else{
+            for (item in items.indices){
+                var addNew = true
+                for (message in messages.indices){
+                    if (items[item].message_id == messages[message].message_id){
+                        messages[message] = items[item]
+                        addNew = false
+                        break
+                    }
+                }
+                if (addNew){
+                    messages.add(0, items[item])
+                }
+            }
+        }
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {
@@ -72,6 +100,5 @@ class MessagesThreadAdapter(private val context: Context, private val messages: 
         var textViewMessage: TextView = itemView.findViewById<View>(R.id.tv_message_content) as TextView
         var textViewTime: TextView = itemView.findViewById<View>(R.id.tv_time) as TextView
         var imgMsg: ImageView = itemView.findViewById(R.id.img_msg)
-
     }
 }

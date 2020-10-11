@@ -7,9 +7,11 @@ import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.lucidsoftworksllc.sabotcommunity.db.SabotDatabase
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
+import javax.inject.Inject
 
 class SharedPrefManager private constructor(private val mCtx: Context) {
     fun userLogin(userid: String?, username: String?, nickname: String?, email: String?, profilepic: String?, usersfollowed: String?, gamesfollowed: String?, usersfriends: String?, blockarray: String?) {
@@ -47,6 +49,7 @@ class SharedPrefManager private constructor(private val mCtx: Context) {
         val editor = sharedPreferences.edit()
         editor.clear()
         editor.apply()
+        SabotDatabase(mCtx).clearAllTables()
     }
 
     fun updateToken(fcm_token: String) {
