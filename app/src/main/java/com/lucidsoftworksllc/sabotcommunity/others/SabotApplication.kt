@@ -10,6 +10,7 @@ import org.acra.annotation.AcraHttpSender
 import org.acra.data.StringFormat
 import org.acra.sender.HttpSender
 
+/*
 @HiltAndroidApp
 open class HiltApplication : Application()
 
@@ -22,4 +23,4 @@ open class ACRAApplication : HiltApplication() {
     }
 }
 
-class SabotApplication : ACRAApplication()
+class SabotApplication : ACRAApplication()*/
