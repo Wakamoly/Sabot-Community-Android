@@ -310,6 +310,9 @@ class MessageFragment : CoFragment() {
                             }
                             if (init){
                                 getMessages(false)
+                            }else{
+                                val updatedMessages = userMessagesDao!!.getMessages(userTo!!,deviceUsername!!)
+                                withContext(Main){ appendRecycler(updatedMessages) }
                             }
                         } catch (e: JSONException) {
                             e.printStackTrace()
@@ -380,7 +383,6 @@ class MessageFragment : CoFragment() {
     private fun processMessage(user_from: String, message: String, image: String, message_id: Int, user_to: String, date_text: String) {
         CoroutineScope(Main).launch {
             lastId = message_id
-            println("LAST ID: $lastId")
             val m = UserMessagesEntity(message_id, user_to, user_from, message, date_text, image)
             withContext(IO){ userMessagesDao?.addMessage(m) }
             adapter!!.add(m)

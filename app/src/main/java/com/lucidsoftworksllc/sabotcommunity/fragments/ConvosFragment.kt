@@ -1,6 +1,5 @@
 package com.lucidsoftworksllc.sabotcommunity.fragments
 
-import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -39,7 +38,6 @@ class ConvosFragment : Fragment() {
     private var messagesNew: ImageView? = null
     private var messagesMenu: ImageView? = null
     private var noPosts: TextView? = null
-    private var dialog: ProgressDialog? = null
     private var recyclerView: RecyclerView? = null
     private var layoutManager: RecyclerView.LayoutManager? = null
     private var adapter: ConvosThreadAdapter? = null
@@ -58,10 +56,6 @@ class ConvosFragment : Fragment() {
         noPosts = convosRootView.findViewById(R.id.noPosts)
         recyclerView = convosRootView.findViewById(R.id.chatConvos)
         progressBar = convosRootView.findViewById(R.id.progressBar)
-
-        /*dialog = ProgressDialog(mCtx)
-        dialog!!.setMessage("Loading conversations...")
-        dialog!!.show()*/
 
         initRecycler()
         initMenus()
@@ -95,21 +89,17 @@ class ConvosFragment : Fragment() {
         viewModel.dataState.observe(viewLifecycleOwner, Observer { dataState ->
             when(dataState){
                 is DataState.Success<List<MessagesDataModel>> -> {
-                    println("Success!")
                     displayProgressbar(false)
                     appendMessages(dataState.data)
                 }
                 is DataState.Error -> {
-                    println("Error!")
                     displayProgressbar(false)
                     displayError(dataState.exception.message)
                 }
                 is DataState.Loading -> {
-                    println("Loading!")
                     displayProgressbar(true)
                 }
                 is DataState.UpdateSuccess<List<MessagesDataModel>> -> {
-                    println("Update Success!")
                     displayProgressbar(false)
                     appendMessages(dataState.data)
                 }
@@ -133,7 +123,6 @@ class ConvosFragment : Fragment() {
     }
 
     private fun appendMessages(messages: List<MessagesDataModel>){
-        println("Appending messages")
         if (messages.isEmpty()) {
             noPosts?.visibility = View.VISIBLE
             progressBar?.visibility = View.GONE
@@ -152,46 +141,4 @@ class ConvosFragment : Fragment() {
         isLoading = false*/
     }
 
-    /*private fun fetchConvos() {
-        val stringRequest = StringRequest(Request.Method.GET, "$URL_FETCH_CONVOS?username=$deviceUsername&userid=$deviceUserID",
-                { response: String? ->
-                    try {
-                        dialog!!.dismiss()
-                        val res = JSONObject(response!!)
-                        val thread = res.getJSONArray("messages")
-                        for (i in 0 until thread.length()) {
-                            val obj = thread.getJSONObject(i)
-                            val sentBy = obj.getString("sent_by")
-                            val profilePic = obj.getString("profile_pic")
-                            val bodySplit = obj.getString("body_split")
-                            val timeMessage = obj.getString("time_message")
-                            val latestProfilePic = obj.getString("latest_profile_pic")
-                            val nickname = obj.getString("nickname")
-                            val verified = obj.getString("verified")
-                            val lastOnline = obj.getString("last_online")
-                            val viewed = obj.getString("viewed")
-                            val id = obj.getString("id")
-                            val userFrom = obj.getString("user_from")
-                            val type = obj.getString("type")
-                            val groupId = obj.getString("group_id")
-                            val messageObject = ConvosHelper(sentBy, bodySplit, timeMessage, latestProfilePic, profilePic, nickname, verified, lastOnline, viewed, id, userFrom, type, groupId)
-                            messages!!.add(messageObject)
-                        }
-                        if (thread.length() == 0) {
-                            noPosts!!.visibility = View.VISIBLE
-                        }
-                        adapter = ConvosThreadAdapter(mCtx!!, messages!!)
-                        recyclerView!!.adapter = adapter
-                        recyclerView?.scheduleLayoutAnimation()
-                    } catch (e: JSONException) {
-                        e.printStackTrace()
-                    }
-                }
-        ) { }
-        (mCtx as ChatActivity?)!!.addToRequestQueue(stringRequest)
-    }*/
-
-    companion object {
-        const val URL_FETCH_CONVOS: String = Constants.ROOT_URL + "messages.php/convos"
-    }
 }
