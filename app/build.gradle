@@ -23,7 +23,7 @@ android {
         applicationId "com.lucidsoftworksllc.sabotcommunity"
         minSdkVersion 18
         targetSdkVersion 29
-        versionCode 60
+        versionCode 62
         versionName "v0.5.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
