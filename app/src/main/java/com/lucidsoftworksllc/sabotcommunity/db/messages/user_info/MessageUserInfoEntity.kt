@@ -3,7 +3,7 @@ package com.lucidsoftworksllc.sabotcommunity.db.messages.user_info
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity
+@Entity(tableName = "messages_user_info")
 data class MessageUserInfoEntity (
         @PrimaryKey(autoGenerate = false) var user_id: Int,
         var profile_pic: String,
