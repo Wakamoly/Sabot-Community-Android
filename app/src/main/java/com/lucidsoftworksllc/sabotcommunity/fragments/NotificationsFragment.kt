@@ -103,7 +103,7 @@ class NotificationsFragment : Fragment() {
         none?.visibility = View.VISIBLE
         if(message != null){
             println("Error message: $message")
-            mContext?.toastLong("Error!: $message")
+            //mContext?.toastLong("Error!: $message")
         }else{
             mContext?.toastShort("Error!")
         }

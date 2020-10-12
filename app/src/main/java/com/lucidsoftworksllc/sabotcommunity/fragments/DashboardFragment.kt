@@ -153,14 +153,16 @@ class DashboardFragment : CoFragment() {
         }
 
         launch {
+            withContext(IO){
+                usersOnline()
+                sendRequest()
+                postsQueryButtonClicked(followingPostsButton)
+            }
             withContext(Main){
                 initDashFeedRecycler()
                 initAdVP()
                 initPublicsVP()
             }
-            usersOnline()
-            sendRequest()
-            postsQueryButtonClicked(followingPostsButton)
         }
 
         hideKeyboardFrom(mContext, dashboardRootView)
@@ -178,7 +180,7 @@ class DashboardFragment : CoFragment() {
                 if (!isLoading && !isLastPage) {
                     isLoading = true
                     currentPage++
-                    launch { loadDashboardFeed(currentPage, clicked) }
+                    //launch { loadDashboardFeed(currentPage, clicked!!) }
                 }
             }
         }
@@ -387,65 +389,61 @@ class DashboardFragment : CoFragment() {
         DashSliderRequest.getInstance(mContext!!)!!.addToRequestQueue(jsonArrayRequest)
     }
 
-    private suspend fun loadDashboardFeed(page: Int, method: String?) {
+    private fun loadDashboardFeed(page: Int, method: String) {
         val items = ArrayList<ProfilenewsRecycler>()
         val stringRequest: StringRequest = object : StringRequest(Method.POST, DashboardFeed_URL, Response.Listener { response: String? ->
             try {
-                launch {
-                    val dashboardfeed = JSONArray(response)
-                    for (i in 0 until dashboardfeed.length()) {
-                        val dashboardfeedObject = dashboardfeed.getJSONObject(i)
-                        val addedBy = dashboardfeedObject.getString("added_by")
-                        if (SharedPrefManager.getInstance(mContext!!)!!.isUserBlocked(addedBy)) continue
-                        val id = dashboardfeedObject.getInt("id")
-                        val type = dashboardfeedObject.getString("type")
-                        val likes = dashboardfeedObject.getString("likes")
-                        val body = dashboardfeedObject.getString("body")
-                        val userTo = dashboardfeedObject.getString("user_to")
-                        val dateAdded = dashboardfeedObject.getString("date_added")
-                        val userClosed = dashboardfeedObject.getString("user_closed")
-                        val deleted = dashboardfeedObject.getString("deleted")
-                        val image = dashboardfeedObject.getString("image")
-                        val userId = dashboardfeedObject.getString("user_id")
-                        val profilePic = dashboardfeedObject.getString("profile_pic")
-                        val verified = dashboardfeedObject.getString("verified")
-                        val online = dashboardfeedObject.getString("online")
-                        val nickname = dashboardfeedObject.getString("nickname")
-                        val username = dashboardfeedObject.getString("username")
-                        val commentcount = dashboardfeedObject.getString("commentcount")
-                        val likedbyuserYes = dashboardfeedObject.getString("likedbyuseryes")
-                        val form = dashboardfeedObject.getString("form")
-                        val edited = dashboardfeedObject.getString("edited")
-                        val dashboardfeedResult = ProfilenewsRecycler(id, type, likes, body, addedBy, userTo, dateAdded, userClosed, deleted, image, userId, profilePic, verified, online, nickname, username, commentcount, likedbyuserYes, form, edited)
-                        items.add(dashboardfeedResult)
-                    }
-                    withContext(Main){
-                        if (dashboardfeed.length() == 0) {
-                            dashProgressBar!!.visibility = View.GONE
-                            relLayoutDash2!!.visibility = View.VISIBLE
-                            noPosts!!.visibility = View.VISIBLE
-                        } else {
-                            if (currentPage != PaginationOnScroll.PAGE_START) dashboardfeedadapter!!.removeLoading()
-                            postsProgress!!.visibility = View.GONE
-                            dashboardfeedadapter!!.addItems(items)
-                            if (page == 1) {
-                                dashboardfeedView?.scheduleLayoutAnimation()
-                            }
-                            // check whether is last page or not
-                            if (dashboardfeed.length() == pageSize) {
-                                dashboardfeedadapter!!.addLoading()
-                            } else {
-                                isLastPage = true
-                                //adapter.removeLoading();
-                            }
-                            isLoading = false
-                            noPosts!!.visibility = View.GONE
-                        }
-                        dashProgressBar!!.visibility = View.GONE
-                        relLayoutDash2!!.visibility = View.VISIBLE
-                    }
-
+                val dashboardfeed = JSONArray(response)
+                for (i in 0 until dashboardfeed.length()) {
+                    val dashboardfeedObject = dashboardfeed.getJSONObject(i)
+                    val addedBy = dashboardfeedObject.getString("added_by")
+                    if (SharedPrefManager.getInstance(mContext!!)!!.isUserBlocked(addedBy)) continue
+                    val id = dashboardfeedObject.getInt("id")
+                    val type = dashboardfeedObject.getString("type")
+                    val likes = dashboardfeedObject.getString("likes")
+                    val body = dashboardfeedObject.getString("body")
+                    val userTo = dashboardfeedObject.getString("user_to")
+                    val dateAdded = dashboardfeedObject.getString("date_added")
+                    val userClosed = dashboardfeedObject.getString("user_closed")
+                    val deleted = dashboardfeedObject.getString("deleted")
+                    val image = dashboardfeedObject.getString("image")
+                    val userId = dashboardfeedObject.getString("user_id")
+                    val profilePic = dashboardfeedObject.getString("profile_pic")
+                    val verified = dashboardfeedObject.getString("verified")
+                    val online = dashboardfeedObject.getString("online")
+                    val nickname = dashboardfeedObject.getString("nickname")
+                    val username = dashboardfeedObject.getString("username")
+                    val commentcount = dashboardfeedObject.getString("commentcount")
+                    val likedbyuserYes = dashboardfeedObject.getString("likedbyuseryes")
+                    val form = dashboardfeedObject.getString("form")
+                    val edited = dashboardfeedObject.getString("edited")
+                    val dashboardfeedResult = ProfilenewsRecycler(id, type, likes, body, addedBy, userTo, dateAdded, userClosed, deleted, image, userId, profilePic, verified, online, nickname, username, commentcount, likedbyuserYes, form, edited)
+                    items.add(dashboardfeedResult)
                 }
+                if (dashboardfeed.length() == 0) {
+                    dashProgressBar!!.visibility = View.GONE
+                    relLayoutDash2!!.visibility = View.VISIBLE
+                    noPosts!!.visibility = View.VISIBLE
+                } else {
+                    if (currentPage != PaginationOnScroll.PAGE_START) dashboardfeedadapter!!.removeLoading()
+                    postsProgress!!.visibility = View.GONE
+                    dashboardfeedadapter!!.addItems(items)
+                    if (page == 1) {
+                        dashboardfeedView?.scheduleLayoutAnimation()
+                    }
+                    // check whether is last page or not
+                    if (dashboardfeed.length() == pageSize) {
+                        dashboardfeedadapter!!.addLoading()
+                    } else {
+                        isLastPage = true
+                        //adapter.removeLoading();
+                    }
+                    isLoading = false
+                    noPosts!!.visibility = View.GONE
+                }
+                dashProgressBar!!.visibility = View.GONE
+                relLayoutDash2!!.visibility = View.VISIBLE
+
             } catch (e: JSONException) {
                 e.printStackTrace()
                 //TODO FIX THIS
@@ -461,7 +459,7 @@ class DashboardFragment : CoFragment() {
                 params["items"] = pageSize.toString()
                 params["userid"] = userID!!
                 params["username"] = username!!
-                params["method"] = method!!
+                params["method"] = method
                 return params
             }
         }
@@ -512,7 +510,9 @@ class DashboardFragment : CoFragment() {
     private suspend fun postsQueryButtonClicked(click: Button?) {
         withContext(Main){postsProgress!!.visibility = View.VISIBLE}
         if (click === allPostsButton) {
-            dashboardfeedRecyclerList!!.clear()
+            if (dashboardfeedRecyclerList != null){
+                dashboardfeedRecyclerList!!.clear()
+            }
             if (dashboardfeedadapter != null) {
                 withContext(Main){ dashboardfeedadapter!!.notifyDataSetChanged() }
             }
@@ -529,11 +529,13 @@ class DashboardFragment : CoFragment() {
                 colorAnimation2.start()
                 clicked = "all"
                 currentPage = 1
-                loadDashboardFeed(currentPage, clicked)
+                loadDashboardFeed(currentPage, clicked!!)
             }
         }
         if (click === followingPostsButton) {
-            dashboardfeedRecyclerList!!.clear()
+            if (dashboardfeedRecyclerList != null){
+                dashboardfeedRecyclerList!!.clear()
+            }
             if (dashboardfeedadapter != null) {
                 withContext(Main){ dashboardfeedadapter!!.notifyDataSetChanged() }
             }
@@ -550,7 +552,7 @@ class DashboardFragment : CoFragment() {
                 colorAnimation2.start()
                 clicked = "following"
                 currentPage = 1
-                loadDashboardFeed(currentPage, clicked)
+                loadDashboardFeed(currentPage, clicked!!)
             }
         }
     }

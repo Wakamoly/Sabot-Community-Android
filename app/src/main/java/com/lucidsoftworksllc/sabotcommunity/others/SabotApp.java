@@ -12,6 +12,7 @@ import org.acra.sender.HttpSender;
 
 import dagger.hilt.android.HiltAndroidApp;
 
+/*
 @HiltAndroidApp
 class HiltApp extends Application{}
 
@@ -25,4 +26,4 @@ class ACRAApp extends HiltApp {
     }
 }
 
-public class SabotApp extends ACRAApp{}
+public class SabotApp extends ACRAApp{}*/
