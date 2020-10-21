@@ -2,7 +2,7 @@ package com.lucidsoftworksllc.sabotcommunity.models
 
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 
-class SliderUtilsDash {
+class DashAdsModel {
     var sliderImageUrl: String? = null
         get() = Constants.BASE_URL + field
     var sliderTitle: String? = null

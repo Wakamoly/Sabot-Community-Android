@@ -78,6 +78,7 @@
                         android:layout_height="wrap_content"/>
 
                     <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                         android:id="@+id/spinnerProgress"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>

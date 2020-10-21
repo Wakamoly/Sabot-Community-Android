@@ -24,7 +24,7 @@ import com.lucidsoftworksllc.sabotcommunity.fragments.ClanFragment
 import com.lucidsoftworksllc.sabotcommunity.fragments.FragmentProfile
 import com.lucidsoftworksllc.sabotcommunity.fragments.ProfilePostFragment
 import com.lucidsoftworksllc.sabotcommunity.fragments.PublicsTopicFragment
-import com.lucidsoftworksllc.sabotcommunity.others.BaseViewHolder
+import com.lucidsoftworksllc.sabotcommunity.others.base.BaseViewHolder
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import de.hdodenhof.circleimageview.CircleImageView

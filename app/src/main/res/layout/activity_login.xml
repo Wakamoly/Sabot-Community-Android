@@ -17,6 +17,7 @@
         tools:visibility="gone" />
 
     <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
         android:id="@+id/loadingProgressBar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"

@@ -198,6 +198,7 @@
                 android:text="5" />
 
             <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                 android:id="@+id/reviews5"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
@@ -219,6 +220,7 @@
                 android:text="4" />
 
             <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                 android:id="@+id/reviews4"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
@@ -240,6 +242,7 @@
                 android:text="3" />
 
             <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                 android:id="@+id/reviews3"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
@@ -261,6 +264,7 @@
                 android:text="2" />
 
             <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                 android:id="@+id/reviews2"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
@@ -282,6 +286,7 @@
                 android:text="1" />
 
             <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                 android:id="@+id/reviews1"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"

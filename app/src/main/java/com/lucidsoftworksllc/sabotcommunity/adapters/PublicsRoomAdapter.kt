@@ -20,7 +20,7 @@ import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.db.publics.PublicsEntity
 import com.lucidsoftworksllc.sabotcommunity.db.SabotDatabase
 import com.lucidsoftworksllc.sabotcommunity.fragments.FragmentPublicsCat
-import com.lucidsoftworksllc.sabotcommunity.others.BaseViewHolder
+import com.lucidsoftworksllc.sabotcommunity.others.base.BaseViewHolder
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import com.yarolegovich.lovelydialog.LovelyStandardDialog

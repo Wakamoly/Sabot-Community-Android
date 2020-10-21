@@ -34,6 +34,7 @@
                 android:layout_height="match_parent">
 
                 <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                     android:id="@+id/clansProgressBar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

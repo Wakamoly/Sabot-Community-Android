@@ -110,6 +110,7 @@
         </LinearLayout>
 
         <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
             android:id="@+id/reportProgressBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

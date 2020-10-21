@@ -37,6 +37,7 @@
             android:layout_height="match_parent"/>
 
         <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
             android:id="@+id/manageSaveProgress"
             android:visibility="gone"
             android:progressDrawable="@drawable/progressbarcolor"

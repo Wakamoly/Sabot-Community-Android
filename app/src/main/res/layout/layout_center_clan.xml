@@ -180,6 +180,7 @@
                     tools:visibility="visible" />
 
                 <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                     android:layout_below="@+id/textViewClanDescription"
                     android:layout_toEndOf="@id/imageViewClanPic"
                     android:id="@+id/followProgressClan"
@@ -546,6 +547,7 @@
             </LinearLayout>
 
             <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                 android:id="@+id/newProgress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

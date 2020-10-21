@@ -48,6 +48,7 @@
                     android:visibility="gone" />
 
                 <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                     android:id="@+id/likeProgress"
                     style="?android:attr/progressBarStyle"
                     android:layout_width="40dp"
@@ -332,6 +333,7 @@
                 tools:visibility="visible">
 
                 <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                     android:id="@+id/urlProgress"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

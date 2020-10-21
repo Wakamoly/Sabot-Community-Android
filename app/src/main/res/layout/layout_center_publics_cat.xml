@@ -178,6 +178,7 @@
                             android:visibility="gone" />
 
                         <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                             android:id="@+id/followProgressCat"
                             android:layout_width="90dp"
                             android:layout_height="48dp"

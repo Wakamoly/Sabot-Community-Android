@@ -25,7 +25,7 @@ import com.lucidsoftworksllc.sabotcommunity.*
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.fragments.*
 import com.lucidsoftworksllc.sabotcommunity.models.ProfilenewsRecycler
-import com.lucidsoftworksllc.sabotcommunity.others.BaseViewHolder
+import com.lucidsoftworksllc.sabotcommunity.others.base.BaseViewHolder
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import com.yarolegovich.lovelydialog.LovelyStandardDialog

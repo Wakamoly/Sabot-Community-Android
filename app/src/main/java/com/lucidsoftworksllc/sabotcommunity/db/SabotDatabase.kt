@@ -49,13 +49,6 @@ abstract class SabotDatabase: RoomDatabase() {
             }
         }
 
-        /*fun clearTables() {
-            GlobalScope.launch(Dispatchers.IO) {
-                instance?.clearAllTables()
-                println("CLEARING ALL TABLES")
-            }
-        }*/
-
         private fun buildDatabase(context: Context) = Room.databaseBuilder(
                 context.applicationContext,
                 SabotDatabase::class.java,

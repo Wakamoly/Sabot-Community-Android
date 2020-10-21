@@ -987,6 +987,7 @@
                                             android:paddingBottom="@dimen/spacing_medium">
 
                                             <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                                                 android:layout_width="wrap_content"
                                                 android:layout_height="wrap_content" />
 
@@ -1738,6 +1739,7 @@
             tools:visibility="gone">
 
             <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                 android:progressDrawable="@drawable/progressbarcolor"
                 android:id="@+id/profileLoadingScreenProgressBar"
                 android:layout_width="wrap_content"

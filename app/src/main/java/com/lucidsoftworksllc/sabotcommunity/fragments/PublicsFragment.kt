@@ -20,6 +20,7 @@ import com.lucidsoftworksllc.sabotcommunity.db.publics.PublicsDao
 import com.lucidsoftworksllc.sabotcommunity.db.publics.PublicsEntity
 import com.lucidsoftworksllc.sabotcommunity.db.SabotDatabase
 import com.lucidsoftworksllc.sabotcommunity.others.*
+import com.lucidsoftworksllc.sabotcommunity.others.base.CoFragment
 import com.yarolegovich.lovelydialog.LovelyChoiceDialog
 import com.yarolegovich.lovelydialog.LovelyStandardDialog
 import kotlinx.coroutines.CoroutineScope

@@ -1,17 +1,32 @@
 package com.lucidsoftworksllc.sabotcommunity.models
 
-class CurrentPublicsPOJO {
-    var id: String? = null
-    var subject: String? = null
-    var catname: String? = null
-    var type: String? = null
-    var profilePic: String? = null
-    var nickname: String? = null
-    var eventDate: String? = null
-    var context: String? = null
-    var numPlayers: String? = null
-    var playingNow1: String? = null
-    var numAdded: String? = null
-    var image: String? = null
-    var playingNow: String? = null
-}
+data class CurrentPublicsPOJO (
+    var id: String,
+    var subject: String,
+    var catname: String,
+    var type: String,
+    var profilePic: String,
+    var nickname: String,
+    var eventDate: String,
+    var context: String,
+    var numPlayers: String,
+    var playingNow1: String,
+    var numAdded: String,
+    var image: String,
+    var playingNow: String
+)
+
+data class CurrentPublicsModel_autogen(
+        val catname: String,
+        val context: String,
+        val event_date: String,
+        val id: Int,
+        val image: String,
+        val nickname: String,
+        val num_added: Int,
+        val num_players: Int,
+        val playing_now: String,
+        val profile_pic: String,
+        val subject: String,
+        val type: String
+)

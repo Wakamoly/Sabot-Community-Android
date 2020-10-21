@@ -19,18 +19,28 @@ import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.R.drawable
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.fragments.PublicsTopicFragment
+import com.lucidsoftworksllc.sabotcommunity.models.network_autogen.CurrentPublicsModel
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlin.collections.ArrayList
 
-class DashCurrentPublicsAdapter(currentPublicsSlider: List<*>, private val context: Context) : PagerAdapter() {
+class DashCurrentPublicsAdapter(private val currentPublicsSlider: ArrayList<CurrentPublicsModel?>, private val context: Context) : PagerAdapter() {
     private var layoutInflater: LayoutInflater? = null
-    @Suppress("UNCHECKED_CAST")
-    private val currentPublicsSlider: List<CurrentPublicsPOJO> = currentPublicsSlider as List<CurrentPublicsPOJO>
     override fun getCount(): Int {
         return currentPublicsSlider.size
     }
 
     override fun isViewFromObject(view: View, `object`: Any): Boolean {
         return view === `object`
+    }
+
+    fun addItems(items: List<CurrentPublicsModel>){
+        currentPublicsSlider.addAll(items)
+        notifyDataSetChanged()
+    }
+
+    fun clear() {
+        currentPublicsSlider.clear()
+        notifyDataSetChanged()
     }
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
@@ -49,40 +59,41 @@ class DashCurrentPublicsAdapter(currentPublicsSlider: List<*>, private val conte
         val numPlayersNeeded = view.findViewById<TextView>(R.id.numPlayersNeeded)
         val whenLayout = view.findViewById<LinearLayout>(R.id.whenLayout)
         val playingNowLayout = view.findViewById<LinearLayout>(R.id.playingNowLayout)
-        textViewDescription.text = utils.context
-        textViewTitle.text = utils.subject
-        catName.text = utils.catname
-        nickname.text = utils.nickname
-        numPlayersAdded.text = utils.numAdded
-        numPlayersNeeded.text = utils.numPlayers
-        tvWhen.text = utils.eventDate
-        if (utils.playingNow1 == "yes") {
+
+        textViewDescription.text = utils?.context
+        textViewTitle.text = utils?.subject
+        catName.text = utils?.catname
+        nickname.text = utils?.nickname
+        numPlayersAdded.text = utils?.num_added.toString()
+        numPlayersNeeded.text = utils?.num_players.toString()
+        tvWhen.text = utils?.event_date
+        if (utils?.playing_now == "yes") {
             playingNowLayout.visibility = View.VISIBLE
         } else {
             playingNowLayout.visibility = View.GONE
         }
-        var finalBackImage = utils.image
+        var finalBackImage = utils?.image
         when {
-            utils.image!!.contains(".jpg") -> {
-                finalBackImage = finalBackImage!!.substring(0, utils.image!!.length - 4) + "_r.jpg"
+            utils?.image!!.contains(".jpg") -> {
+                finalBackImage = finalBackImage?.substring(0, utils.image.length - 4) + "_r.jpg"
             }
-            utils.image!!.contains(".png") -> {
-                finalBackImage = finalBackImage!!.substring(0, utils.image!!.length - 4) + "_r.png"
+            utils.image.contains(".png") -> {
+                finalBackImage = finalBackImage?.substring(0, utils.image.length - 4) + "_r.png"
             }
-            utils.image!!.contains(".gif") -> {
-                finalBackImage = finalBackImage!!.substring(0, utils.image!!.length - 4) + "_r.gif"
+            utils.image.contains(".gif") -> {
+                finalBackImage = finalBackImage?.substring(0, utils.image.length - 4) + "_r.gif"
             }
         }
         Glide.with(context)
                 .load(Constants.BASE_URL + finalBackImage)
                 .override(Target.SIZE_ORIGINAL)
                 .into(imageView)
-        val profilePic = utils.profilePic!!.substring(0, utils.profilePic!!.length - 4) + "_r.JPG"
+        val profilePic = utils?.profile_pic?.substring(0, utils.profile_pic.length - 4) + "_r.JPG"
         Glide.with(context)
                 .load(Constants.BASE_URL + profilePic)
                 .override(Target.SIZE_ORIGINAL)
                 .into(profileImage)
-        when (utils.type) {
+        when (utils?.type) {
             "Xbox" -> {
                 platformImage.setImageResource(drawable.icons8_xbox_50)
                 platformImage.visibility = View.VISIBLE
@@ -116,16 +127,16 @@ class DashCurrentPublicsAdapter(currentPublicsSlider: List<*>, private val conte
                 platformImage.visibility = View.VISIBLE
             }
         }
-        if (utils.eventDate == "now") {
+        if (utils?.event_date == "now") {
             whenLayout.setBackgroundResource(drawable.details_button)
-        } else if (utils.eventDate == "ended") {
+        } else if (utils?.event_date == "ended") {
             whenLayout.setBackgroundResource(drawable.red_button)
         }
         view.setOnClickListener {
             if (context is FragmentContainer) {
                 val ldf = PublicsTopicFragment()
                 val args = Bundle()
-                args.putString("PublicsId", utils.id)
+                args.putString("PublicsId", utils?.id.toString())
                 ldf.arguments = args
                 (context as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
             }

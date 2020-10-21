@@ -126,6 +126,7 @@
             android:background="@color/colorAccent" />
 
         <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
             android:id="@+id/messageProgress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -214,6 +215,7 @@
                     android:src="@drawable/ic_send_grey_24dp" />
 
                 <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                     android:id="@+id/sendProgress"
                     android:layout_width="30dp"
                     android:layout_height="35dp"

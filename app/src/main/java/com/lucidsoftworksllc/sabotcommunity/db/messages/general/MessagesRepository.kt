@@ -39,20 +39,20 @@ constructor(
                         if (rowExists.isNotEmpty()){
                             message.id = rowExists[0].id
                             messagesDao.updateRow(cacheMapper.mapToEntity(message))
-                            println("UPDATING USER ROW message.id: ${message.id}, ${message.sent_by}")
+                            //println("UPDATING USER ROW message.id: ${message.id}, ${message.sent_by}")
                         }else {
                             messagesDao.insert(cacheMapper.mapToEntity(message))
-                            println("INSERTING USER NEW ID: ${message.id}, ${message.sent_by}")
+                            //println("INSERTING USER NEW ID: ${message.id}, ${message.sent_by}")
                         }
                     }else{
                         val rowExists = messagesDao.isRowExistGroup(message.group_id)
                         if (rowExists.isNotEmpty()){
                             message.id = rowExists[0].id
                             messagesDao.updateRow(cacheMapper.mapToEntity(message))
-                            println("UPDATING GROUP ROW message.id: ${message.id}, ${message.group_id}")
+                            //println("UPDATING GROUP ROW message.id: ${message.id}, ${message.group_id}")
                         }else {
                             messagesDao.insert(cacheMapper.mapToEntity(message))
-                            println("INSERTING GROUP NEW ID: ${message.id}, ${message.group_id}")
+                            //println("INSERTING GROUP NEW ID: ${message.id}, ${message.group_id}")
                         }
                     }
 

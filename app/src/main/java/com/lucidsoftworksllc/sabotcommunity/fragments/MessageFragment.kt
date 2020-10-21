@@ -45,13 +45,12 @@ import com.lucidsoftworksllc.sabotcommunity.db.messages.user_info.MessageUserInf
 import com.lucidsoftworksllc.sabotcommunity.db.messages.user_info.MessageUserInfoEntity
 import com.lucidsoftworksllc.sabotcommunity.db.messages.user_messages.UserMessagesDao
 import com.lucidsoftworksllc.sabotcommunity.db.messages.user_messages.UserMessagesEntity
-import com.lucidsoftworksllc.sabotcommunity.models.MessagesHelper
 import com.lucidsoftworksllc.sabotcommunity.others.*
 import com.lucidsoftworksllc.sabotcommunity.others.Constants.ROOT_URL
+import com.lucidsoftworksllc.sabotcommunity.others.base.CoFragment
 import com.theartofdev.edmodo.cropper.CropImage
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main

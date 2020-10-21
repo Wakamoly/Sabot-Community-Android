@@ -15,77 +15,46 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager.widget.ViewPager
+import androidx.viewpager.widget.ViewPager.INVISIBLE
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
-import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.JsonArrayRequest
-import com.android.volley.toolbox.StringRequest
-import com.google.android.material.tabs.TabLayout
 import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.R.drawable
-import com.lucidsoftworksllc.sabotcommunity.models.SliderUtilsDash
 import com.lucidsoftworksllc.sabotcommunity.activities.ChatActivity
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.adapters.DashCurrentPublicsAdapter
 import com.lucidsoftworksllc.sabotcommunity.adapters.DashViewPagerAdapter
 import com.lucidsoftworksllc.sabotcommunity.adapters.ProfilenewsAdapter
-import com.lucidsoftworksllc.sabotcommunity.models.CurrentPublicsPOJO
+import com.lucidsoftworksllc.sabotcommunity.databinding.FragmentDashboardBinding
+import com.lucidsoftworksllc.sabotcommunity.fragments.repositories.DashboardRepo
+import com.lucidsoftworksllc.sabotcommunity.fragments.viewmodels.DashboardVM
 import com.lucidsoftworksllc.sabotcommunity.models.ProfilenewsRecycler
+import com.lucidsoftworksllc.sabotcommunity.models.network_autogen.CurrentPublicsModel
+import com.lucidsoftworksllc.sabotcommunity.models.network_autogen.DashboardAdModelItem
+import com.lucidsoftworksllc.sabotcommunity.models.network_autogen.UsersOnlineModel2
+import com.lucidsoftworksllc.sabotcommunity.network.DashApi
 import com.lucidsoftworksllc.sabotcommunity.others.*
+import com.lucidsoftworksllc.sabotcommunity.others.base.BaseFragment
+import com.lucidsoftworksllc.sabotcommunity.util.DataState
 import com.yarolegovich.lovelydialog.LovelyChoiceDialog
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
-import java.util.*
+import kotlinx.android.synthetic.main.fragment_dashboard.*
+import kotlinx.android.synthetic.main.snippet_top_dashboardbar.*
+import kotlin.collections.ArrayList
 
-class DashboardFragment : CoFragment() {
-    private var dashboardRefreshLayout: SwipeRefreshLayout? = null
-    private var sliderImg: ArrayList<SliderUtilsDash?>? = null
-    private var currentPublicsList: ArrayList<CurrentPublicsPOJO?>? = null
-    private var viewPager: ViewPager? = null
-    private var currentPublicsVP: ViewPager? = null
-    private var sliderDotspanel: TabLayout? = null
-    private var currentPublicsVPDots: TabLayout? = null
-    private var currentPublicsTV: LinearLayout? = null
-    private var noCurrentPublics: LinearLayout? = null
-    private var newsLayout: LinearLayout? = null
-    private var noPosts: TextView? = null
-    private var numUsersOnline: TextView? = null
-    private var numCurrentPublics: TextView? = null
-    private var filterText: TextView? = null
-    private var badgeTextView: TextView? = null
-    private var newsTextView: TextView? = null
-    private var newsTextView2: TextView? = null
-    private var sliderboi: RelativeLayout? = null
-    private var relLayoutDash2: RelativeLayout? = null
-    private var dashContainer: RelativeLayout? = null
-    private var followingPostsButton: Button? = null
-    private var allPostsButton: Button? = null
-    private var dashProgressBar: ProgressBar? = null
-    private var currentPublicsProgress: ProgressBar? = null
-    private var postsProgress: ProgressBar? = null
-    private var mContext: Context? = null
-    private var viewPagerAdapter: DashViewPagerAdapter? = null
-    private var userID: String? = null
-    private var username: String? = null
-    private var dashboardMenu: ImageView? = null
-    private var dashboardToMessages: ImageView? = null
-    private var currentPublicsOptions: ImageView? = null
+class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, DashboardRepo>() {
+
     private var filter: String? = null
     private var adNotified: ArrayList<String>? = null
-    private var dashScroll: ScrollView? = null
-    private var dashboardfeedView: RecyclerView? = null
+    private var sliderImgAdsModel: ArrayList<DashboardAdModelItem?>? = null
+    private var currentPublicsList: ArrayList<CurrentPublicsModel?>? = null
+    private var mContext: Context? = null
+    private var viewPagerAdapter: DashViewPagerAdapter? = null
+    private var currentPublicsAdapter: DashCurrentPublicsAdapter? = null
+    private var userID: String? = null
+    private var username: String? = null
     private var currentPage = PaginationOnScroll.PAGE_START
     private var isLastPage = false
     private val pageSize = PaginationOnScroll.PAGE_SIZE
@@ -93,54 +62,28 @@ class DashboardFragment : CoFragment() {
     private var clicked: String? = null
     private var dashboardfeedRecyclerList: MutableList<ProfilenewsRecycler>? = null
     private var dashboardfeedadapter: ProfilenewsAdapter? = null
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val dashboardRootView = inflater.inflate(R.layout.fragment_dashboard, null)
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         mContext = activity
-        dashProgressBar = dashboardRootView.findViewById(R.id.dashProgressBar)
-        sliderboi = dashboardRootView.findViewById(R.id.sliderboi)
-        relLayoutDash2 = dashboardRootView.findViewById(R.id.relLayoutDash2)
-        followingPostsButton = dashboardRootView.findViewById(R.id.followingPostsButton)
-        allPostsButton = dashboardRootView.findViewById(R.id.allPostsButton)
         userID = SharedPrefManager.getInstance(mContext!!)!!.userID
         username = SharedPrefManager.getInstance(mContext!!)!!.username
-        dashboardfeedView = dashboardRootView.findViewById(R.id.dashboardfeedView)
-        dashboardRefreshLayout = dashboardRootView.findViewById(R.id.dashSwipe)
-        dashboardMenu = dashboardRootView.findViewById(R.id.dashboardMenu)
-        dashboardToMessages = dashboardRootView.findViewById(R.id.dashboardToMessages)
-        noPosts = dashboardRootView.findViewById(R.id.noPosts)
-        numUsersOnline = dashboardRootView.findViewById(R.id.numUsersOnline)
-        currentPublicsTV = dashboardRootView.findViewById(R.id.currentPublicsTV)
-        currentPublicsProgress = dashboardRootView.findViewById(R.id.currentPublicsProgress)
-        numCurrentPublics = dashboardRootView.findViewById(R.id.numCurrentPublics)
-        currentPublicsOptions = dashboardRootView.findViewById(R.id.currentPublicsOptions)
-        noCurrentPublics = dashboardRootView.findViewById(R.id.noCurrentPublics)
-        filterText = dashboardRootView.findViewById(R.id.filterText)
-        dashContainer = dashboardRootView.findViewById(R.id.dashContainer)
-        badgeTextView = dashboardRootView.findViewById(R.id.badge_text_view)
-        postsProgress = dashboardRootView.findViewById(R.id.postsProgress)
-        newsLayout = dashboardRootView.findViewById(R.id.newsLayout)
-        newsTextView = dashboardRootView.findViewById(R.id.newsTextView)
-        newsTextView2 = dashboardRootView.findViewById(R.id.newsTextView2)
-        dashScroll = dashboardRootView.findViewById(R.id.dashScroll)
-        viewPager = dashboardRootView.findViewById(R.id.viewPager)
-        sliderDotspanel = dashboardRootView.findViewById(R.id.SliderDots)
-        sliderDotspanel?.setupWithViewPager(viewPager, true)
-        currentPublicsVP = dashboardRootView.findViewById(R.id.currentPublicsVP)
-        currentPublicsVPDots = dashboardRootView.findViewById(R.id.currentPublicsVPDots)
 
+        currentPublicsVPDots.setupWithViewPager(viewPager, true)
 
-        sliderImg = ArrayList()
+        sliderImgAdsModel = ArrayList()
         currentPublicsList = ArrayList()
         adNotified = ArrayList()
         currentPublicsVPDots?.setupWithViewPager(currentPublicsVP, true)
         dashboardMenu?.setOnClickListener { (mContext as FragmentContainer?)!!.openDrawer() }
         dashboardToMessages?.setOnClickListener { startActivity(Intent(mContext, ChatActivity::class.java)) }
-        followingPostsButton?.setOnClickListener { launch { postsQueryButtonClicked(followingPostsButton) } }
-        allPostsButton?.setOnClickListener { launch { postsQueryButtonClicked(allPostsButton) } }
+        followingPostsButton?.setOnClickListener { postsQueryButtonClicked(followingPostsButton) }
+        allPostsButton?.setOnClickListener { postsQueryButtonClicked(allPostsButton) }
         filter = SharedPrefManager.getInstance(mContext!!)!!.currentPublics
 
 
-        dashboardRefreshLayout?.setOnRefreshListener {
+        dashSwipe.setOnRefreshListener {
             adNotified!!.clear()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
@@ -148,25 +91,72 @@ class DashboardFragment : CoFragment() {
             } else {
                 (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
             }
-            dashboardRefreshLayout?.isRefreshing = false
+            dashSwipe?.isRefreshing = false
             sliderboi?.requestFocus()
         }
 
-        launch {
-            withContext(IO){
-                usersOnline()
-                sendRequest()
-                postsQueryButtonClicked(followingPostsButton)
-            }
-            withContext(Main){
-                initDashFeedRecycler()
-                initAdVP()
-                initPublicsVP()
-            }
-        }
+        initDashFeedRecycler()
+        initAdVP()
+        initPublicsVP()
 
-        hideKeyboardFrom(mContext, dashboardRootView)
-        return dashboardRootView
+        subscribeObservers()
+
+        hideKeyboardFrom(mContext, view)
+
+    }
+
+    private fun subscribeObservers(){
+        viewModel.getAds(deviceUsername.toString())
+        viewModel.ads.observe(viewLifecycleOwner, Observer{
+            when(it){
+                is DataState.Success -> {
+                    dashProgressBar.visible(false)
+                    relLayoutDash2!!.visible(true)
+                    updateAdUI(it.data)
+                }
+                is DataState.Loading -> {
+                    dashProgressBar.visible(true)
+                }
+            }
+        })
+
+        viewModel.getNumOnline(deviceUsername.toString())
+        viewModel.numOnline.observe(viewLifecycleOwner, Observer{
+            when(it){
+                is DataState.Success -> {
+                    updateNumOnlineUI(it.data)
+                }
+            }
+        })
+
+
+        viewModel.getCurrentPublics(deviceUsername.toString(), filter.toString())
+        viewModel.publics.observe(viewLifecycleOwner, Observer{
+            when(it){
+                is DataState.Success -> {
+                    currentPublicsProgress.visible(false)
+                    updateCurrentPublicsUI(it.data)
+                }
+                is DataState.Loading -> {
+                    currentPublicsProgress.visible(true)
+                }
+            }
+        })
+
+        postsQueryButtonClicked(followingPostsButton)
+        viewModel.feed.observe(viewLifecycleOwner, Observer{
+            when(it){
+                is DataState.Success -> {
+                    postsProgress.visible(false)
+                    updateDashFeedUI(it.data)
+                }
+                is DataState.Loading -> {
+                    postsProgress.visible(true)
+                }
+            }
+        })
+
+
     }
 
     private fun initDashFeedRecycler(){
@@ -175,7 +165,8 @@ class DashboardFragment : CoFragment() {
         ViewCompat.setNestedScrollingEnabled(dashboardfeedView!!, false)
         dashboardfeedadapter = ProfilenewsAdapter(mContext!!, dashboardfeedRecyclerList)
         dashboardfeedView?.adapter = dashboardfeedadapter
-        dashScroll?.viewTreeObserver?.addOnScrollChangedListener {
+        // TODO: 10/21/20 FIX THIS
+        /*dashScroll?.viewTreeObserver?.addOnScrollChangedListener {
             if (dashScroll?.getChildAt(0)?.bottom!! <= dashScroll?.height!! + dashScroll?.scrollY!!) {
                 if (!isLoading && !isLastPage) {
                     isLoading = true
@@ -183,30 +174,32 @@ class DashboardFragment : CoFragment() {
                     //launch { loadDashboardFeed(currentPage, clicked!!) }
                 }
             }
-        }
+        }*/
     }
 
     private fun initAdVP(){
-        viewPagerAdapter = DashViewPagerAdapter(sliderImg!!, mContext!!)
+        viewPagerAdapter = DashViewPagerAdapter(sliderImgAdsModel!!, mContext!!)
         viewPager?.adapter = viewPagerAdapter
         viewPager?.addOnPageChangeListener(object : OnPageChangeListener {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
             override fun onPageSelected(position: Int) {
-                val adID = sliderImg!![position]!!.sliderAdID
-                adViewed(adID!!)
+                val adID = sliderImgAdsModel!![position]!!.ad_id
+                adViewed(adID)
             }
             override fun onPageScrollStateChanged(state: Int) {
-                dashboardRefreshLayout?.isEnabled = state != ViewPager.SCROLL_STATE_DRAGGING
+                dashSwipe?.isEnabled = state != ViewPager.SCROLL_STATE_DRAGGING
             }
         })
     }
 
     private fun initPublicsVP(){
+        currentPublicsAdapter = DashCurrentPublicsAdapter(currentPublicsList!!, mContext!!)
+        currentPublicsVP.adapter = currentPublicsAdapter
         currentPublicsVP?.addOnPageChangeListener(object : OnPageChangeListener {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
             override fun onPageSelected(position: Int) {}
             override fun onPageScrollStateChanged(state: Int) {
-                dashboardRefreshLayout?.isEnabled = state != ViewPager.SCROLL_STATE_DRAGGING
+                dashSwipe?.isEnabled = state != ViewPager.SCROLL_STATE_DRAGGING
             }
         })
 
@@ -223,9 +216,8 @@ class DashboardFragment : CoFragment() {
                         SharedPrefManager.getInstance(mContext!!)!!.currentPublics = item
                         setPlatformImage(item)
                         filter = item
-                        currentPublicsProgress?.visibility = View.VISIBLE
-                        currentPublicsList!!.clear()
-                        launch { currentPublics() }
+                        currentPublicsAdapter!!.clear()
+                        viewModel.getCurrentPublics(deviceUsername.toString(), filter.toString())
                     }
                     .show()
         }
@@ -241,229 +233,89 @@ class DashboardFragment : CoFragment() {
         }
         if (isAdViewed == "no") {
             adNotified!!.add(adID)
-            val stringRequest: StringRequest = object : StringRequest(Method.POST, URL_VIEWED, Response.Listener { }, Response.ErrorListener { }) {
-                override fun getParams(): Map<String, String> {
-                    val parms: MutableMap<String, String> = HashMap()
-                    parms["id"] = adID
-                    parms["method"] = "view"
-                    parms["user_id"] = SharedPrefManager.getInstance(mContext!!)!!.userID!!
-                    parms["username"] = SharedPrefManager.getInstance(mContext!!)!!.username!!
-                    return parms
-                }
-            }
-            (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
+            viewModel.setAdViewed(adID.toInt(), "view", deviceUserID!!, deviceUsername!!)
         }
     }
 
-    private suspend fun usersOnline() {
-        val stringRequest = StringRequest(Request.Method.GET, "$USERS_ONLINE?username=$username", { response: String? ->
-            try {
-                launch {
-                    val obj = JSONObject(response!!)
-                    val usersonline = obj.getJSONArray("numonline")
-                    for (i in 0 until usersonline.length()) {
-                        val usersonlineObj = usersonline.getJSONObject(i)
-                        val num = usersonlineObj.getString("num")
-                        val numpublics = usersonlineObj.getString("numpublics")
-                        withContext(Main) {
-                            numUsersOnline!!.text = num
-                            numCurrentPublics!!.text = numpublics
-                            val unreadmessages = usersonlineObj.getString("unreadmessages").toInt()
-                            if (unreadmessages > 0) {
-                                badgeTextView!!.visibility = View.VISIBLE
-                                if (unreadmessages > 9) {
-                                    badgeTextView!!.text = "9+"
-                                } else {
-                                    badgeTextView!!.text = usersonlineObj.getString("unreadmessages")
-                                }
-                            }
-                        }
-                    }
-                    val dashnews = obj.getJSONArray("dashnews")
-                    if (dashnews.length() != 0) {
-                        withContext(Main){
-                            newsLayout!!.visibility = View.VISIBLE
-                            for (i in 0 until dashnews.length()) {
-                                val usersonlineObj = dashnews.getJSONObject(i)
-                                val toptext = usersonlineObj.getString("toptext")
-                                val bottomtext = usersonlineObj.getString("bottomtext")
-                                val link = usersonlineObj.getString("link")
-                                newsTextView!!.text = toptext
-                                newsTextView2!!.text = bottomtext
-                                newsLayout!!.setOnClickListener { mContext!!.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link))) }
-                            }
-                        }
-                    }
-                }
-            } catch (e: JSONException) {
-                e.printStackTrace()
-            }
-        }) { }
-        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
-    }
+    private fun updateNumOnlineUI(data: UsersOnlineModel2) {
+        val dashNews = data.dashnews
+        val usersOnline = data.numonline
 
-    private fun currentPublics() {
-        currentPublicsList!!.clear()
-        val jsonArrayRequest = JsonArrayRequest(Request.Method.GET, "$CURRENT_PUBLICS?filter=$filter&username=$username", null, { response: JSONArray ->
-            launch {
-                if (response.length() == 0) {
-                    withContext(Main){
-                        noCurrentPublics!!.visibility = View.VISIBLE
-                        currentPublicsProgress!!.visibility = View.GONE
-                        currentPublicsTV!!.setOnClickListener {
-                            currentPublicsProgress!!.visibility = View.VISIBLE
-                            currentPublicsList!!.clear()
-                            launch { currentPublics() }
-                        }
-                        noCurrentPublics!!.setOnClickListener {
-                            val asf: Fragment = PublicsFragment()
-                            val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                            fragmentTransaction.replace(R.id.fragment_container, asf)
-                            fragmentTransaction.addToBackStack(null)
-                            fragmentTransaction.commit()
-                        }
-                    }
+        with(binding){
+            numUsersOnline.text = usersOnline.num.toString()
+            numCurrentPublics.text = usersOnline.numpublics.toString()
+            if (usersOnline.unreadmessages > 0) {
+                badge_text_view!!.visibility = View.VISIBLE
+                if (usersOnline.unreadmessages > 9) {
+                    badge_text_view.text = "9+"
                 } else {
-                    for (i in 0 until response.length()) {
-                        val currentPublics = CurrentPublicsPOJO()
-                        try {
-                            val jsonObject = response.getJSONObject(i)
-                            currentPublics.id = jsonObject.getString("id")
-                            currentPublics.subject = jsonObject.getString("subject")
-                            currentPublics.catname = jsonObject.getString("catname")
-                            currentPublics.type = jsonObject.getString("type")
-                            currentPublics.profilePic = jsonObject.getString("profile_pic")
-                            currentPublics.nickname = jsonObject.getString("nickname")
-                            currentPublics.eventDate = jsonObject.getString("event_date")
-                            currentPublics.context = jsonObject.getString("context")
-                            currentPublics.numPlayers = jsonObject.getString("num_players")
-                            currentPublics.numAdded = jsonObject.getString("num_added")
-                            currentPublics.image = jsonObject.getString("image")
-                            currentPublics.playingNow = jsonObject.getString("playing_now")
-                        } catch (e: JSONException) {
-                            e.printStackTrace()
-                        }
-                        withContext(Main){ currentPublicsList!!.add(currentPublics) }
-                    }
-                    withContext(Main){
-                        val currentPublicsAdapter = DashCurrentPublicsAdapter(currentPublicsList!!, mContext!!)
-                        currentPublicsVP!!.adapter = currentPublicsAdapter
-                        currentPublicsProgress!!.visibility = View.GONE
-                        noCurrentPublics!!.visibility = View.GONE
-                        currentPublicsTV!!.setOnClickListener {
-                            currentPublicsProgress!!.visibility = View.VISIBLE
-                            launch { currentPublics() }
-                        }
-                    }
+                    badge_text_view.text = usersOnline.unreadmessages.toString()
                 }
             }
-        }) { }
-        DashSliderRequest.getInstance(mContext!!)?.addToRequestQueue(jsonArrayRequest)
 
+            newsLayout.visibility = View.VISIBLE
+            newsTextView.text = dashNews.toptext
+            newsTextView2.text = dashNews.bottomtext
+            newsLayout.setOnClickListener { mContext!!.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(dashNews.link))) }
+        }
     }
 
-    private suspend fun sendRequest() {
-        val jsonArrayRequest = JsonArrayRequest(Request.Method.GET, "$DashboardAds_URL?username=$username", null, { response: JSONArray ->
-            for (i in 0 until response.length()) {
-                val sliderUtils = SliderUtilsDash()
-                try {
-                    val jsonObject = response.getJSONObject(i)
-                    sliderUtils.sliderImageUrl = jsonObject.getString("cat_image")
-                    sliderUtils.sliderDescription = jsonObject.getString("cat_description")
-                    sliderUtils.sliderTitle = jsonObject.getString("cat_name")
-                    sliderUtils.sliderID = jsonObject.getString("cat_id")
-                    sliderUtils.sliderType = jsonObject.getString("type")
-                    sliderUtils.sliderTag = jsonObject.getString("tag")
-                    sliderUtils.sliderAdID = jsonObject.getString("ad_id")
-                } catch (e: JSONException) {
-                    e.printStackTrace()
+    private fun updateCurrentPublicsUI(data: List<CurrentPublicsModel>){
+        currentPublicsAdapter!!.clear()
+        if (data.isEmpty()){
+            with(binding){
+                currentPublicsVP.visibility = INVISIBLE
+                noCurrentPublics.visible(true)
+                currentPublicsTV.setOnClickListener {
+                    currentPublicsAdapter!!.clear()
+                    viewModel.getCurrentPublics(deviceUsername.toString(), filter.toString())
                 }
-                CoroutineScope(Main).launch {
-                    sliderImg!!.add(sliderUtils)
-                    adViewed(sliderImg!![0]!!.sliderAdID!!)
-                    viewPagerAdapter!!.notifyDataSetChanged()
+                noCurrentPublics.setOnClickListener {
+                    val asf = PublicsFragment()
+                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
+                    fragmentTransaction.replace(R.id.fragment_container, asf)
+                    fragmentTransaction.addToBackStack(null)
+                    fragmentTransaction.commit()
                 }
             }
-            launch { currentPublics() }
-        }) { }
-        DashSliderRequest.getInstance(mContext!!)!!.addToRequestQueue(jsonArrayRequest)
-    }
-
-    private fun loadDashboardFeed(page: Int, method: String) {
-        val items = ArrayList<ProfilenewsRecycler>()
-        val stringRequest: StringRequest = object : StringRequest(Method.POST, DashboardFeed_URL, Response.Listener { response: String? ->
-            try {
-                val dashboardfeed = JSONArray(response)
-                for (i in 0 until dashboardfeed.length()) {
-                    val dashboardfeedObject = dashboardfeed.getJSONObject(i)
-                    val addedBy = dashboardfeedObject.getString("added_by")
-                    if (SharedPrefManager.getInstance(mContext!!)!!.isUserBlocked(addedBy)) continue
-                    val id = dashboardfeedObject.getInt("id")
-                    val type = dashboardfeedObject.getString("type")
-                    val likes = dashboardfeedObject.getString("likes")
-                    val body = dashboardfeedObject.getString("body")
-                    val userTo = dashboardfeedObject.getString("user_to")
-                    val dateAdded = dashboardfeedObject.getString("date_added")
-                    val userClosed = dashboardfeedObject.getString("user_closed")
-                    val deleted = dashboardfeedObject.getString("deleted")
-                    val image = dashboardfeedObject.getString("image")
-                    val userId = dashboardfeedObject.getString("user_id")
-                    val profilePic = dashboardfeedObject.getString("profile_pic")
-                    val verified = dashboardfeedObject.getString("verified")
-                    val online = dashboardfeedObject.getString("online")
-                    val nickname = dashboardfeedObject.getString("nickname")
-                    val username = dashboardfeedObject.getString("username")
-                    val commentcount = dashboardfeedObject.getString("commentcount")
-                    val likedbyuserYes = dashboardfeedObject.getString("likedbyuseryes")
-                    val form = dashboardfeedObject.getString("form")
-                    val edited = dashboardfeedObject.getString("edited")
-                    val dashboardfeedResult = ProfilenewsRecycler(id, type, likes, body, addedBy, userTo, dateAdded, userClosed, deleted, image, userId, profilePic, verified, online, nickname, username, commentcount, likedbyuserYes, form, edited)
-                    items.add(dashboardfeedResult)
+        }else{
+            with(binding){
+                noCurrentPublics.visible(false)
+                currentPublicsVP.visible(true)
+                currentPublicsAdapter?.addItems(data)
+                currentPublicsTV.setOnClickListener {
+                    currentPublicsProgress.visibility = View.VISIBLE
+                    viewModel.getCurrentPublics(deviceUsername.toString(), filter.toString())
                 }
-                if (dashboardfeed.length() == 0) {
-                    dashProgressBar!!.visibility = View.GONE
-                    relLayoutDash2!!.visibility = View.VISIBLE
-                    noPosts!!.visibility = View.VISIBLE
-                } else {
-                    if (currentPage != PaginationOnScroll.PAGE_START) dashboardfeedadapter!!.removeLoading()
-                    postsProgress!!.visibility = View.GONE
-                    dashboardfeedadapter!!.addItems(items)
-                    if (page == 1) {
-                        dashboardfeedView?.scheduleLayoutAnimation()
-                    }
-                    // check whether is last page or not
-                    if (dashboardfeed.length() == pageSize) {
-                        dashboardfeedadapter!!.addLoading()
-                    } else {
-                        isLastPage = true
-                        //adapter.removeLoading();
-                    }
-                    isLoading = false
-                    noPosts!!.visibility = View.GONE
-                }
-                dashProgressBar!!.visibility = View.GONE
-                relLayoutDash2!!.visibility = View.VISIBLE
-
-            } catch (e: JSONException) {
-                e.printStackTrace()
-                //TODO FIX THIS
-                dashProgressBar!!.visibility = View.GONE
-                relLayoutDash2!!.visibility = View.VISIBLE
-                noPosts!!.visibility = View.VISIBLE
-                postsProgress!!.visibility = View.GONE
-            }
-        }, Response.ErrorListener { /*Toast.makeText(mContext, "Couldn't get dashboard feed!", Toast.LENGTH_SHORT).show()*/ }) {
-            override fun getParams(): Map<String, String> {
-                val params: MutableMap<String, String> = HashMap()
-                params["page"] = page.toString()
-                params["items"] = pageSize.toString()
-                params["userid"] = userID!!
-                params["username"] = username!!
-                params["method"] = method
-                return params
             }
         }
-        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
+    }
+
+    private fun updateAdUI(data: List<DashboardAdModelItem>){
+        adViewed(data[0].ad_id)
+        viewPagerAdapter!!.addItems(data)
+    }
+
+    private fun updateDashFeedUI(data: List<ProfilenewsRecycler>){
+        if (data.isEmpty()){
+            noPosts.visible(true)
+        }else{
+            if (currentPage != PaginationOnScroll.PAGE_START) dashboardfeedadapter!!.removeLoading()
+            postsProgress!!.visibility = View.GONE
+            dashboardfeedadapter!!.addItems(data)
+            if (currentPage == 1) {
+                dashboardfeedView.scheduleLayoutAnimation()
+            }
+            // check whether is last page or not
+            if (data.size == pageSize) {
+                dashboardfeedadapter!!.addLoading()
+            } else {
+                isLastPage = true
+                //adapter.removeLoading();
+            }
+            isLoading = false
+            noPosts.visible(false)
+        }
     }
 
     private fun setPlatformImage(item: String?) {
@@ -507,65 +359,70 @@ class DashboardFragment : CoFragment() {
         }
     }
 
-    private suspend fun postsQueryButtonClicked(click: Button?) {
-        withContext(Main){postsProgress!!.visibility = View.VISIBLE}
+    private fun postsQueryButtonClicked(click: Button?) {
+        postsProgress!!.visibility = View.VISIBLE
         if (click === allPostsButton) {
             if (dashboardfeedRecyclerList != null){
                 dashboardfeedRecyclerList!!.clear()
             }
             if (dashboardfeedadapter != null) {
-                withContext(Main){ dashboardfeedadapter!!.notifyDataSetChanged() }
+                dashboardfeedadapter!!.notifyDataSetChanged()
             }
-            withContext(Main){
-                val colorFrom = ContextCompat.getColor(mContext!!, R.color.grey_80)
-                val colorTo = ContextCompat.getColor(mContext!!, R.color.green)
-                val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, colorTo)
-                colorAnimation.duration = 750
-                colorAnimation.addUpdateListener { animator: ValueAnimator -> allPostsButton!!.setBackgroundColor(animator.animatedValue as Int) }
-                colorAnimation.start()
-                val colorAnimation2 = ValueAnimator.ofObject(ArgbEvaluator(), colorTo, colorFrom)
-                colorAnimation2.duration = 750
-                colorAnimation2.addUpdateListener { animator: ValueAnimator -> followingPostsButton!!.setBackgroundColor(animator.animatedValue as Int) }
-                colorAnimation2.start()
-                clicked = "all"
-                currentPage = 1
-                loadDashboardFeed(currentPage, clicked!!)
-            }
+            val colorFrom = ContextCompat.getColor(mContext!!, R.color.grey_80)
+            val colorTo = ContextCompat.getColor(mContext!!, R.color.green)
+            val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, colorTo)
+            colorAnimation.duration = 750
+            colorAnimation.addUpdateListener { animator: ValueAnimator -> allPostsButton!!.setBackgroundColor(animator.animatedValue as Int) }
+            colorAnimation.start()
+            val colorAnimation2 = ValueAnimator.ofObject(ArgbEvaluator(), colorTo, colorFrom)
+            colorAnimation2.duration = 750
+            colorAnimation2.addUpdateListener { animator: ValueAnimator -> followingPostsButton!!.setBackgroundColor(animator.animatedValue as Int) }
+            colorAnimation2.start()
+            clicked = "all"
+            currentPage = 1
+            viewModel.getDashboardFeed(currentPage, pageSize, deviceUsername.toString(), deviceUserID!!, clicked.toString())
+
         }
         if (click === followingPostsButton) {
             if (dashboardfeedRecyclerList != null){
                 dashboardfeedRecyclerList!!.clear()
             }
             if (dashboardfeedadapter != null) {
-                withContext(Main){ dashboardfeedadapter!!.notifyDataSetChanged() }
+                dashboardfeedadapter!!.notifyDataSetChanged()
             }
-            withContext(Main){
-                val colorTo = ContextCompat.getColor(mContext!!, R.color.grey_80)
-                val colorFrom = ContextCompat.getColor(mContext!!, R.color.green)
-                val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, colorTo)
-                colorAnimation.duration = 250
-                colorAnimation.addUpdateListener { animator: ValueAnimator -> allPostsButton!!.setBackgroundColor(animator.animatedValue as Int) }
-                colorAnimation.start()
-                val colorAnimation2 = ValueAnimator.ofObject(ArgbEvaluator(), colorTo, colorFrom)
-                colorAnimation2.duration = 250
-                colorAnimation2.addUpdateListener { animator: ValueAnimator -> followingPostsButton!!.setBackgroundColor(animator.animatedValue as Int) }
-                colorAnimation2.start()
-                clicked = "following"
-                currentPage = 1
-                loadDashboardFeed(currentPage, clicked!!)
-            }
+            val colorTo = ContextCompat.getColor(mContext!!, R.color.grey_80)
+            val colorFrom = ContextCompat.getColor(mContext!!, R.color.green)
+            val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, colorTo)
+            colorAnimation.duration = 250
+            colorAnimation.addUpdateListener { animator: ValueAnimator -> allPostsButton!!.setBackgroundColor(animator.animatedValue as Int) }
+            colorAnimation.start()
+            val colorAnimation2 = ValueAnimator.ofObject(ArgbEvaluator(), colorTo, colorFrom)
+            colorAnimation2.duration = 250
+            colorAnimation2.addUpdateListener { animator: ValueAnimator -> followingPostsButton!!.setBackgroundColor(animator.animatedValue as Int) }
+            colorAnimation2.start()
+            clicked = "following"
+            currentPage = 1
+            viewModel.getDashboardFeed(currentPage, pageSize, deviceUsername.toString(), deviceUserID!!, clicked.toString())
+
         }
     }
 
     companion object {
-        private const val DashboardAds_URL = Constants.ROOT_URL + "dashboardads_api.php"
-        private const val CURRENT_PUBLICS = Constants.ROOT_URL + "current_publics.php"
-        private const val DashboardFeed_URL = Constants.ROOT_URL + "dashboardfeed_api.php"
-        private const val URL_VIEWED = Constants.ROOT_URL + "dashboard_ad_interaction.php"
-        private const val USERS_ONLINE = Constants.ROOT_URL + "num_users_online.php"
         fun hideKeyboardFrom(context: Context?, view: View) {
             val imm = context!!.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(view.windowToken, 0)
         }
+    }
+
+    override fun getViewModel() = DashboardVM::class.java
+
+    override fun getFragmentBinding(
+            inflater: LayoutInflater,
+            container: ViewGroup?
+    ) = FragmentDashboardBinding.inflate(inflater, container, false)
+
+    override fun getFragmentRepository(): DashboardRepo {
+        val api = remoteDataSource.buildApi(DashApi::class.java, mContext?.fcmToken)
+        return DashboardRepo(api)
     }
 }
