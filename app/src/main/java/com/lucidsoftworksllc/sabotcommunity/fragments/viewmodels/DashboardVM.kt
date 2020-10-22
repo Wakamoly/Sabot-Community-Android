@@ -59,6 +59,8 @@ class DashboardVM (
         _numOnline.value = repository.getNumOnline(dUsername)
     }
 
+
+
     fun setAdViewed(adID: Int, method: String, dUserID: Int, dUsername: String) = viewModelScope.launch {
         repository.setAdViewed(adID, method, dUserID, dUsername)
     }

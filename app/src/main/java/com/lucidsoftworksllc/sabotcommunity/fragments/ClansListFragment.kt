@@ -38,7 +38,7 @@ class ClansListFragment : Fragment() {
     private var clansMenu: ImageView? = null
     private var recyclerView: RecyclerView? = null
     private val layoutManager: RecyclerView.LayoutManager? = null
-    private var adapter: RecyclerView.Adapter<*>? = null
+    private var adapter: JoinedClansAdapter? = null
     private var clans: MutableList<ClansRecycler>? = null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val clansRootView = inflater.inflate(R.layout.fragment_clans_list, null)
@@ -57,7 +57,7 @@ class ClansListFragment : Fragment() {
         dialog = ProgressDialog(mContext)
         dialog!!.setMessage("Loading joined clans...")
         dialog!!.show()
-        adapter = JoinedClansAdapter(mContext!!, clans!!)
+        adapter = JoinedClansAdapter(mContext!!)
         recyclerView?.adapter = adapter
         clansMenu?.setOnClickListener { view: View? ->
             val popup = PopupMenu(mContext, view)
@@ -110,6 +110,8 @@ class ClansListFragment : Fragment() {
                                 val ldf = NewClanFragment()
                                 (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                             }
+                        }else{
+                            adapter?.addItems(clans)
                         }
                         dialog!!.dismiss()
                         clansProgressBar!!.visibility = View.GONE

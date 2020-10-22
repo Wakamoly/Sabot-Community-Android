@@ -23,6 +23,7 @@ import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -47,15 +48,22 @@ import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.adapters.JoinedClansAdapter
 import com.lucidsoftworksllc.sabotcommunity.adapters.ProfilenewsAdapter
 import com.lucidsoftworksllc.sabotcommunity.adapters.PublicsTopicAdapter
+import com.lucidsoftworksllc.sabotcommunity.databinding.FragmentProfileBinding
+import com.lucidsoftworksllc.sabotcommunity.fragments.repositories.ProfileRepo
+import com.lucidsoftworksllc.sabotcommunity.fragments.viewmodels.ProfileVM
 import com.lucidsoftworksllc.sabotcommunity.models.ClansRecycler
 import com.lucidsoftworksllc.sabotcommunity.models.ProfilenewsRecycler
 import com.lucidsoftworksllc.sabotcommunity.models.PublicsTopicRecycler
-import com.lucidsoftworksllc.sabotcommunity.others.Constants
-import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
-import com.lucidsoftworksllc.sabotcommunity.others.toastLong
+import com.lucidsoftworksllc.sabotcommunity.models.network_autogen.ProfileTopModel
+import com.lucidsoftworksllc.sabotcommunity.network.ProfileApi
+import com.lucidsoftworksllc.sabotcommunity.others.*
+import com.lucidsoftworksllc.sabotcommunity.others.base.BaseFragment
+import com.lucidsoftworksllc.sabotcommunity.util.DataState
 import com.theartofdev.edmodo.cropper.CropImage
 import com.yarolegovich.lovelydialog.LovelyStandardDialog
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlinx.android.synthetic.main.fragment_profile.*
+import kotlinx.android.synthetic.main.snippet_top_profilebar.*
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -63,217 +71,43 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.*
 
-class FragmentProfile : Fragment() {
-    private var profilenewsView: RecyclerView? = null
+class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileRepo>() {
     private var newsadapter: ProfilenewsAdapter? = null
     private var publicsnewsadapter: PublicsTopicAdapter? = null
     private var clansAdapter: JoinedClansAdapter? = null
     private var profilenewsRecyclerList: MutableList<ProfilenewsRecycler>? = null
     private var profilepublicsnewsRecyclerList: MutableList<PublicsTopicRecycler>? = null
     private var clans: MutableList<ClansRecycler>? = null
-    private var userSwitch: TextView? = null
-    private var userTwitter: TextView? = null
-    private var userDiscordProfile: TextView? = null
-    private var profileWebsite: TextView? = null
-    private var profileItemsLabel: TextView? = null
-    private var followingTV: TextView? = null
-    private var connectionsTV: TextView? = null
-    private var followersTV: TextView? = null
-    private var postsNoPosts: TextView? = null
-    private var textViewClanTag: TextView? = null
-    private var textViewTvPosts: TextView? = null
-    private val textViewTvLikes: TextView? = null
-    private val editProfile: TextView? = null
-    private var textViewUsername: TextView? = null
-    private var textViewNickname: TextView? = null
-    private var textViewDescription: TextView? = null
-    private var reviewCount: TextView? = null
-    private var userTwitch: TextView? = null
-    private var userMixer: TextView? = null
-    private var userPSN: TextView? = null
-    private var userXbox: TextView? = null
-    private var userDiscord: TextView? = null
-    private var userSteam: TextView? = null
-    private var userInstagram: TextView? = null
-    private var userYoutube: TextView? = null
-    private var followersCount: TextView? = null
-    private var friendsCount: TextView? = null
-    private var followingCount: TextView? = null
-    private var starIcon: ImageView? = null
-    private var imageViewProfilePic: ImageView? = null
-    private var imageViewProfileCover: ImageView? = null
-    private var profileOnlineIcon: ImageView? = null
-    private var imageUploadBtn: ImageView? = null
-    private var verifiedIcon: CircleImageView? = null
+
     private var mContext: Context? = null
-    private var submitStatusButton: Button? = null
-    private var profileNewsMoreBtn: Button? = null
-    private var profilePostsButton: Button? = null
-    private var publicsPostsButton: Button? = null
-    private var profileClansButton: Button? = null
-    private var userSwitchDetails: RelativeLayout? = null
-    private var userTwitterDetails: RelativeLayout? = null
-    private var userDiscordProfileDetails: RelativeLayout? = null
-    private var mProgressBar: RelativeLayout? = null
-    private var profileErrorScreen: RelativeLayout? = null
-    private var setProfileCoverButton: RelativeLayout? = null
-    private var setProfilePhotoButton: RelativeLayout? = null
-    private var profileDisabledScreen: RelativeLayout? = null
-    private var userTwitchDetails: RelativeLayout? = null
-    private var userInstagramDetails: RelativeLayout? = null
-    private var userYoutubeDetails: RelativeLayout? = null
-    private var userMixerDetails: RelativeLayout? = null
-    private var userPSNDetails: RelativeLayout? = null
-    private var userXboxDetails: RelativeLayout? = null
-    private var userDiscordDetails: RelativeLayout? = null
-    private var userSteamDetails: RelativeLayout? = null
-    private var profileWebsiteContainer: LinearLayout? = null
-    private var profileLayout: LinearLayout? = null
-    private var addPostLayout: LinearLayout? = null
-    private var playerratingLayout: LinearLayout? = null
-    private var moreButtonLayout: LinearLayout? = null
-    private var profileStatusContainer: LinearLayout? = null
-    private var addMessageButton: MaterialRippleLayout? = null
-    private var requestSentFriendButton: MaterialRippleLayout? = null
-    private var addFriendProgress: MaterialRippleLayout? = null
-    private var editProfileButton: MaterialRippleLayout? = null
-    private var followProfileButton: MaterialRippleLayout? = null
-    private var followedProfileButton: MaterialRippleLayout? = null
-    private var addFriendButton: MaterialRippleLayout? = null
-    private var addedFriendButton: MaterialRippleLayout? = null
-    private var requestedFriendButton: MaterialRippleLayout? = null
-    private var addItemButton: MaterialRippleLayout? = null
-    private var profileRating: SimpleRatingBar? = null
-    private var profileRefreshLayout: SwipeRefreshLayout? = null
-    private var postTypeSpinner: Spinner? = null
     private var imageToUpload: Bitmap? = null
     private var profileUsername: String? = null
     private var rQueue: RequestQueue? = null
     private var jsonObject: JSONObject? = null
-    private var userID: String? = null
     private var userProfileID: String? = null
-    private var deviceUsername: String? = null
-    private var statusUpdate: EditText? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val userProfileRootView = inflater.inflate(R.layout.fragment_profile, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         mContext = activity
-        mProgressBar = userProfileRootView.findViewById(R.id.profileLoadingScreen)
-        addFriendProgress = userProfileRootView.findViewById(R.id.addFriendProgress)
-        followingCount = userProfileRootView.findViewById(R.id.followingCount)
-        followersCount = userProfileRootView.findViewById(R.id.followersCount)
-        friendsCount = userProfileRootView.findViewById(R.id.friendsCount)
-        userTwitch = userProfileRootView.findViewById(R.id.userTwitch)
-        userMixer = userProfileRootView.findViewById(R.id.userMixer)
-        userPSN = userProfileRootView.findViewById(R.id.userPSN)
-        userXbox = userProfileRootView.findViewById(R.id.userXbox)
-        userDiscord = userProfileRootView.findViewById(R.id.userDiscord)
-        userSteam = userProfileRootView.findViewById(R.id.userSteam)
-        userTwitchDetails = userProfileRootView.findViewById(R.id.userTwitchDetails)
-        userInstagram = userProfileRootView.findViewById(R.id.userInstagram)
-        userInstagramDetails = userProfileRootView.findViewById(R.id.userInstagramDetails)
-        userYoutube = userProfileRootView.findViewById(R.id.userYoutube)
-        userYoutubeDetails = userProfileRootView.findViewById(R.id.userYoutubeDetails)
-        userMixerDetails = userProfileRootView.findViewById(R.id.userMixerDetails)
-        userPSNDetails = userProfileRootView.findViewById(R.id.userPSNDetails)
-        userXboxDetails = userProfileRootView.findViewById(R.id.userXboxDetails)
-        userDiscordDetails = userProfileRootView.findViewById(R.id.userDiscordDetails)
-        userSteamDetails = userProfileRootView.findViewById(R.id.userSteamDetails)
-        profileDisabledScreen = userProfileRootView.findViewById(R.id.profileDisabledScreen)
-        textViewNickname = userProfileRootView.findViewById(R.id.textViewNickname)
-        textViewUsername = userProfileRootView.findViewById(R.id.textViewUsername)
-        textViewTvPosts = userProfileRootView.findViewById(R.id.tvPosts)
-        statusUpdate = userProfileRootView.findViewById(R.id.statusUpdate)
-        submitStatusButton = userProfileRootView.findViewById(R.id.submitStatusButton)
-        postsNoPosts = userProfileRootView.findViewById(R.id.postsNoPosts)
-        //textViewTvLikes = userProfileRootView.findViewById(R.id.tvFollowers);
-        addPostLayout = userProfileRootView.findViewById(R.id.addPostLayout)
-        playerratingLayout = userProfileRootView.findViewById(R.id.profileRatingContainer)
-        textViewDescription = userProfileRootView.findViewById<View>(R.id.textViewDescription) as TextView
-        verifiedIcon = userProfileRootView.findViewById(R.id.verifiedIcon)
-        addItemButton = userProfileRootView.findViewById(R.id.addItemButton)
-        profileOnlineIcon = userProfileRootView.findViewById(R.id.profileOnlineIcon)
-        setProfilePhotoButton = userProfileRootView.findViewById(R.id.setProfilePhotoButton)
-        setProfileCoverButton = userProfileRootView.findViewById(R.id.setProfileCoverButton)
-        imageViewProfilePic = userProfileRootView.findViewById(R.id.imageViewProfilePic)
-        imageViewProfileCover = userProfileRootView.findViewById(R.id.profileCover)
-        editProfileButton = userProfileRootView.findViewById(R.id.editProfileButton)
-        followProfileButton = userProfileRootView.findViewById(R.id.followProfileButton)
-        followedProfileButton = userProfileRootView.findViewById(R.id.followedProfileButton)
-        requestedFriendButton = userProfileRootView.findViewById(R.id.requestedFriendButton)
-        addedFriendButton = userProfileRootView.findViewById(R.id.addedFriendButton)
-        addFriendButton = userProfileRootView.findViewById(R.id.addFriendButton)
-        addMessageButton = userProfileRootView.findViewById(R.id.addMessageButton)
-        starIcon = userProfileRootView.findViewById(R.id.starIcon)
-        profileRating = userProfileRootView.findViewById(R.id.profileRating)
-        //editProfile = (TextView) userProfileRootView.findViewById(R.id.textEditProfile);
-        postTypeSpinner = userProfileRootView.findViewById(R.id.postTypeSpinner)
-        profileLayout = userProfileRootView.findViewById(R.id.profileLayout)
-        reviewCount = userProfileRootView.findViewById(R.id.reviewCount)
-        profileRefreshLayout = userProfileRootView.findViewById(R.id.profileRefreshLayout)
-        requestSentFriendButton = userProfileRootView.findViewById(R.id.requestSentFriendButton)
-        addMessageButton = userProfileRootView.findViewById(R.id.addMessageButton)
-        moreButtonLayout = userProfileRootView.findViewById(R.id.moreButtonLayout)
-        imageUploadBtn = userProfileRootView.findViewById(R.id.imageUploadBtn)
-        textViewClanTag = userProfileRootView.findViewById(R.id.textViewClanTag)
-        profileErrorScreen = userProfileRootView.findViewById(R.id.profileErrorScreen)
-        profileStatusContainer = userProfileRootView.findViewById(R.id.profileStatusContainer)
-        profileNewsMoreBtn = userProfileRootView.findViewById(R.id.profileNewsMoreBtn)
-        followersTV = userProfileRootView.findViewById(R.id.followers)
-        followingTV = userProfileRootView.findViewById(R.id.following)
-        connectionsTV = userProfileRootView.findViewById(R.id.connections)
-        profileClansButton = userProfileRootView.findViewById(R.id.profileClansButtons)
-        publicsPostsButton = userProfileRootView.findViewById(R.id.publicsPostsButtons)
-        profilePostsButton = userProfileRootView.findViewById(R.id.profilePostsButton)
-        profileItemsLabel = userProfileRootView.findViewById(R.id.profileItemsLabel)
-        profileWebsite = userProfileRootView.findViewById(R.id.profileWebsite)
-        profileWebsiteContainer = userProfileRootView.findViewById(R.id.profileWebsiteContainer)
-        userDiscordProfileDetails = userProfileRootView.findViewById(R.id.userDiscordProfileDetails)
-        userDiscordProfile = userProfileRootView.findViewById(R.id.userDiscordProfile)
-        userTwitterDetails = userProfileRootView.findViewById(R.id.userTwitterDetails)
-        userTwitter = userProfileRootView.findViewById(R.id.userTwitter)
-        userSwitchDetails = userProfileRootView.findViewById(R.id.userSwitchDetails)
-        userSwitch = userProfileRootView.findViewById(R.id.userSwitch)
-        imageToUpload = null
-        userID = SharedPrefManager.getInstance(mContext!!)!!.userID
-        deviceUsername = SharedPrefManager.getInstance(mContext!!)!!.username
+
+        //imageToUpload = null
+
         profilenewsRecyclerList = ArrayList()
         profilepublicsnewsRecyclerList = ArrayList()
         clans = ArrayList()
-        profilenewsView = userProfileRootView.findViewById(R.id.recyclerProfilenews)
-        profilenewsView?.setHasFixedSize(true)
-        profilenewsView?.layoutManager = LinearLayoutManager(mContext)
-        if (arguments != null) {
-            if (requireArguments().getString("UserId") != null) {
-                userProfileID = requireArguments().getString("UserId")
-                loadProfileTop()
-            } else if (requireArguments().getString("Username") != null && requireArguments().getString("UserId") == null) {
-                getUserID(requireArguments().getString("Username"))
-            } else {
-                userProfileID = userID
-                loadProfileTop()
-            }
-        } else {
-            userProfileID = userID
-            loadProfileTop()
-        }
-        profileRefreshLayout?.setOnRefreshListener {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
-                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
-            } else {
-                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
-            }
-            profileRefreshLayout?.isRefreshing = false
-            imageViewProfileCover?.requestFocus()
-        }
+
+        recyclerProfilenews.setHasFixedSize(true)
+        recyclerProfilenews.layoutManager = LinearLayoutManager(mContext)
+
+        profileRefreshLayout.setOnRefreshListener { refreshProfile() }
+
         addItemButton?.setOnClickListener {
-            if (addPostLayout?.visibility != View.GONE) {
-                addPostLayout?.visibility = View.GONE
+            if (addPostLayout.visibility != View.GONE) {
+                addPostLayout.visibility = View.GONE
             } else {
-                addPostLayout?.visibility = View.VISIBLE
-                statusUpdate?.requestFocus()
-                if (statusUpdate?.hasFocus()!!) {
+                addPostLayout.visibility = View.VISIBLE
+                statusUpdate.requestFocus()
+                if (statusUpdate.hasFocus()) {
                     val imm = mContext!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
                 }
@@ -304,7 +138,70 @@ class FragmentProfile : Fragment() {
             fragmentTransaction.addToBackStack(null)
             fragmentTransaction.commit()
         }
-        return userProfileRootView
+
+        profileClansButtons.setOnClickListener { postsQueryButtonClicked(profileClansButtons) }
+        publicsPostsButtons.setOnClickListener { postsQueryButtonClicked(publicsPostsButtons) }
+        profilePostsButton.setOnClickListener { postsQueryButtonClicked(profilePostsButton) }
+
+        subscribeObservers()
+
+    }
+
+    private fun refreshProfile(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
+            (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
+        } else {
+            (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
+        }
+        profileRefreshLayout.isRefreshing = false
+        profileCover.requestFocus()
+    }
+
+    private fun subscribeObservers(){
+        if (arguments != null) {
+            if (requireArguments().getString("UserId") != null) {
+                userProfileID = requireArguments().getString("UserId")
+                viewModel.getProfileTop(deviceUserID!!, userProfileID!!.toInt(), deviceUsername.toString())
+            } else if (requireArguments().getString("Username") != null && requireArguments().getString("UserId") == null) {
+                getUserID(requireArguments().getString("Username"))
+            } else {
+                userProfileID = deviceUserID.toString()
+                viewModel.getProfileTop(deviceUserID!!, userProfileID!!.toInt(), deviceUsername.toString())
+            }
+        } else {
+            userProfileID = deviceUserID.toString()
+            viewModel.getProfileTop(deviceUserID!!, userProfileID!!.toInt(), deviceUsername.toString())
+        }
+
+
+        viewModel.profileTop.observe(viewLifecycleOwner, Observer{
+            when(it){
+                is DataState.Success -> {
+                    //profileLoadingScreen.visible(false)
+                    profileLayout.visible(true)
+                    updateProfileTopUI(it.data)
+                }
+                is DataState.Loading -> {
+                    profileLoadingScreen.visible(true)
+                }
+                is DataState.Failure -> handleApiError(it) {
+                    refreshProfile()
+                }
+            }
+        })
+
+        viewModel.profileNews.observe(viewLifecycleOwner, {
+            when (it) {
+                is DataState.Success -> {
+                    updateProfileNewsUI(it.data)
+                }
+                is DataState.Loading -> {
+                    // TODO: 10/22/20 Add progress bar
+                }
+            }
+        })
+
     }
 
     private fun submitStatus(body: String, added_by: String, user_to: String, type: String, form: String) {
@@ -322,24 +219,24 @@ class FragmentProfile : Fragment() {
                     } else {
                         (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
                     }
-                    statusUpdate!!.setText("")
-                    imageViewProfileCover!!.requestFocus()
+                    statusUpdate.setText("")
+                    profileCover.requestFocus()
                 } else {
-                    mProgressBar!!.visibility = View.GONE
+                    profileLoadingScreen.visible(false)
                 }
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
         }, Response.ErrorListener {
-            mProgressBar!!.visibility = View.GONE
-            Toast.makeText(mContext, "Error on Response, please try again later...", Toast.LENGTH_LONG).show()
+            profileLoadingScreen.visible(false)
+            mContext?.toastShort("Error on Response, please try again later...")
         }) {
             override fun getParams(): Map<String, String> {
                 val params: MutableMap<String, String> = HashMap()
                 params["body"] = body
                 params["added_by"] = added_by
                 params["user_to"] = user_to
-                params["user_id"] = userID!!
+                params["user_id"] = deviceUserID!!.toString()
                 params["type"] = type
                 params["form"] = form
                 return params
@@ -368,253 +265,262 @@ class FragmentProfile : Fragment() {
                     rQueue!!.cache.clear()
                     try {
                         if (jsonObject.getString("error") == "true") {
-                            Toast.makeText(mContext, jsonObject.getString("message"), Toast.LENGTH_SHORT).show()
+                            mContext?.toastShort(jsonObject.getString("message"))
                         }
                     } catch (e: JSONException) {
                         e.printStackTrace()
-                        Toast.makeText(mContext, "Failed!", Toast.LENGTH_SHORT).show()
+                        mContext?.toastShort("Failed to upload!")
                     }
                 }) { }
         rQueue = Volley.newRequestQueue(mContext)
         rQueue?.add(jsonObjectRequest)
     }
 
-    private fun loadProfileTop() {
-        //final String users_friends_array = SharedPrefManager.getInstance(mContext).getUsersFriends();
-        val stringRequest = StringRequest(Request.Method.GET, "$ProfileTop_URL?userid=$userID&userid2=$userProfileID&deviceusername=$deviceUsername", { response: String? ->
-            try {
-                val profiletop = JSONArray(response)
-                val profiletopObject = profiletop.getJSONObject(0)
-                val id = profiletopObject.getString("id")
-                val nickname = profiletopObject.getString("nickname")
-                val username = profiletopObject.getString("username")
-                val description = profiletopObject.getString("description")
-                val verified = profiletopObject.getString("verified")
-                //String signup_date = profiletopObject.getString("signup_date");
-                val profilePic = profiletopObject.getString("profile_pic")
-                val coverPic = profiletopObject.getString("cover_pic")
-                val numPosts = profiletopObject.getString("num_posts")
-                //String num_likes = profiletopObject.getString("num_likes");
-                val userClosed = profiletopObject.getString("user_closed")
-                val userBanned = profiletopObject.getString("user_banned")
-                val numFriends = profiletopObject.getString("num_friends")
-                val followings = profiletopObject.getString("followings")
-                val followers = profiletopObject.getString("followers")
-                val twitch = profiletopObject.getString("twitch")
-                val mixer = profiletopObject.getString("mixer")
-                val psn = profiletopObject.getString("psn")
-                val xbox = profiletopObject.getString("xbox")
-                val discord = profiletopObject.getString("discord")
-                val steam = profiletopObject.getString("steam")
-                val instagram = profiletopObject.getString("instagram")
-                val youtube = profiletopObject.getString("youtube")
-                val lastOnline = profiletopObject.getString("last_online")
-                val count = profiletopObject.getString("count")
-                val average = profiletopObject.getString("average")
-                val clantag = profiletopObject.getString("clantag")
-                val blocked = profiletopObject.getString("blocked")
-                val supporter = profiletopObject.getString("supporter")
-                val discordUser = profiletopObject.getString("discord_user")
-                val twitter = profiletopObject.getString("twitter")
-                val website = profiletopObject.getString("website")
-                val nintendo = profiletopObject.getString("nintendo")
-                val isFollowing = profiletopObject.getString("isFollowing")
-                val isConnected = profiletopObject.getString("isConnected")
-                val connections = profiletopObject.getString("connections")
-                profileUsername = username
-                if (userID == userProfileID) {
-                    addMessageButton!!.visibility = View.GONE
-                    addFriendButton!!.visibility = View.GONE
-                    addFriendProgress!!.visibility = View.GONE
-                    followProfileButton!!.visibility = View.GONE
-                    editProfileButton!!.visibility = View.VISIBLE
-                    setProfileCoverButton!!.visibility = View.VISIBLE
-                    setProfilePhotoButton!!.visibility = View.VISIBLE
+    private fun updateProfileTopUI(data: ProfileTopModel){
+        val id = data.id
+        val nickname = data.nickname
+        val username = data.username
+        val description = data.description
+        val verified = data.verified
+        val profilePic = data.profile_pic
+        val coverPic = data.cover_pic
+        val numPosts = data.num_posts
+        val userClosed = data.user_closed
+        val userBanned = data.user_banned
+        val numFriends = data.num_friends
+        val followings = data.followings
+        val followers = data.followers
+        val twitch = data.twitch
+        val mixer = data.mixer
+        val psn = data.psn
+        val xbox = data.xbox
+        val discord = data.discord
+        val steam = data.steam
+        val instagram = data.instagram
+        val youtube = data.youtube
+        val lastOnline = data.last_online
+        val count = data.count
+        val average = data.average
+        val clantag = data.clantag
+        val blocked = data.blocked
+        val supporter = data.supporter
+        val discordUser = data.discord_user
+        val twitter = data.twitter
+        val website = data.website
+        val nintendo = data.nintendo
+        val isFollowing = data.isFollowing
+        val isConnected = data.isConnected
+        val connections = data.connections
+
+        profileUsername = username
+        if (deviceUserID == userProfileID!!.toInt()) {
+            addMessageButton.visible(false)
+            addFriendButton.visible(false)
+            addFriendProgress.visible(false)
+            followProfileButton.visible(false)
+            editProfileButton.visible(true)
+            setProfileCoverButton.visible(true)
+            setProfilePhotoButton.visible(true)
+        }
+        if (blocked == "yes" || SharedPrefManager.getInstance(mContext!!)!!.isUserBlocked(username)) {
+            profileErrorScreen.visible(true)
+            profileLayout.visible(false)
+            profileLoadingScreen.visible(false)
+        } else if (userClosed == "yes" || userBanned == "yes") {
+            profileDisabledScreen.visible(true)
+            profileLayout.visible(false)
+            profileLoadingScreen.visible(false)
+        } else {
+            postsQueryButtonClicked(profilePostsButton)
+        }
+        if (clantag != "") textViewClanTag!!.text = String.format("[%s]", clantag)
+        if (supporter == "yes") {
+            starIcon.visible(true)
+        }
+        if (discordUser.isNotEmpty()) {
+            userDiscordProfileDetails.visible(true)
+            userDiscordProfile.text = discordUser
+        }
+        if (twitter.isNotEmpty()) {
+            userTwitterDetails.visible(true)
+            userTwitter.text = twitter
+            userTwitterDetails.setOnClickListener {
+                if (mContext is FragmentContainer) {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/$twitter")))
                 }
-                if (blocked == "yes" || SharedPrefManager.getInstance(mContext!!)!!.isUserBlocked(username)) {
-                    profileErrorScreen!!.visibility = View.VISIBLE
-                    profileLayout!!.visibility = View.GONE
-                    mProgressBar!!.visibility = View.GONE
-                } else if (userClosed == "yes" || userBanned == "yes") {
-                    profileDisabledScreen!!.visibility = View.VISIBLE
-                    profileLayout!!.visibility = View.GONE
-                    mProgressBar!!.visibility = View.GONE
-                } else {
-                    postsQueryButtonClicked(profilePostsButton)
+            }
+        }
+        if (website.isNotEmpty()) {
+            profileWebsiteContainer.visible(true)
+            profileWebsite.text = website
+            profileWebsiteContainer.setOnClickListener {
+                if (mContext is FragmentContainer) {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(website)))
                 }
-                if (clantag != "") textViewClanTag!!.text = String.format("[%s]", clantag)
-                if (supporter == "yes") {
-                    starIcon!!.visibility = View.VISIBLE
+            }
+        }
+        if (nintendo.isNotEmpty()) {
+            userSwitchDetails.visible(true)
+            userSwitch.text = nintendo
+        }
+        profileCover.setOnClickListener {
+            val asf: Fragment = PhotoViewFragment()
+            val args = Bundle()
+            args.putString("image", coverPic)
+            asf.arguments = args
+            val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
+            fragmentTransaction.replace(R.id.fragment_container, asf)
+            fragmentTransaction.addToBackStack(null)
+            fragmentTransaction.commit()
+        }
+        imageViewProfilePic.setOnClickListener {
+            val asf: Fragment = PhotoViewFragment()
+            val args = Bundle()
+            args.putString("image", profilePic)
+            asf.arguments = args
+            val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
+            fragmentTransaction.replace(R.id.fragment_container, asf)
+            fragmentTransaction.addToBackStack(null)
+            fragmentTransaction.commit()
+        }
+        addMessageButton.setOnClickListener { startActivity(Intent(mContext, ChatActivity::class.java).putExtra("user_to", username)) }
+        followersCount.text = followers.toString()
+        followingCount.text = followings.toString()
+        friendsCount.text = numFriends.toString()
+        if (twitch.isNotEmpty()) {
+            userTwitch.text = twitch
+            userTwitchDetails.visible(true)
+            userTwitchDetails.setOnClickListener {
+                if (mContext is FragmentContainer) {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.twitch.tv/$twitch")))
                 }
-                if (discordUser.isNotEmpty()) {
-                    userDiscordProfileDetails!!.visibility = View.VISIBLE
-                    userDiscordProfile!!.text = discordUser
+            }
+        }
+        if (mixer.isNotEmpty()) {
+            userMixer.text = mixer
+            userMixerDetails.visible(true)
+            userMixerDetails.setOnClickListener {
+                if (mContext is FragmentContainer) {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://mixer.com/$mixer")))
                 }
-                if (twitter.isNotEmpty()) {
-                    userTwitterDetails!!.visibility = View.VISIBLE
-                    userTwitter!!.text = twitter
-                    userTwitterDetails!!.setOnClickListener {
-                        if (mContext is FragmentContainer) {
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/$twitter")))
-                        }
-                    }
+            }
+        }
+        if (psn.isNotEmpty()) {
+            userPSN.text = psn
+            userPSNDetails.visible(true)
+            userPSNDetails.setOnClickListener {
+                if (mContext is FragmentContainer) {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://psnprofiles.com/$psn")))
                 }
-                if (website.isNotEmpty()) {
-                    profileWebsiteContainer!!.visibility = View.VISIBLE
-                    profileWebsite!!.text = website
-                    profileWebsiteContainer!!.setOnClickListener {
-                        if (mContext is FragmentContainer) {
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(website)))
-                        }
-                    }
+            }
+        }
+        if (xbox.isNotEmpty()) {
+            userXbox.text = xbox
+            userXboxDetails.visible(true)
+            userXboxDetails.setOnClickListener {
+                if (mContext is FragmentContainer) {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://account.xbox.com/en-us/profile?gamertag=$xbox")))
                 }
-                if (nintendo.isNotEmpty()) {
-                    userSwitchDetails!!.visibility = View.VISIBLE
-                    userSwitch!!.text = nintendo
+            }
+        }
+        if (discord.isNotEmpty()) {
+            userDiscord.setText(R.string.discord_server_text)
+            userDiscordDetails.visible(true)
+            userDiscordDetails.setOnClickListener {
+                if (mContext is FragmentContainer) {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.discord.gg/$discord")))
                 }
-                imageViewProfileCover!!.setOnClickListener {
-                    val asf: Fragment = PhotoViewFragment()
-                    val args = Bundle()
-                    args.putString("image", coverPic)
-                    asf.arguments = args
-                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                    fragmentTransaction.replace(R.id.fragment_container, asf)
-                    fragmentTransaction.addToBackStack(null)
-                    fragmentTransaction.commit()
+            }
+        }
+        if (steam.isNotEmpty()) {
+            userSteam.text = steam
+            userSteamDetails.visible(true)
+            userSteamDetails.setOnClickListener {
+                if (mContext is FragmentContainer) {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://steamcommunity.com/id/$steam")))
                 }
-                imageViewProfilePic!!.setOnClickListener {
-                    val asf: Fragment = PhotoViewFragment()
-                    val args = Bundle()
-                    args.putString("image", profilePic)
-                    asf.arguments = args
-                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                    fragmentTransaction.replace(R.id.fragment_container, asf)
-                    fragmentTransaction.addToBackStack(null)
-                    fragmentTransaction.commit()
+            }
+        }
+        if (youtube.isNotEmpty()) {
+            userYoutubeDetails.visible(true)
+            userYoutubeDetails.setOnClickListener {
+                if (mContext is FragmentContainer) {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://youtube.com/channel/$youtube")))
                 }
-                addMessageButton!!.setOnClickListener { startActivity(Intent(mContext, ChatActivity::class.java).putExtra("user_to", username)) }
-                followersCount!!.text = followers
-                followingCount!!.text = followings
-                friendsCount!!.text = numFriends
-                if (twitch.isNotEmpty()) {
-                    userTwitch!!.text = twitch
-                    userTwitchDetails!!.visibility = View.VISIBLE
-                    userTwitchDetails!!.setOnClickListener {
-                        if (mContext is FragmentContainer) {
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.twitch.tv/$twitch")))
-                        }
-                    }
+            }
+        }
+        if (instagram.isNotEmpty()) {
+            userInstagram.text = instagram
+            userInstagramDetails.visible(true)
+            userInstagramDetails.setOnClickListener {
+                if (mContext is FragmentContainer) {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://instagram.com/$instagram")))
                 }
-                if (mixer.isNotEmpty()) {
-                    userMixer!!.text = mixer
-                    userMixerDetails!!.visibility = View.VISIBLE
-                    userMixerDetails!!.setOnClickListener {
-                        if (mContext is FragmentContainer) {
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://mixer.com/$mixer")))
-                        }
-                    }
-                }
-                if (psn.isNotEmpty()) {
-                    userPSN!!.text = psn
-                    userPSNDetails!!.visibility = View.VISIBLE
-                    userPSNDetails!!.setOnClickListener {
-                        if (mContext is FragmentContainer) {
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://psnprofiles.com/$psn")))
-                        }
-                    }
-                }
-                if (xbox.isNotEmpty()) {
-                    userXbox!!.text = xbox
-                    userXboxDetails!!.visibility = View.VISIBLE
-                    userXboxDetails!!.setOnClickListener {
-                        if (mContext is FragmentContainer) {
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://account.xbox.com/en-us/profile?gamertag=$xbox")))
-                        }
-                    }
-                }
-                if (discord.isNotEmpty()) {
-                    userDiscord!!.setText(R.string.discord_server_text)
-                    userDiscordDetails!!.visibility = View.VISIBLE
-                    userDiscordDetails!!.setOnClickListener {
-                        if (mContext is FragmentContainer) {
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.discord.gg/$discord")))
-                        }
-                    }
-                }
-                if (steam.isNotEmpty()) {
-                    userSteam!!.text = steam
-                    userSteamDetails!!.visibility = View.VISIBLE
-                    userSteamDetails!!.setOnClickListener {
-                        if (mContext is FragmentContainer) {
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://steamcommunity.com/id/$steam")))
-                        }
-                    }
-                }
-                if (youtube.isNotEmpty()) {
-                    userYoutubeDetails!!.visibility = View.VISIBLE
-                    userYoutubeDetails!!.setOnClickListener {
-                        if (mContext is FragmentContainer) {
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://youtube.com/channel/$youtube")))
-                        }
-                    }
-                }
-                if (instagram.isNotEmpty()) {
-                    userInstagram!!.text = instagram
-                    userInstagramDetails!!.visibility = View.VISIBLE
-                    userInstagramDetails!!.setOnClickListener {
-                        if (mContext is FragmentContainer) {
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://instagram.com/$instagram")))
-                        }
-                    }
-                }
-                val averageFloat = average.toFloat()
-                profileRating!!.rating = averageFloat
-                reviewCount!!.text = count
-                val usernameTo: String
-                if (SharedPrefManager.getInstance(mContext!!)!!.username != username) {
-                    usernameTo = username
-                    if (isFollowing == "yes") {
-                        followProfileButton!!.visibility = View.GONE
-                        followedProfileButton!!.visibility = View.VISIBLE
-                    }
-                    if (isConnected == "yes") {
-                        addedFriendButton!!.visibility = View.VISIBLE
-                        addFriendProgress!!.visibility = View.GONE
-                        addItemButton!!.visibility = View.VISIBLE
-                    } else {
-                        connectionRequest(username)
-                    }
-                    if (isConnected != "yes" && userProfileID != userID) {
-                        addItemButton!!.visibility = View.GONE
-                    }
-                } else {
-                    // profile is device user's
-                    usernameTo = "none"
-                    if (SharedPrefManager.getInstance(mContext!!)!!.profilePic != profilePic) {
-                        SharedPrefManager.getInstance(mContext!!)!!.profilePic = profilePic
-                    }
-                    /*if(!connections.equals(users_friends_array)){
-                        SharedPrefManager.getInstance(mContext).getFriendArray();
-                    }*/
-                }
-                submitStatusButton!!.setOnClickListener { view: View ->
-                    val body = statusUpdate!!.text.toString()
-                    val addedBy = SharedPrefManager.getInstance(mContext!!)!!.username
-                    val spinnerText = postTypeSpinner!!.selectedItem.toString()
-                    val form = "user"
-                    if (statusUpdate!!.text.toString().isNotEmpty() && spinnerText.isNotEmpty()) {
-                        profileLayout!!.visibility = View.GONE
-                        mProgressBar!!.visibility = View.VISIBLE
-                        submitStatus(body, addedBy!!, usernameTo, spinnerText, form)
-                        hideKeyboardFrom(mContext, view)
-                    } else {
-                        Toast.makeText(mContext, "You must enter text before submitting!", Toast.LENGTH_LONG).show()
-                    }
-                }
-                playerratingLayout!!.setOnClickListener {
+            }
+        }
+        val averageFloat = average.toFloat()
+        profileRating.rating = averageFloat
+        reviewCount.text = count.toString()
+        val usernameTo: String
+        if (SharedPrefManager.getInstance(mContext!!)!!.username != username) {
+            usernameTo = username
+            if (isFollowing == "yes") {
+                followProfileButton.visible(false)
+                followedProfileButton.visible(true)
+            }
+            if (isConnected == "yes") {
+                addedFriendButton.visible(true)
+                addFriendProgress.visible(false)
+                addItemButton.visible(true)
+            } else {
+                connectionRequest(username)
+            }
+            if (isConnected != "yes" && userProfileID!!.toInt() != deviceUserID) {
+                addItemButton.visible(false)
+            }
+        } else {
+            // profile is device user's
+            usernameTo = "none"
+            if (SharedPrefManager.getInstance(mContext!!)!!.profilePic != profilePic) {
+                SharedPrefManager.getInstance(mContext!!)!!.profilePic = profilePic
+            }
+        }
+        submitStatusButton!!.setOnClickListener { view: View ->
+            val body = statusUpdate!!.text.toString()
+            val addedBy = SharedPrefManager.getInstance(mContext!!)!!.username
+            val spinnerText = postTypeSpinner!!.selectedItem.toString()
+            val form = "user"
+            if (statusUpdate!!.text.toString().isNotEmpty() && spinnerText.isNotEmpty()) {
+                profileLayout.visible(false)
+                profileLoadingScreen.visible(true)
+                submitStatus(body, addedBy!!, usernameTo, spinnerText, form)
+                hideKeyboardFrom(mContext, view)
+            } else {
+                mContext?.toastShort("You must enter text before submitting!")
+            }
+        }
+        profileRatingContainer!!.setOnClickListener {
+            val ldf = PlayerReviewFragment()
+            val args = Bundle()
+            args.putString("UserId", id.toString())
+            args.putString("username", username)
+            args.putString("nickname", nickname)
+            args.putString("verified", verified)
+            args.putString("profile_pic", profilePic)
+            args.putString("all_friend_array", connections)
+            args.putString("last_online", lastOnline)
+            ldf.arguments = args
+            requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+        }
+        moreButtonLayout!!.setOnClickListener { view: View? ->
+            val popup = PopupMenu(mContext, view)
+            val inflater = popup.menuInflater
+            inflater.inflate(R.menu.profile_more_menu, popup.menu)
+            popup.setOnMenuItemClickListener { item: MenuItem ->
+                if (item.itemId == R.id.menuPlayerReview) {
                     val ldf = PlayerReviewFragment()
                     val args = Bundle()
-                    args.putString("UserId", id)
+                    args.putString("UserId", id.toString())
                     args.putString("username", username)
                     args.putString("nickname", nickname)
                     args.putString("verified", verified)
@@ -624,198 +530,176 @@ class FragmentProfile : Fragment() {
                     ldf.arguments = args
                     requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
-                moreButtonLayout!!.setOnClickListener { view: View? ->
-                    val popup = PopupMenu(mContext, view)
-                    val inflater = popup.menuInflater
-                    inflater.inflate(R.menu.profile_more_menu, popup.menu)
-                    popup.setOnMenuItemClickListener { item: MenuItem ->
-                        if (item.itemId == R.id.menuPlayerReview) {
-                            val ldf = PlayerReviewFragment()
-                            val args = Bundle()
-                            args.putString("UserId", id)
-                            args.putString("username", username)
-                            args.putString("nickname", nickname)
-                            args.putString("verified", verified)
-                            args.putString("profile_pic", profilePic)
-                            args.putString("all_friend_array", connections)
-                            args.putString("last_online", lastOnline)
-                            ldf.arguments = args
-                            requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
-                        }
-                        if (item.itemId == R.id.menuPlayerReport) {
-                            val ldf = ReportFragment()
-                            val args = Bundle()
-                            args.putString("context", "player")
-                            args.putString("type", "user")
-                            args.putString("id", id)
-                            ldf.arguments = args
-                            requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
-                        }
-                        if (item.itemId == R.id.menuPlayerBlock) {
-                            if (deviceUsername != profileUsername) {
-                                val dialogClickListener = DialogInterface.OnClickListener { _: DialogInterface?, which: Int ->
-                                    when (which) {
-                                        DialogInterface.BUTTON_POSITIVE -> {
-                                            SharedPrefManager.getInstance(mContext!!)!!.blockUser(username)
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
-                                                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
-                                            } else {
-                                                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
-                                            }
-                                        }
-                                        DialogInterface.BUTTON_NEGATIVE -> { }
+                if (item.itemId == R.id.menuPlayerReport) {
+                    val ldf = ReportFragment()
+                    val args = Bundle()
+                    args.putString("context", "player")
+                    args.putString("type", "user")
+                    args.putString("id", id.toString())
+                    ldf.arguments = args
+                    requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                }
+                if (item.itemId == R.id.menuPlayerBlock) {
+                    if (deviceUsername != profileUsername) {
+                        val dialogClickListener = DialogInterface.OnClickListener { _: DialogInterface?, which: Int ->
+                            when (which) {
+                                DialogInterface.BUTTON_POSITIVE -> {
+                                    SharedPrefManager.getInstance(mContext!!)!!.blockUser(username)
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                        (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
+                                        (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
+                                    } else {
+                                        (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
                                     }
                                 }
-                                val builder = AlertDialog.Builder(mContext, R.style.AlertDialogStyle)
-                                builder.setMessage("Block user?").setPositiveButton("Yes", dialogClickListener)
-                                        .setNegativeButton("No", dialogClickListener).show()
-                            } else {
-                                Toast.makeText(mContext, "Are you really trying to block yourself?", Toast.LENGTH_SHORT).show()
+                                DialogInterface.BUTTON_NEGATIVE -> { }
                             }
                         }
-                        true
+                        val builder = AlertDialog.Builder(mContext, R.style.AlertDialogStyle)
+                        builder.setMessage("Block user?").setPositiveButton("Yes", dialogClickListener)
+                                .setNegativeButton("No", dialogClickListener).show()
+                    } else {
+                        mContext?.toastLong("Are you really trying to block yourself?")
                     }
-                    popup.show()
                 }
-                followProfileButton!!.setOnClickListener { followUser(username, followers, "follow") }
-                followedProfileButton!!.setOnClickListener {
-                    LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
-                            .setTopColorRes(R.color.green)
-                            .setButtonsColorRes(R.color.green)
-                            .setIcon(R.drawable.ic_friend_add)
-                            .setTitle("Unfollow @$username?")
-                            .setPositiveButton(R.string.yes) { followUser(username, followers, "unfollow") }
-                            .setNegativeButton(R.string.no, null)
-                            .show()
-                }
-                addFriendButton!!.setOnClickListener {
-                    LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
-                            .setTopColorRes(R.color.green)
-                            .setButtonsColorRes(R.color.green)
-                            .setIcon(R.drawable.ic_friend_add)
-                            .setTitle("Connection")
-                            .setMessage("Connecting is PERMANENT as this user will be able to review you at any time if accepted.\n\nConnect with @$username?")
-                            .setPositiveButton(R.string.yes) {
-                                addFriendButton!!.visibility = View.GONE
-                                requestSentFriendButton!!.visibility = View.VISIBLE
-                                addConnection(username)
-                                followUser(username, followers, "follow")
-                            }
-                            .setNegativeButton(R.string.no, null)
-                            .show()
-                }
-                requestedFriendButton!!.setOnClickListener {
-                    LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
-                            .setTopColorRes(R.color.green)
-                            .setButtonsColorRes(R.color.green)
-                            .setIcon(R.drawable.ic_friend_add)
-                            .setTitle("Connection")
-                            .setMessage("Connecting is PERMANENT as this user will be able to review you at any time if accepted.\n\nConnect with @$username?")
-                            .setPositiveButton(R.string.yes) {
-                                addFriendButton!!.visibility = View.GONE
-                                requestedFriendButton!!.visibility = View.VISIBLE
-                                acceptConnection(username)
-                                followUser(username, followers, "follow")
-                            }
-                            .setNegativeButton(R.string.no, null)
-                            .show()
-                }
-                requestSentFriendButton!!.setOnClickListener {
-                    LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
-                            .setTopColorRes(R.color.green)
-                            .setButtonsColorRes(R.color.green)
-                            .setIcon(R.drawable.ic_friend_add)
-                            .setTitle("Connection")
-                            .setMessage("You are in the process of being permanently connected! If you're having trouble with this user, consider blocking or reporting.")
-                            .show()
-                }
-                addedFriendButton!!.setOnClickListener {
-                    LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
-                            .setTopColorRes(R.color.green)
-                            .setButtonsColorRes(R.color.green)
-                            .setIcon(R.drawable.ic_friend_add)
-                            .setTitle("Connection")
-                            .setMessage("You are permanently connected! If you're having trouble with this user, consider blocking or reporting.")
-                            .show()
-                }
-                if (description != "") {
-                    textViewDescription!!.text = description
-                    profileStatusContainer!!.visibility = View.VISIBLE
-                }
-                if (verified == "yes") {
-                    verifiedIcon!!.visibility = View.VISIBLE
-                }
-                if (lastOnline == "yes") {
-                    profileOnlineIcon!!.visibility = View.VISIBLE
-                }
-                textViewUsername!!.text = String.format("@%s", username)
-                textViewTvPosts!!.text = numPosts
-                textViewNickname!!.text = nickname
-                Glide.with(mContext!!)
-                        .load(Constants.BASE_URL + profilePic)
-                        .error(R.mipmap.ic_launcher)
-                        .into(imageViewProfilePic!!)
-                if (coverPic.isNotEmpty()) {
-                    Glide.with(mContext!!)
-                            .load(Constants.BASE_URL + coverPic)
-                            .error(R.mipmap.ic_launcher)
-                            .into(imageViewProfileCover!!)
-                }
-                followersTV!!.setOnClickListener {
-                    val asf: Fragment = UserListFragment()
-                    val args = Bundle()
-                    args.putString("query", "followers")
-                    args.putString("queryID", profileUsername)
-                    asf.arguments = args
-                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                    fragmentTransaction.replace(R.id.fragment_container, asf)
-                    fragmentTransaction.addToBackStack(null)
-                    fragmentTransaction.commit()
-                }
-                followingTV!!.setOnClickListener {
-                    val asf: Fragment = UserListFragment()
-                    val args = Bundle()
-                    args.putString("query", "following")
-                    args.putString("queryID", profileUsername)
-                    asf.arguments = args
-                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                    fragmentTransaction.replace(R.id.fragment_container, asf)
-                    fragmentTransaction.addToBackStack(null)
-                    fragmentTransaction.commit()
-                }
-                connectionsTV!!.setOnClickListener {
-                    val asf: Fragment = UserListFragment()
-                    val args = Bundle()
-                    args.putString("query", "connections")
-                    args.putString("queryID", profileUsername)
-                    asf.arguments = args
-                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                    fragmentTransaction.replace(R.id.fragment_container, asf)
-                    fragmentTransaction.addToBackStack(null)
-                    fragmentTransaction.commit()
-                }
-                imageViewProfileCover!!.requestFocus()
-            } catch (e: JSONException) {
-                e.printStackTrace()
+                true
             }
-        }) { Toast.makeText(mContext, "Network Error!", Toast.LENGTH_SHORT).show() }
-        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
+            popup.show()
+        }
+        followProfileButton.setOnClickListener { followUser(username, followers.toString(), "follow") }
+        followedProfileButton.setOnClickListener {
+            LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
+                    .setTopColorRes(R.color.green)
+                    .setButtonsColorRes(R.color.green)
+                    .setIcon(R.drawable.ic_friend_add)
+                    .setTitle("Unfollow @$username?")
+                    .setPositiveButton(R.string.yes) { followUser(username, followers.toString(), "unfollow") }
+                    .setNegativeButton(R.string.no, null)
+                    .show()
+        }
+        addFriendButton.setOnClickListener {
+            LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
+                    .setTopColorRes(R.color.green)
+                    .setButtonsColorRes(R.color.green)
+                    .setIcon(R.drawable.ic_friend_add)
+                    .setTitle("Connection")
+                    .setMessage("Connecting is PERMANENT as this user will be able to review you at any time if accepted.\n\nConnect with @$username?")
+                    .setPositiveButton(R.string.yes) {
+                        addFriendButton.visible(false)
+                        requestSentFriendButton.visible(true)
+                        addConnection(username)
+                        followUser(username, followers.toString(), "follow")
+                    }
+                    .setNegativeButton(R.string.no, null)
+                    .show()
+        }
+        requestedFriendButton.setOnClickListener {
+            LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
+                    .setTopColorRes(R.color.green)
+                    .setButtonsColorRes(R.color.green)
+                    .setIcon(R.drawable.ic_friend_add)
+                    .setTitle("Connection")
+                    .setMessage("Connecting is PERMANENT as this user will be able to review you at any time if accepted.\n\nConnect with @$username?")
+                    .setPositiveButton(R.string.yes) {
+                        addFriendButton!!.visibility = View.GONE
+                        requestedFriendButton!!.visibility = View.VISIBLE
+                        acceptConnection(username)
+                        followUser(username, followers.toString(), "follow")
+                    }
+                    .setNegativeButton(R.string.no, null)
+                    .show()
+        }
+        requestSentFriendButton.setOnClickListener {
+            LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
+                    .setTopColorRes(R.color.green)
+                    .setButtonsColorRes(R.color.green)
+                    .setIcon(R.drawable.ic_friend_add)
+                    .setTitle("Connection")
+                    .setMessage("You are in the process of being permanently connected! If you're having trouble with this user, consider blocking or reporting.")
+                    .show()
+        }
+        addedFriendButton.setOnClickListener {
+            LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
+                    .setTopColorRes(R.color.green)
+                    .setButtonsColorRes(R.color.green)
+                    .setIcon(R.drawable.ic_friend_add)
+                    .setTitle("Connection")
+                    .setMessage("You are permanently connected! If you're having trouble with this user, consider blocking or reporting.")
+                    .show()
+        }
+        if (description != "") {
+            textViewDescription.text = description
+            profileStatusContainer.visibility = View.VISIBLE
+        }
+        if (verified == "yes") {
+            verifiedIcon.visibility = View.VISIBLE
+        }
+        if (lastOnline == "yes") {
+            profileOnlineIcon.visibility = View.VISIBLE
+        }
+        textViewUsername.text = String.format("@%s", username)
+        tvPosts.text = numPosts.toString()
+        textViewNickname.text = nickname
+        Glide.with(mContext!!)
+                .load(Constants.BASE_URL + profilePic)
+                .error(R.mipmap.ic_launcher)
+                .into(imageViewProfilePic)
+        if (coverPic.isNotEmpty()) {
+            Glide.with(mContext!!)
+                    .load(Constants.BASE_URL + coverPic)
+                    .error(R.mipmap.ic_launcher)
+                    .into(profileCover)
+        }
+        binding.followers.setOnClickListener {
+            val asf: Fragment = UserListFragment()
+            val args = Bundle()
+            args.putString("query", "followers")
+            args.putString("queryID", profileUsername)
+            asf.arguments = args
+            val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
+            fragmentTransaction.replace(R.id.fragment_container, asf)
+            fragmentTransaction.addToBackStack(null)
+            fragmentTransaction.commit()
+        }
+        binding.following.setOnClickListener {
+            val asf: Fragment = UserListFragment()
+            val args = Bundle()
+            args.putString("query", "following")
+            args.putString("queryID", profileUsername)
+            asf.arguments = args
+            val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
+            fragmentTransaction.replace(R.id.fragment_container, asf)
+            fragmentTransaction.addToBackStack(null)
+            fragmentTransaction.commit()
+        }
+        binding.connections.setOnClickListener {
+            val asf: Fragment = UserListFragment()
+            val args = Bundle()
+            args.putString("query", "connections")
+            args.putString("queryID", profileUsername)
+            asf.arguments = args
+            val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
+            fragmentTransaction.replace(R.id.fragment_container, asf)
+            fragmentTransaction.addToBackStack(null)
+            fragmentTransaction.commit()
+        }
+        profileCover.requestFocus()
     }
+
 
     private fun followUser(username: String, followers: String, method: String) {
         if (method == "follow") {
-            followProfileButton!!.visibility = View.GONE
-            followedProfileButton!!.visibility = View.VISIBLE
+            followProfileButton.visible(false)
+            followedProfileButton.visible(true)
             var numFollowers = followers.toInt()
             numFollowers++
             followersCount!!.text = numFollowers.toString()
         } else if (method == "unfollow") {
-            followedProfileButton!!.visibility = View.GONE
-            followProfileButton!!.visibility = View.VISIBLE
+            followedProfileButton.visible(false)
+            followProfileButton.visible(true)
             var numFollowers = followers.toInt()
             numFollowers--
-            followersCount!!.text = numFollowers.toString()
+            followersCount.text = numFollowers.toString()
         }
         val stringRequest: StringRequest = object : StringRequest(Method.POST, FOLLOW_USER, Response.Listener { response: String? ->
             try {
@@ -830,7 +714,7 @@ class FragmentProfile : Fragment() {
             override fun getParams(): Map<String, String> {
                 val params: MutableMap<String, String> = HashMap()
                 params["username"] = deviceUsername!!
-                params["user_id"] = userID!!
+                params["user_id"] = deviceUserID!!.toString()
                 params["user_followed"] = username
                 params["method"] = method
                 return params
@@ -839,8 +723,32 @@ class FragmentProfile : Fragment() {
         (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
-    private fun loadProfilenews() {
-        val stringRequest = StringRequest(Request.Method.GET, "$Profilenews_URL?userid=$userID&userprofileid=$userProfileID&thisusername=$deviceUsername", { response: String? ->
+    private fun updateProfileNewsUI(data: List<ProfilenewsRecycler>){
+        if (data.isEmpty()) {
+            postsNoPosts.visible(true)
+            postsNoPosts.text = mContext!!.getString(R.string.no_posts_to_show)
+        } else {
+            postsNoPosts.visible(false)
+        }
+        newsadapter = ProfilenewsAdapter(mContext!!)
+        newsadapter!!.addItems(data)
+        recyclerProfilenews.adapter = newsadapter
+        recyclerProfilenews.scheduleLayoutAnimation()
+        recyclerProfilenews.isNestedScrollingEnabled = false
+        profileLoadingScreen.visible(false)
+        profileNewsMoreBtn.setOnClickListener {
+            val ldf = SeeAllFragment()
+            val args = Bundle()
+            args.putString("queryid", profileUsername)
+            args.putString("queryidextra", userProfileID.toString())
+            args.putString("method", "posts")
+            ldf.arguments = args
+            (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+        }
+    }
+
+    /*private fun loadProfilenews() {
+        val stringRequest = StringRequest(Request.Method.GET, "$Profilenews_URL?userid=$deviceUserID&userprofileid=$userProfileID&thisusername=$deviceUsername", { response: String? ->
             try {
                 val profilenews = JSONArray(response)
                 for (i in 0 until profilenews.length()) {
@@ -878,28 +786,26 @@ class FragmentProfile : Fragment() {
                 } catch (ignored: Exception) {
                 }
                 newsadapter = ProfilenewsAdapter(mContext!!, profilenewsRecyclerList)
-                profilenewsView!!.adapter = newsadapter
-                profilenewsView?.scheduleLayoutAnimation()
-                profilenewsView!!.isNestedScrollingEnabled = false
-                profileLayout!!.visibility = View.VISIBLE
-                mProgressBar!!.visibility = View.GONE
-                profileNewsMoreBtn!!.setOnClickListener {
+                recyclerProfilenews.adapter = newsadapter
+                recyclerProfilenews.scheduleLayoutAnimation()
+                recyclerProfilenews.isNestedScrollingEnabled = false
+                profileLayout.visible(true)
+                profileLoadingScreen.visible(false)
+                profileNewsMoreBtn.setOnClickListener {
                     val ldf = SeeAllFragment()
                     val args = Bundle()
                     args.putString("queryid", profileUsername)
-                    args.putString("queryidextra", userProfileID)
+                    args.putString("queryidextra", userProfileID.toString())
                     args.putString("method", "posts")
                     ldf.arguments = args
                     (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
-                profileClansButton!!.setOnClickListener { postsQueryButtonClicked(profileClansButton) }
-                publicsPostsButton!!.setOnClickListener { postsQueryButtonClicked(publicsPostsButton) }
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
         }) { }
         (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
-    }
+    }*/
 
     private fun loadProfilePublicsnews() {
         val stringRequest = StringRequest(Request.Method.GET, "$ProfilePublicsNews_URL?username=$profileUsername", { response: String? ->
@@ -937,17 +843,15 @@ class FragmentProfile : Fragment() {
                     (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 if (profilepublicsnews.length() == 0) {
-                    postsNoPosts!!.visibility = View.VISIBLE
-                    postsNoPosts!!.text = getString(R.string.no_posts_to_show)
+                    postsNoPosts.visible(true)
+                    postsNoPosts.text = getString(R.string.no_posts_to_show)
                 } else {
-                    postsNoPosts!!.visibility = View.GONE
+                    postsNoPosts.visible(false)
                 }
                 publicsnewsadapter = PublicsTopicAdapter(mContext!!, profilepublicsnewsRecyclerList!!)
-                profilenewsView!!.adapter = publicsnewsadapter
-                profilenewsView?.scheduleLayoutAnimation()
-                profilenewsView!!.isNestedScrollingEnabled = false
-                profileClansButton!!.setOnClickListener { postsQueryButtonClicked(profileClansButton) }
-                profilePostsButton!!.setOnClickListener { postsQueryButtonClicked(profilePostsButton) }
+                recyclerProfilenews.adapter = publicsnewsadapter
+                recyclerProfilenews.scheduleLayoutAnimation()
+                recyclerProfilenews.isNestedScrollingEnabled = false
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
@@ -975,16 +879,15 @@ class FragmentProfile : Fragment() {
                             clans!!.add(clansObject)
                         }
                         if (thread.length() == 0) {
-                            postsNoPosts!!.visibility = View.VISIBLE
-                            postsNoPosts!!.text = getString(R.string.no_clans_text)
+                            postsNoPosts.visible(true)
+                            postsNoPosts.text = getString(R.string.no_clans_text)
                         }
-                        mProgressBar!!.visibility = View.GONE
-                        clansAdapter = JoinedClansAdapter(mContext!!, clans!!)
-                        profilenewsView!!.adapter = clansAdapter
-                        profilenewsView?.scheduleLayoutAnimation()
-                        profilenewsView!!.isNestedScrollingEnabled = false
-                        publicsPostsButton!!.setOnClickListener { postsQueryButtonClicked(publicsPostsButton) }
-                        profilePostsButton!!.setOnClickListener { postsQueryButtonClicked(profilePostsButton) }
+                        profileLoadingScreen.visible(false)
+                        clansAdapter = JoinedClansAdapter(mContext!!)
+                        clansAdapter?.addItems(clans)
+                        recyclerProfilenews.adapter = clansAdapter
+                        recyclerProfilenews.scheduleLayoutAnimation()
+                        recyclerProfilenews.isNestedScrollingEnabled = false
                     } catch (e: JSONException) {
                         e.printStackTrace()
                     }
@@ -999,16 +902,16 @@ class FragmentProfile : Fragment() {
                 val obj = JSONObject(response!!)
                 if (!obj.getBoolean("error")) {
                     if (obj.has("request_sent") && obj.getString("request_sent") == "yes") {
-                        requestSentFriendButton!!.visibility = View.VISIBLE
-                        addFriendButton!!.visibility = View.GONE
-                        addFriendProgress!!.visibility = View.GONE
+                        requestSentFriendButton.visible(true)
+                        addFriendButton.visible(false)
+                        addFriendProgress.visible(false)
                     } else if (obj.has("request_received") && obj.getString("request_received") == "yes") {
-                        requestedFriendButton!!.visibility = View.VISIBLE
-                        addFriendButton!!.visibility = View.GONE
-                        addFriendProgress!!.visibility = View.GONE
-                    } else if (!(addedFriendButton!!.visibility == View.VISIBLE || userID == userProfileID)) {
-                        addFriendButton!!.visibility = View.VISIBLE
-                        addFriendProgress!!.visibility = View.GONE
+                        requestedFriendButton.visible(true)
+                        addFriendButton.visible(false)
+                        addFriendProgress.visible(false)
+                    } else if (!(addedFriendButton.visibility == View.VISIBLE || deviceUserID == userProfileID!!.toInt())) {
+                        addFriendButton.visible(true)
+                        addFriendProgress.visible(false)
                     }
                 } else {
                     Toast.makeText(mContext, obj.getString("message"), Toast.LENGTH_LONG).show()
@@ -1058,8 +961,8 @@ class FragmentProfile : Fragment() {
                 val obj = JSONObject(response!!)
                 if (!obj.getBoolean("error")) {
                     if (obj.getString("request_accepted") == "yes") {
-                        addedFriendButton!!.visibility = View.VISIBLE
-                        requestedFriendButton!!.visibility = View.GONE
+                        addedFriendButton.visible(true)
+                        requestedFriendButton.visible(false)
                     }
                 } else {
                     Toast.makeText(mContext, obj.getString("message"), Toast.LENGTH_LONG).show()
@@ -1142,36 +1045,36 @@ class FragmentProfile : Fragment() {
     private fun postsQueryButtonClicked(clicked: Button?) {
         when {
             clicked === profilePostsButton -> {
-                profilePostsButton!!.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.green))
-                profileClansButton!!.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.grey_80))
-                publicsPostsButton!!.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.grey_80))
+                profilePostsButton.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.green))
+                profileClansButtons.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.grey_80))
+                publicsPostsButtons.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.grey_80))
                 //TODO add progressbar
                 profilenewsRecyclerList!!.clear()
-                loadProfilenews()
-                textViewTvPosts!!.visibility = View.VISIBLE
-                profileItemsLabel!!.text = mContext!!.getString(R.string.profile_posts_text)
-                profileNewsMoreBtn!!.visibility = View.VISIBLE
+                viewModel.getProfileNews(deviceUserID!!.toInt(), userProfileID!!.toInt(), deviceUsername.toString())
+                tvPosts.visible(true)
+                profileItemsLabel.text = mContext!!.getString(R.string.profile_posts_text)
+                profileNewsMoreBtn.visible(true)
             }
-            clicked === profileClansButton -> {
-                profilePostsButton!!.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.grey_80))
-                publicsPostsButton!!.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.grey_80))
-                profileClansButton!!.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.green))
+            clicked === profileClansButtons -> {
+                profilePostsButton.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.grey_80))
+                publicsPostsButtons.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.grey_80))
+                profileClansButtons.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.green))
                 clans!!.clear()
                 loadJoinedClans()
-                textViewTvPosts!!.visibility = View.GONE
-                profileItemsLabel!!.text = mContext!!.getString(R.string.clans_joined_text)
+                tvPosts.visible(false)
+                profileItemsLabel.text = mContext!!.getString(R.string.clans_joined_text)
                 //TODO: Fix this with see all fragment --> clans
-                profileNewsMoreBtn!!.visibility = View.GONE
+                profileNewsMoreBtn.visible(true)
             }
-            clicked === publicsPostsButton -> {
-                profileClansButton!!.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.grey_80))
+            clicked === publicsPostsButtons -> {
+                profileClansButtons!!.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.grey_80))
                 profilePostsButton!!.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.grey_80))
-                publicsPostsButton!!.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.green))
+                publicsPostsButtons!!.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.green))
                 profilepublicsnewsRecyclerList!!.clear()
                 loadProfilePublicsnews()
-                textViewTvPosts!!.visibility = View.GONE
-                profileItemsLabel!!.text = mContext!!.getString(R.string.publics_posts_text)
-                profileNewsMoreBtn!!.visibility = View.VISIBLE
+                tvPosts.visible(false)
+                profileItemsLabel.text = mContext!!.getString(R.string.publics_posts_text)
+                profileNewsMoreBtn.visible(true)
             }
         }
     }
@@ -1183,9 +1086,9 @@ class FragmentProfile : Fragment() {
                     val obj = JSONObject(response!!)
                     if (obj.getString("error") == "false") {
                         userProfileID = obj.getString("userid")
-                        loadProfileTop()
+                        viewModel.getProfileTop(deviceUserID!!, userProfileID!!.toInt(), deviceUsername.toString())
                     } else {
-                        profileErrorScreen!!.visibility = View.VISIBLE
+                        profileErrorScreen.visible(true)
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
@@ -1226,4 +1129,8 @@ class FragmentProfile : Fragment() {
             imm.hideSoftInputFromWindow(view.windowToken, 0)
         }
     }
+
+    override fun getViewModel() = ProfileVM::class.java
+    override fun getFragmentBinding(inflater: LayoutInflater, container: ViewGroup?) = FragmentProfileBinding.inflate(inflater, container, false)
+    override fun getFragmentRepository() = ProfileRepo(remoteDataSource.buildApi(ProfileApi::class.java, mContext?.fcmToken))
 }

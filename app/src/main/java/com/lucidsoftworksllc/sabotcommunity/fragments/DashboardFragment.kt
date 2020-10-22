@@ -83,17 +83,7 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
         filter = SharedPrefManager.getInstance(mContext!!)!!.currentPublics
 
 
-        dashSwipe.setOnRefreshListener {
-            adNotified!!.clear()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
-                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
-            } else {
-                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
-            }
-            dashSwipe?.isRefreshing = false
-            sliderboi?.requestFocus()
-        }
+        dashSwipe.setOnRefreshListener { refreshDash() }
 
         initDashFeedRecycler()
         initAdVP()
@@ -103,6 +93,18 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
 
         hideKeyboardFrom(mContext, view)
 
+    }
+
+    private fun refreshDash(){
+        adNotified!!.clear()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
+            (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
+        } else {
+            (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
+        }
+        dashSwipe?.isRefreshing = false
+        sliderboi?.requestFocus()
     }
 
     private fun subscribeObservers(){
@@ -117,6 +119,7 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
                 is DataState.Loading -> {
                     dashProgressBar.visible(true)
                 }
+                is DataState.Failure -> handleApiError(it) { refreshDash() }
             }
         })
 
@@ -163,7 +166,7 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
         dashboardfeedRecyclerList = ArrayList()
         dashboardfeedView?.layoutManager = LinearLayoutManager(mContext)
         ViewCompat.setNestedScrollingEnabled(dashboardfeedView!!, false)
-        dashboardfeedadapter = ProfilenewsAdapter(mContext!!, dashboardfeedRecyclerList)
+        dashboardfeedadapter = ProfilenewsAdapter(mContext!!)
         dashboardfeedView?.adapter = dashboardfeedadapter
         // TODO: 10/21/20 FIX THIS
         /*dashScroll?.viewTreeObserver?.addOnScrollChangedListener {
@@ -360,6 +363,7 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
     }
 
     private fun postsQueryButtonClicked(click: Button?) {
+        dashboardfeedadapter?.clear()
         postsProgress!!.visibility = View.VISIBLE
         if (click === allPostsButton) {
             if (dashboardfeedRecyclerList != null){

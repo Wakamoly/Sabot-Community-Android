@@ -39,9 +39,11 @@ import org.json.JSONObject
 import org.jsoup.Jsoup
 import java.io.IOException
 import java.util.*
+import kotlin.collections.ArrayList
 
-class ProfilenewsAdapter(private val mCtx: Context, private val profilenewsList: MutableList<ProfilenewsRecycler>?) : RecyclerView.Adapter<BaseViewHolder>() {
+class ProfilenewsAdapter(private val mCtx: Context) : RecyclerView.Adapter<BaseViewHolder>() {
     private var isLoaderVisible = false
+    private val profilenewsList: MutableList<ProfilenewsRecycler> = ArrayList()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (viewType) {
             VIEW_TYPE_NORMAL -> ViewHolder(
@@ -59,30 +61,35 @@ class ProfilenewsAdapter(private val mCtx: Context, private val profilenewsList:
 
     override fun getItemViewType(position: Int): Int {
         return if (isLoaderVisible) {
-            if (position == profilenewsList!!.size - 1) VIEW_TYPE_LOADING else VIEW_TYPE_NORMAL
+            if (position == profilenewsList.size - 1) VIEW_TYPE_LOADING else VIEW_TYPE_NORMAL
         } else {
             VIEW_TYPE_NORMAL
         }
     }
 
     override fun getItemCount(): Int {
-        return profilenewsList?.size ?: 0
+        return profilenewsList.size ?: 0
+    }
+
+    fun clear() {
+        profilenewsList.clear()
+        notifyDataSetChanged()
     }
 
     fun addItems(items: List<ProfilenewsRecycler>?) {
-        profilenewsList!!.addAll(items!!)
+        profilenewsList.addAll(items!!)
         notifyDataSetChanged()
     }
 
     fun addLoading() {
         isLoaderVisible = true
-        profilenewsList!!.add(ProfilenewsRecycler(0, null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString()))
+        profilenewsList.add(ProfilenewsRecycler(0, null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString()))
         notifyItemInserted(profilenewsList.size - 1)
     }
 
     fun removeLoading() {
         isLoaderVisible = false
-        if (profilenewsList!!.size != 0) {
+        if (profilenewsList.size != 0) {
             val position = profilenewsList.size - 1
             val item = getItem(position)
             profilenewsList.removeAt(position)
@@ -90,13 +97,8 @@ class ProfilenewsAdapter(private val mCtx: Context, private val profilenewsList:
         }
     }
 
-    fun clear() {
-        profilenewsList!!.clear()
-        notifyDataSetChanged()
-    }
-
     private fun getItem(position: Int): ProfilenewsRecycler {
-        return profilenewsList!![position]
+        return profilenewsList[position]
     }
 
     inner class ViewHolder(itemView: View) : BaseViewHolder(itemView) {
@@ -132,7 +134,7 @@ class ProfilenewsAdapter(private val mCtx: Context, private val profilenewsList:
         override fun clear() {}
         override fun onBind(position: Int) {
             super.onBind(position)
-            val profilenews = profilenewsList!![position]
+            val profilenews = profilenewsList[position]
             textViewBody.text = profilenews.body
             textViewNumComments.text = profilenews.commentcount
             textviewaddedBy.text = profilenews.nickname
