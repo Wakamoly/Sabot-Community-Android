@@ -18,6 +18,7 @@ import androidx.core.view.ViewCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager.widget.ViewPager.INVISIBLE
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
@@ -44,31 +45,29 @@ import kotlinx.android.synthetic.main.fragment_dashboard.*
 import kotlinx.android.synthetic.main.snippet_top_dashboardbar.*
 import kotlin.collections.ArrayList
 
-class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, DashboardRepo>() {
+class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, DashboardRepo>(), ProfilenewsAdapter.Interaction {
 
-    private var filter: String? = null
+    private lateinit var filter: String
     private var adNotified: ArrayList<String>? = null
     private var sliderImgAdsModel: ArrayList<DashboardAdModelItem?>? = null
     private var currentPublicsList: ArrayList<CurrentPublicsModel?>? = null
-    private var mContext: Context? = null
-    private var viewPagerAdapter: DashViewPagerAdapter? = null
-    private var currentPublicsAdapter: DashCurrentPublicsAdapter? = null
-    private var userID: String? = null
-    private var username: String? = null
+    private lateinit var mContext: Context
     private var currentPage = PaginationOnScroll.PAGE_START
     private var isLastPage = false
     private val pageSize = PaginationOnScroll.PAGE_SIZE
-    private var isLoading = false
-    private var clicked: String? = null
-    private var dashboardfeedRecyclerList: MutableList<ProfilenewsRecycler>? = null
-    private var dashboardfeedadapter: ProfilenewsAdapter? = null
+    private var isLoading = true
+    private var clicked: String? = ""
+    private lateinit var dashboardfeedadapter: ProfilenewsAdapter
+    private var viewPagerAdapter: DashViewPagerAdapter? = null
+    private var currentPublicsAdapter: DashCurrentPublicsAdapter? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mContext = requireContext()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        mContext = activity
-        userID = SharedPrefManager.getInstance(mContext!!)!!.userID
-        username = SharedPrefManager.getInstance(mContext!!)!!.username
 
         currentPublicsVPDots.setupWithViewPager(viewPager, true)
 
@@ -80,7 +79,7 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
         dashboardToMessages?.setOnClickListener { startActivity(Intent(mContext, ChatActivity::class.java)) }
         followingPostsButton?.setOnClickListener { postsQueryButtonClicked(followingPostsButton) }
         allPostsButton?.setOnClickListener { postsQueryButtonClicked(allPostsButton) }
-        filter = SharedPrefManager.getInstance(mContext!!)!!.currentPublics
+        filter = SharedPrefManager.getInstance(mContext)!!.currentPublics.toString()
 
 
         dashSwipe.setOnRefreshListener { refreshDash() }
@@ -150,10 +149,12 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
         viewModel.feed.observe(viewLifecycleOwner, Observer{
             when(it){
                 is DataState.Success -> {
+                    isLoading = false
                     postsProgress.visible(false)
                     updateDashFeedUI(it.data)
                 }
                 is DataState.Loading -> {
+                    isLoading = true
                     postsProgress.visible(true)
                 }
             }
@@ -163,25 +164,44 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
     }
 
     private fun initDashFeedRecycler(){
-        dashboardfeedRecyclerList = ArrayList()
-        dashboardfeedView?.layoutManager = LinearLayoutManager(mContext)
+        dashboardfeedView?.layoutManager = LinearLayoutManager(this@DashboardFragment.context)
         ViewCompat.setNestedScrollingEnabled(dashboardfeedView!!, false)
-        dashboardfeedadapter = ProfilenewsAdapter(mContext!!)
+        dashboardfeedadapter = ProfilenewsAdapter(mContext, this@DashboardFragment)
         dashboardfeedView?.adapter = dashboardfeedadapter
         // TODO: 10/21/20 FIX THIS
+
         /*dashScroll?.viewTreeObserver?.addOnScrollChangedListener {
-            if (dashScroll?.getChildAt(0)?.bottom!! <= dashScroll?.height!! + dashScroll?.scrollY!!) {
-                if (!isLoading && !isLastPage) {
-                    isLoading = true
-                    currentPage++
-                    //launch { loadDashboardFeed(currentPage, clicked!!) }
+            if (dashScroll?.viewTreeObserver?.isAlive!!){
+                if (dashScroll?.getChildAt(0)?.bottom!! <= dashScroll?.height!! + dashScroll?.scrollY!!) {
+                    if (!isLoading && !isLastPage) {
+                        isLoading = true
+                        currentPage++
+                        viewModel.getDashboardFeed(currentPage, pageSize, deviceUsername.toString(), deviceUserID!!, clicked.toString())
+                    }
                 }
             }
         }*/
+
+        /*dashboardfeedView.addOnScrollListener(object : RecyclerView.OnScrollListener(){
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val lastPosition = layoutManager.findLastVisibleItemPosition()
+                if (lastPosition == dashboardfeedadapter.itemCount.minus(2)){
+                    println("DashFeed getting next page")
+                    if (!isLoading && !isLastPage) {
+                        isLoading = true
+                        currentPage++
+                        viewModel.getDashboardFeed(currentPage, pageSize, deviceUsername.toString(), deviceUserID!!, clicked.toString())
+                    }
+                }
+            }
+        })*/
+
     }
 
     private fun initAdVP(){
-        viewPagerAdapter = DashViewPagerAdapter(sliderImgAdsModel!!, mContext!!)
+        viewPagerAdapter = DashViewPagerAdapter(sliderImgAdsModel!!, mContext)
         viewPager?.adapter = viewPagerAdapter
         viewPager?.addOnPageChangeListener(object : OnPageChangeListener {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
@@ -196,7 +216,7 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
     }
 
     private fun initPublicsVP(){
-        currentPublicsAdapter = DashCurrentPublicsAdapter(currentPublicsList!!, mContext!!)
+        currentPublicsAdapter = DashCurrentPublicsAdapter(currentPublicsList!!, mContext)
         currentPublicsVP.adapter = currentPublicsAdapter
         currentPublicsVP?.addOnPageChangeListener(object : OnPageChangeListener {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
@@ -214,13 +234,13 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
                     .setTopColorRes(R.color.colorPrimary)
                     .setTitle(R.string.platform_filter)
                     .setIcon(drawable.icons8_workstation_48)
-                    .setMessage(resources.getString(R.string.selected_platform) + " " + SharedPrefManager.getInstance(mContext!!)!!.currentPublics)
+                    .setMessage(resources.getString(R.string.selected_platform) + " " + SharedPrefManager.getInstance(mContext)!!.currentPublics)
                     .setItems(items) { _: Int, item: String? ->
-                        SharedPrefManager.getInstance(mContext!!)!!.currentPublics = item
+                        SharedPrefManager.getInstance(mContext)!!.currentPublics = item
                         setPlatformImage(item)
-                        filter = item
-                        currentPublicsAdapter!!.clear()
-                        viewModel.getCurrentPublics(deviceUsername.toString(), filter.toString())
+                        filter = item.toString()
+                        currentPublicsAdapter?.clear()
+                        viewModel.getCurrentPublics(deviceUsername.toString(), filter)
                     }
                     .show()
         }
@@ -248,7 +268,7 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
             numUsersOnline.text = usersOnline.num.toString()
             numCurrentPublics.text = usersOnline.numpublics.toString()
             if (usersOnline.unreadmessages > 0) {
-                badge_text_view!!.visibility = View.VISIBLE
+                badge_text_view.visible(true)
                 if (usersOnline.unreadmessages > 9) {
                     badge_text_view.text = "9+"
                 } else {
@@ -256,22 +276,22 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
                 }
             }
 
-            newsLayout.visibility = View.VISIBLE
+            newsLayout.visible(true)
             newsTextView.text = dashNews.toptext
             newsTextView2.text = dashNews.bottomtext
-            newsLayout.setOnClickListener { mContext!!.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(dashNews.link))) }
+            newsLayout.setOnClickListener { mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(dashNews.link))) }
         }
     }
 
     private fun updateCurrentPublicsUI(data: List<CurrentPublicsModel>){
-        currentPublicsAdapter!!.clear()
+        currentPublicsAdapter?.clear()
         if (data.isEmpty()){
             with(binding){
                 currentPublicsVP.visibility = INVISIBLE
                 noCurrentPublics.visible(true)
                 currentPublicsTV.setOnClickListener {
-                    currentPublicsAdapter!!.clear()
-                    viewModel.getCurrentPublics(deviceUsername.toString(), filter.toString())
+                    currentPublicsAdapter?.clear()
+                    viewModel.getCurrentPublics(deviceUsername.toString(), filter)
                 }
                 noCurrentPublics.setOnClickListener {
                     val asf = PublicsFragment()
@@ -287,8 +307,8 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
                 currentPublicsVP.visible(true)
                 currentPublicsAdapter?.addItems(data)
                 currentPublicsTV.setOnClickListener {
-                    currentPublicsProgress.visibility = View.VISIBLE
-                    viewModel.getCurrentPublics(deviceUsername.toString(), filter.toString())
+                    currentPublicsProgress.visible(true)
+                    viewModel.getCurrentPublics(deviceUsername.toString(), filter)
                 }
             }
         }
@@ -296,25 +316,25 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
 
     private fun updateAdUI(data: List<DashboardAdModelItem>){
         adViewed(data[0].ad_id)
-        viewPagerAdapter!!.addItems(data)
+        viewPagerAdapter?.addItems(data)
     }
 
     private fun updateDashFeedUI(data: List<ProfilenewsRecycler>){
         if (data.isEmpty()){
             noPosts.visible(true)
         }else{
-            if (currentPage != PaginationOnScroll.PAGE_START) dashboardfeedadapter!!.removeLoading()
-            postsProgress!!.visibility = View.GONE
-            dashboardfeedadapter!!.addItems(data)
+            if (currentPage != PaginationOnScroll.PAGE_START) dashboardfeedadapter.removeLoading()
+            postsProgress.visible(false)
+            dashboardfeedadapter.addItems(data)
             if (currentPage == 1) {
                 dashboardfeedView.scheduleLayoutAnimation()
             }
             // check whether is last page or not
             if (data.size == pageSize) {
-                dashboardfeedadapter!!.addLoading()
+                dashboardfeedadapter.addLoading()
             } else {
                 isLastPage = true
-                //adapter.removeLoading();
+                //adapter.removeLoading()
             }
             isLoading = false
             noPosts.visible(false)
@@ -324,86 +344,78 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
     private fun setPlatformImage(item: String?) {
         when (item) {
             "Xbox" -> {
-                currentPublicsOptions!!.setImageResource(drawable.icons8_xbox_50)
-                filterText!!.visibility = View.VISIBLE
+                currentPublicsOptions.setImageResource(drawable.icons8_xbox_50)
+                filterText.visible(true)
             }
             "PlayStation" -> {
-                currentPublicsOptions!!.setImageResource(drawable.icons8_playstation_50)
-                filterText!!.visibility = View.VISIBLE
+                currentPublicsOptions.setImageResource(drawable.icons8_playstation_50)
+                filterText.visible(true)
             }
             "Steam" -> {
-                currentPublicsOptions!!.setImageResource(drawable.icons8_steam_48)
-                filterText!!.visibility = View.VISIBLE
+                currentPublicsOptions.setImageResource(drawable.icons8_steam_48)
+                filterText.visible(true)
             }
             "PC" -> {
-                currentPublicsOptions!!.setImageResource(drawable.icons8_workstation_48)
-                filterText!!.visibility = View.VISIBLE
+                currentPublicsOptions.setImageResource(drawable.icons8_workstation_48)
+                filterText.visible(true)
             }
             "Mobile" -> {
-                currentPublicsOptions!!.setImageResource(drawable.icons8_mobile_48)
-                filterText!!.visibility = View.VISIBLE
+                currentPublicsOptions.setImageResource(drawable.icons8_mobile_48)
+                filterText.visible(true)
             }
             "Switch" -> {
-                currentPublicsOptions!!.setImageResource(drawable.icons8_nintendo_switch_48)
-                filterText!!.visibility = View.VISIBLE
+                currentPublicsOptions.setImageResource(drawable.icons8_nintendo_switch_48)
+                filterText.visible(true)
             }
             "Cross-Platform" -> {
-                currentPublicsOptions!!.setImageResource(drawable.icons8_collect_40)
-                filterText!!.visibility = View.VISIBLE
+                currentPublicsOptions.setImageResource(drawable.icons8_collect_40)
+                filterText.visible(true)
             }
             "Other" -> {
-                currentPublicsOptions!!.setImageResource(drawable.icons8_question_mark_64)
-                filterText!!.visibility = View.VISIBLE
+                currentPublicsOptions.setImageResource(drawable.icons8_question_mark_64)
+                filterText.visible(true)
             }
             else -> {
-                currentPublicsOptions!!.setImageResource(drawable.ic_ellipses)
-                filterText!!.visibility = View.GONE
+                currentPublicsOptions.setImageResource(drawable.ic_ellipses)
+                filterText.visible(true)
             }
         }
     }
 
     private fun postsQueryButtonClicked(click: Button?) {
-        dashboardfeedadapter?.clear()
-        postsProgress!!.visibility = View.VISIBLE
+        dashboardfeedadapter.clear()
+        postsProgress.visible(true)
         if (click === allPostsButton) {
-            if (dashboardfeedRecyclerList != null){
-                dashboardfeedRecyclerList!!.clear()
+            if(clicked == "following"){
+                val colorFrom = ContextCompat.getColor(mContext, R.color.grey_80)
+                val colorTo = ContextCompat.getColor(mContext, R.color.green)
+                val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, colorTo)
+                colorAnimation.duration = 750
+                colorAnimation.addUpdateListener { animator: ValueAnimator -> allPostsButton.setBackgroundColor(animator.animatedValue as Int) }
+                colorAnimation.start()
+                val colorAnimation2 = ValueAnimator.ofObject(ArgbEvaluator(), colorTo, colorFrom)
+                colorAnimation2.duration = 750
+                colorAnimation2.addUpdateListener { animator: ValueAnimator -> followingPostsButton.setBackgroundColor(animator.animatedValue as Int) }
+                colorAnimation2.start()
             }
-            if (dashboardfeedadapter != null) {
-                dashboardfeedadapter!!.notifyDataSetChanged()
-            }
-            val colorFrom = ContextCompat.getColor(mContext!!, R.color.grey_80)
-            val colorTo = ContextCompat.getColor(mContext!!, R.color.green)
-            val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, colorTo)
-            colorAnimation.duration = 750
-            colorAnimation.addUpdateListener { animator: ValueAnimator -> allPostsButton!!.setBackgroundColor(animator.animatedValue as Int) }
-            colorAnimation.start()
-            val colorAnimation2 = ValueAnimator.ofObject(ArgbEvaluator(), colorTo, colorFrom)
-            colorAnimation2.duration = 750
-            colorAnimation2.addUpdateListener { animator: ValueAnimator -> followingPostsButton!!.setBackgroundColor(animator.animatedValue as Int) }
-            colorAnimation2.start()
             clicked = "all"
             currentPage = 1
             viewModel.getDashboardFeed(currentPage, pageSize, deviceUsername.toString(), deviceUserID!!, clicked.toString())
 
         }
         if (click === followingPostsButton) {
-            if (dashboardfeedRecyclerList != null){
-                dashboardfeedRecyclerList!!.clear()
+            if (clicked == "all" || clicked == ""){
+                val colorTo = ContextCompat.getColor(mContext, R.color.grey_80)
+                val colorFrom = ContextCompat.getColor(mContext, R.color.green)
+                val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, colorTo)
+                colorAnimation.duration = 250
+                colorAnimation.addUpdateListener { animator: ValueAnimator -> allPostsButton.setBackgroundColor(animator.animatedValue as Int) }
+                colorAnimation.start()
+                val colorAnimation2 = ValueAnimator.ofObject(ArgbEvaluator(), colorTo, colorFrom)
+                colorAnimation2.duration = 250
+                colorAnimation2.addUpdateListener { animator: ValueAnimator -> followingPostsButton.setBackgroundColor(animator.animatedValue as Int) }
+                colorAnimation2.start()
             }
-            if (dashboardfeedadapter != null) {
-                dashboardfeedadapter!!.notifyDataSetChanged()
-            }
-            val colorTo = ContextCompat.getColor(mContext!!, R.color.grey_80)
-            val colorFrom = ContextCompat.getColor(mContext!!, R.color.green)
-            val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, colorTo)
-            colorAnimation.duration = 250
-            colorAnimation.addUpdateListener { animator: ValueAnimator -> allPostsButton!!.setBackgroundColor(animator.animatedValue as Int) }
-            colorAnimation.start()
-            val colorAnimation2 = ValueAnimator.ofObject(ArgbEvaluator(), colorTo, colorFrom)
-            colorAnimation2.duration = 250
-            colorAnimation2.addUpdateListener { animator: ValueAnimator -> followingPostsButton!!.setBackgroundColor(animator.animatedValue as Int) }
-            colorAnimation2.start()
             clicked = "following"
             currentPage = 1
             viewModel.getDashboardFeed(currentPage, pageSize, deviceUsername.toString(), deviceUserID!!, clicked.toString())
@@ -426,7 +438,15 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
     ) = FragmentDashboardBinding.inflate(inflater, container, false)
 
     override fun getFragmentRepository(): DashboardRepo {
-        val api = remoteDataSource.buildApi(DashApi::class.java, mContext?.fcmToken)
+        val api = remoteDataSource.buildApi(DashApi::class.java, mContext.fcmToken)
         return DashboardRepo(api)
+    }
+
+    override fun onItemSelected(position: Int, item: ProfilenewsRecycler) {
+        TODO("Not yet implemented")
+    }
+
+    override fun restoreListPosition() {
+        TODO("Not yet implemented")
     }
 }

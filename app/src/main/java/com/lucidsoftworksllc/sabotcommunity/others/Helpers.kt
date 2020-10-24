@@ -3,10 +3,13 @@ package com.lucidsoftworksllc.sabotcommunity.others
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.view.View
 import android.widget.Toast
-import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.*
 import com.google.android.material.snackbar.Snackbar
+import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.others.base.BaseFragment
 import com.lucidsoftworksllc.sabotcommunity.util.DataState
 
@@ -34,6 +37,44 @@ fun<A : Activity> Activity.startNewActivity(activity: Class<A>){
         it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(it)
     }
+}
+
+fun newFragmentMain(mCtx: Context, fragment: Fragment, replace: Boolean){
+    val fragTransaction = (mCtx as FragmentActivity)
+            .supportFragmentManager
+            .beginTransaction()
+            .setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
+            .setCustomAnimations(R.anim.slide_in, R.anim.fade_out)
+    when(replace){
+        true -> {
+            fragTransaction.add(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit()
+        }
+        false -> {
+            fragTransaction.replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit()
+        }
+    }
+}
+
+inline fun FragmentManager.doTransaction(func: FragmentTransaction.() ->
+FragmentTransaction) {
+    beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).func().commit()
+}
+
+fun AppCompatActivity.addFragment(frameId: Int, fragment: Fragment){
+    supportFragmentManager.doTransaction { add(frameId, fragment) }
+}
+
+
+fun AppCompatActivity.replaceFragment(frameId: Int, fragment: Fragment) {
+    supportFragmentManager.doTransaction{ replace(frameId, fragment) }
+}
+
+fun AppCompatActivity.removeFragment(fragment: Fragment) {
+    supportFragmentManager.doTransaction{ remove(fragment) }
 }
 
 fun View.visible(isVisible: Boolean){

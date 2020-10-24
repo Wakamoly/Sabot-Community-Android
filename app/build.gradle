@@ -22,7 +22,7 @@ android {
         multiDexEnabled true
         applicationId "com.lucidsoftworksllc.sabotcommunity"
         minSdkVersion 18
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 63
         versionName "v0.5.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -61,10 +61,10 @@ def acraVersion = '5.7.0'
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.exifinterface:exifinterface:1.3.0'
+    implementation 'androidx.exifinterface:exifinterface:1.3.1'
     implementation 'com.android.volley:volley:1.1.1'
     implementation 'com.karumi:dexter:5.0.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
@@ -74,8 +74,8 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.iarcuschin:simpleratingbar:0.1.5'
     implementation 'com.chabbal:slidingdotsplash:1.0.2'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.0'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.3.0'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.1'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.3.1'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'com.google.firebase:firebase-messaging:20.3.0'
     implementation 'org.jsoup:jsoup:1.12.2'
@@ -93,7 +93,7 @@ dependencies {
     implementation "androidx.core:core-ktx:+"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.7"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     def room_version = "2.2.5"
@@ -119,6 +119,9 @@ dependencies {
 
     // ViewModel and LiveData
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+
+    //Paging
+    implementation 'android.arch.paging:runtime:1.0.1'
 }
 
 kapt {

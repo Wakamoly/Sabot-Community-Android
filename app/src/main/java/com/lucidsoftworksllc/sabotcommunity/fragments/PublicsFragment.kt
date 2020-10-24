@@ -39,7 +39,7 @@ class PublicsFragment : CoFragment() {
     private var isLastPageFrag = false
     private var isLoadingFrag = false
     private var currentPage = PaginationOnScroll.PAGE_START
-    private val pageSize = PaginationOnScroll.PAGE_SIZE
+    private val pageSize = PaginationOnScroll.PAGE_SIZE_LARGE
     private var publicsPlatformFilter: ImageView? = null
     private var publicsNewGame: ImageView? = null
     private var username: String? = null

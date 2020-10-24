@@ -20,4 +20,7 @@ interface MessageUserInfoDao {
     @Query("SELECT EXISTS(SELECT user_id FROM messages_user_info WHERE user_id = :user_id LIMIT 1)")
     suspend fun isRowExist(user_id : Int) : Boolean
 
+    @Query("SELECT EXISTS(SELECT user_id FROM messages_user_info WHERE username = :username LIMIT 1)")
+    suspend fun isRowExistUsername(username: String) : Boolean
+
 }

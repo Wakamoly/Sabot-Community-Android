@@ -30,10 +30,12 @@ import de.hdodenhof.circleimageview.CircleImageView
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
+import kotlin.collections.ArrayList
 
-class ConvosThreadAdapter(private val mCtx: Context, private val convosList: MutableList<MessagesDataModel>) : RecyclerView.Adapter<ConvosThreadAdapter.ViewHolder>() {
+class ConvosThreadAdapter(private val mCtx: Context) : RecyclerView.Adapter<ConvosThreadAdapter.ViewHolder>() {
     private var deviceUsername: String? = null
     private var isLoaderVisible = false
+    private val convosList: MutableList<MessagesDataModel> = ArrayList()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(mCtx)
         val view = inflater.inflate(R.layout.recycler_userslist_messages, null)

@@ -70,7 +70,7 @@ class ConvosFragment : Fragment() {
         recyclerView?.layoutManager = layoutManager
 
         messages = ArrayList()
-        adapter = ConvosThreadAdapter(mCtx!!, messages!! as MutableList<MessagesDataModel>)
+        adapter = ConvosThreadAdapter(mCtx!!)
         recyclerView?.adapter = adapter
     }
 

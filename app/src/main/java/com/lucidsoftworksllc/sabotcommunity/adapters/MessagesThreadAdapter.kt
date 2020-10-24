@@ -19,9 +19,11 @@ import com.lucidsoftworksllc.sabotcommunity.db.messages.general.MessagesDataMode
 import com.lucidsoftworksllc.sabotcommunity.db.messages.user_messages.UserMessagesEntity
 import com.lucidsoftworksllc.sabotcommunity.fragments.PhotoViewFragment
 import java.util.*
+import kotlin.collections.ArrayList
 
-class MessagesThreadAdapter(private val context: Context, private val messages: MutableList<UserMessagesEntity>, private val username: String) : RecyclerView.Adapter<MessagesThreadAdapter.ViewHolder>() {
+class MessagesThreadAdapter(private val context: Context, private val username: String) : RecyclerView.Adapter<MessagesThreadAdapter.ViewHolder>() {
     private val SELF = 786
+    private val messages: MutableList<UserMessagesEntity> = ArrayList()
     override fun getItemViewType(position: Int): Int {
         val message = messages[position]
         return if (message.user_from == username) {

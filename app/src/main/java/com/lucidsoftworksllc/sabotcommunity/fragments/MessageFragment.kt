@@ -50,6 +50,7 @@ import com.lucidsoftworksllc.sabotcommunity.others.Constants.ROOT_URL
 import com.lucidsoftworksllc.sabotcommunity.others.base.CoFragment
 import com.theartofdev.edmodo.cropper.CropImage
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlinx.android.synthetic.main.content_chat.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.IO
@@ -64,39 +65,21 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class MessageFragment : CoFragment() {
-    private var mCtx: Context? = null
+    private lateinit var mCtx: Context
     private var deviceUserID: String? = null
     private var deviceUsername: String? = null
-    private var userTo: String? = null
-    private val profilePic: String? = null
-    private val nickname: String? = null
+    private lateinit var userTo: String
     private var imageUploaded: String = ""
     private var lastId = 0
-    private var profileMessageToName: TextView? = null
-    private var lastOnline: TextView? = null
-    private var sendButton: ImageView? = null
-    private var imgAttachment: ImageView? = null
-    private var userMessageMenu: ImageView? = null
-    private var backMessageButton: ImageView? = null
-    private var profileMessageToImage: CircleImageView? = null
-    private var verifiedView: CircleImageView? = null
-    private var onlineView: CircleImageView? = null
-    private var messageEditText: EditText? = null
-    private var cannotRespondLayout: LinearLayout? = null
-    private var usernameLayout: LinearLayout? = null
     private var layoutManager: LinearLayoutManager? = null
-    private var messages: List<UserMessagesEntity>? = null
-    private var messagesRecyclerView: RecyclerView? = null
-    private var adapter: MessagesThreadAdapter? = null
-    private var messageProgress: ProgressBar? = null
-    private var sendProgress: ProgressBar? = null
+    private lateinit var adapter: MessagesThreadAdapter
     private var imageToUpload: Bitmap? = null
-    private var messageUserInfoDao: MessageUserInfoDao? = null
-    private var userMessagesDao: UserMessagesDao? = null
-    private var typedMessageDao: TypedMessageDao? = null
+    private lateinit var messageUserInfoDao: MessageUserInfoDao
+    private lateinit var userMessagesDao: UserMessagesDao
+    private lateinit var typedMessageDao: TypedMessageDao
     var rQueue: RequestQueue? = null
     var jsonObject: JSONObject? = null
-    var canUpdate: Boolean = true
+    var canUpdate: Boolean = false
 
     override fun onPause() {
         super.onPause()
@@ -110,43 +93,34 @@ class MessageFragment : CoFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val messageRootView = inflater.inflate(R.layout.content_chat, null)
-        mCtx = activity
+        mCtx = requireContext()
+        return messageRootView
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         canUpdate = true
-        messageEditText = messageRootView.findViewById(R.id.et_message)
-        onlineView = messageRootView.findViewById(R.id.online)
-        verifiedView = messageRootView.findViewById(R.id.verified)
-        messageProgress = messageRootView.findViewById(R.id.messageProgress)
-        sendButton = messageRootView.findViewById(R.id.img_send)
-        imgAttachment = messageRootView.findViewById(R.id.img_attachment)
-        profileMessageToName = messageRootView.findViewById(R.id.profileMessageToName)
-        profileMessageToImage = messageRootView.findViewById(R.id.profileMessageToImage)
-        userMessageMenu = messageRootView.findViewById(R.id.userMessageMenu)
-        backMessageButton = messageRootView.findViewById(R.id.backMessageButton)
-        sendProgress = messageRootView.findViewById(R.id.sendProgress)
-        cannotRespondLayout = messageRootView.findViewById(R.id.cannotRespondLayout)
-        usernameLayout = messageRootView.findViewById(R.id.usernameLayout)
-        lastOnline = messageRootView.findViewById(R.id.lastOnline)
-        messagesRecyclerView = messageRootView.findViewById(R.id.recycler_chat_list)
-        userTo = requireArguments().getString("user_to")
-        deviceUserID = mCtx?.deviceUserID
-        deviceUsername = mCtx?.deviceUsername
-        messageUserInfoDao = SabotDatabase(mCtx!!).getMessageUserInfo()
-        userMessagesDao = SabotDatabase(mCtx!!).getUserMessagesDao()
-        typedMessageDao = SabotDatabase(mCtx!!).getTypedMessageDao()
+        userTo = requireArguments().getString("user_to").toString()
+        deviceUserID = mCtx.deviceUserID
+        deviceUsername = mCtx.deviceUsername
+        messageUserInfoDao = SabotDatabase(mCtx).getMessageUserInfo()
+        userMessagesDao = SabotDatabase(mCtx).getUserMessagesDao()
+        typedMessageDao = SabotDatabase(mCtx).getTypedMessageDao()
 
         initRecycler()
         initTypedMessage()
         initUserInfoDatabase(true)
         getMessages(true)
 
-        messageEditText?.addTextChangedListener(object : TextWatcher {
+        et_message.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 launch {
-                    if (typedMessageDao?.isRowExistUser(userTo!!)!!){
-                        typedMessageDao?.updateTypedMessageUser(s.toString(),userTo!!)
+                    if (typedMessageDao.isRowExistUser(userTo)){
+                        typedMessageDao.updateTypedMessageUser(s.toString(),userTo)
                     }else{
-                        val typedMessage = TypedMessageEntity("user",userTo!!,0,s.toString())
-                        typedMessageDao?.insertTypedMessage(typedMessage)
+                        val typedMessage = TypedMessageEntity("user",userTo,0,s.toString())
+                        typedMessageDao.insertTypedMessage(typedMessage)
                     }
                 }
             }
@@ -154,46 +128,37 @@ class MessageFragment : CoFragment() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        backMessageButton?.setOnClickListener { requireActivity().supportFragmentManager.popBackStackImmediate() }
-        imgAttachment?.setOnClickListener {
+        backMessageButton.setOnClickListener { requireActivity().supportFragmentManager.popBackStackImmediate() }
+        img_attachment.setOnClickListener {
             requestMultiplePermissions()
             openCropper()
         }
-        return messageRootView
     }
 
     private fun openCropper() {
         CropImage.activity()
-                .start(requireContext(), this)
+                .start(mCtx, this)
     }
 
     private fun initTypedMessage(){
         launch {
-            if (typedMessageDao?.isRowExistUser(userTo!!)!!){
-                val typedMessage = typedMessageDao?.getTypedMessageUser(userTo!!)!!
-                if (typedMessage.isNotBlank()) withContext(Main){messageEditText?.setText(typedMessage)}
+            if (typedMessageDao.isRowExistUser(userTo)){
+                val typedMessage = typedMessageDao.getTypedMessageUser(userTo)
+                if (typedMessage.isNotBlank()) withContext(Main){ et_message.setText(typedMessage) }
             }
         }
     }
 
     private fun initUserInfoDatabase(init: Boolean) {
         launch {
-            val userInfoEntity = withContext(Default) { messageUserInfoDao?.getUserInfo(userTo!!) }
+            val userInfoEntity = withContext(Default) { messageUserInfoDao.getUserInfo(userTo) }
             if (init) {
-                if (userInfoEntity != null) {
-                    withContext(Main){
-                        updateUserInfoView(userInfoEntity)
-                        loadUserInfo(userTo)
-                    }
-                } else {
-                    withContext(Main){
-                        loadUserInfo(userTo)
-                    }
+                if(messageUserInfoDao.isRowExistUsername(userTo)){
+                    updateUserInfoView(userInfoEntity)
                 }
+                loadUserInfo(userTo)
             } else {
-                withContext(Main){
-                    updateUserInfoView(userInfoEntity!!)
-                }
+                updateUserInfoView(userInfoEntity)
             }
         }
     }
@@ -207,29 +172,29 @@ class MessageFragment : CoFragment() {
             val lastOnlineText = userInfoEntity.last_online_text
             val userToId = userInfoEntity.user_id
             val username = userInfoEntity.username
-            lastOnline!!.text = lastOnlineText
-            sendButton!!.setOnClickListener { view: View ->
-                val body = messageEditText!!.text.toString().trim { it <= ' ' }
-                if (messageEditText!!.text.toString().isNotEmpty() || imageUploaded.isNotEmpty()) {
+            lastOnline.text = lastOnlineText
+            img_send.setOnClickListener { view: View ->
+                val body = et_message.text.toString().trim { it <= ' ' }
+                if (et_message.text.toString().isNotEmpty() || imageUploaded.isNotEmpty()) {
                     sendMessage(username, body)
                     hideKeyboardFrom(mCtx, view)
                 } else {
                     Toast.makeText(mCtx, "You must enter text before submitting!", Toast.LENGTH_LONG).show()
                 }
             }
-            usernameLayout!!.setOnClickListener { startActivity(Intent(mCtx, FragmentContainer::class.java).putExtra("user_to_id", userToId)) }
+            usernameLayout.setOnClickListener { startActivity(Intent(mCtx, FragmentContainer::class.java).putExtra("user_to_id", userToId.toString())) }
             if (lastOnline1 == "yes") {
-                onlineView!!.visibility = View.VISIBLE
+                online_view.visible(true)
             }
             if (verified == "yes") {
-                verifiedView!!.visibility = View.VISIBLE
+                verified_view.visible(true)
             }
-            profileMessageToName!!.text = nickname
+            profileMessageToName.text = nickname
             val profilePic2 = profilePic1.substring(0, profilePic1.length - 4) + "_r.JPG"
-            Glide.with(mCtx!!)
+            Glide.with(mCtx)
                     .load(Constants.BASE_URL + profilePic2)
-                    .into(profileMessageToImage!!)
-            userMessageMenu!!.setOnClickListener { view: View? ->
+                    .into(profileMessageToImage)
+            userMessageMenu.setOnClickListener { view: View? ->
                 val popup = PopupMenu(mCtx, view)
                 val inflater = popup.menuInflater
                 inflater.inflate(R.menu.message_top_menu, popup.menu)
@@ -244,7 +209,7 @@ class MessageFragment : CoFragment() {
                         (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).replace(R.id.chat_fragment_container, ldf).addToBackStack(null).commit()
                     }
                     if (item.itemId == R.id.menuPlayerBlock) {
-                        SharedPrefManager.getInstance(mCtx!!)!!.blockUser(username)
+                        SharedPrefManager.getInstance(mCtx)!!.blockUser(username)
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             requireActivity().supportFragmentManager.beginTransaction().detach(this@MessageFragment).commitNowAllowingStateLoss()
                             requireActivity().supportFragmentManager.beginTransaction().attach(this@MessageFragment).commitAllowingStateLoss()
@@ -260,26 +225,25 @@ class MessageFragment : CoFragment() {
     }
 
     private fun initRecycler(){
-        messagesRecyclerView?.setHasFixedSize(true)
+        recycler_chat_list.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(mCtx)
-        messages = ArrayList()
         layoutManager?.reverseLayout = true
         layoutManager?.stackFromEnd = true
-        messagesRecyclerView?.layoutManager = layoutManager
-        adapter = MessagesThreadAdapter(mCtx!!, messages!! as MutableList<UserMessagesEntity>, deviceUsername!!)
-        messagesRecyclerView?.adapter = adapter
+        recycler_chat_list.layoutManager = layoutManager
+        adapter = MessagesThreadAdapter(mCtx, deviceUsername!!)
+        recycler_chat_list.adapter = adapter
     }
 
     private fun appendRecycler(messageList: List<UserMessagesEntity>){
         if (messageList.isNotEmpty()){
             lastId = messageList[0].message_id
-            adapter?.addItems(messageList)
-            messageProgress!!.visibility = View.GONE
-            messagesRecyclerView!!.visibility = View.VISIBLE
+            adapter.addItems(messageList)
+            messageProgress.visibility = View.GONE
+            recycler_chat_list.visibility = View.VISIBLE
             scrollToBottomNow()
         }else{
-            messageProgress!!.visibility = View.GONE
-            messagesRecyclerView!!.visibility = View.VISIBLE
+            messageProgress.visibility = View.GONE
+            recycler_chat_list.visibility = View.VISIBLE
         }
     }
 
@@ -300,17 +264,17 @@ class MessageFragment : CoFragment() {
                                 val image = obj.getString("image")
                                 val messageObject = UserMessagesEntity(id, userTo1, userFrom, body, date, image)
                                 withContext(Default){
-                                    if (userMessagesDao!!.isRowExist(id)){
-                                        userMessagesDao!!.updateMessage(messageObject)
+                                    if (userMessagesDao.isRowExist(id)){
+                                        userMessagesDao.updateMessage(messageObject)
                                     }else{
-                                        userMessagesDao!!.addMessage(messageObject)
+                                        userMessagesDao.addMessage(messageObject)
                                     }
                                 }
                             }
                             if (init){
                                 getMessages(false)
                             }else{
-                                val updatedMessages = userMessagesDao!!.getMessages(userTo!!,deviceUsername!!)
+                                val updatedMessages = userMessagesDao.getMessages(userTo,deviceUsername!!)
                                 withContext(Main){ appendRecycler(updatedMessages) }
                             }
                         } catch (e: JSONException) {
@@ -325,8 +289,8 @@ class MessageFragment : CoFragment() {
     private fun getMessages(init: Boolean) {
         launch {
             if (init){
-                val userMessages = withContext(IO){ userMessagesDao?.getMessages(userTo!!,deviceUsername!!) }
-                if (userMessages!!.isEmpty()){
+                val userMessages = withContext(IO){ userMessagesDao.getMessages(userTo,deviceUsername!!) }
+                if (userMessages.isEmpty()){
                     getMessagesInit(true)
                 }else{
                     withContext(Main){ appendRecycler(userMessages) }
@@ -334,8 +298,8 @@ class MessageFragment : CoFragment() {
                     messagesFromID()
                 }
             }else{
-                val userMessages = withContext(IO){ userMessagesDao?.getMessages(userTo!!,deviceUsername!!) }
-                withContext(Main){ appendRecycler(userMessages!!) }
+                val userMessages = withContext(IO){ userMessagesDao.getMessages(userTo,deviceUsername!!) }
+                withContext(Main){ appendRecycler(userMessages) }
                 messagesFromID()
             }
         }
@@ -351,11 +315,11 @@ class MessageFragment : CoFragment() {
                             val lastOnline1 = res.getString("userLastOnline")
                             if (lastOnline1 != "null") {
                                 withContext(Main){
-                                    lastOnline!!.text = lastOnline1
+                                    lastOnline.text = lastOnline1
                                     if (lastOnline1 == "Online now") {
-                                        onlineView!!.visibility = View.VISIBLE
+                                        online_view.visibility = View.VISIBLE
                                     } else {
-                                        onlineView!!.visibility = View.GONE
+                                        online_view.visibility = View.GONE
                                     }
                                 }
                             }
@@ -383,15 +347,15 @@ class MessageFragment : CoFragment() {
         CoroutineScope(Main).launch {
             lastId = message_id
             val m = UserMessagesEntity(message_id, user_to, user_from, message, date_text, image)
-            withContext(IO){ userMessagesDao?.addMessage(m) }
-            adapter!!.add(m)
+            withContext(IO){ userMessagesDao.addMessage(m) }
+            adapter.add(m)
             scrollToBottom()
         }
     }
 
     private fun sendMessage(user_string: String, message: String) {
-        sendButton!!.visibility = View.GONE
-        sendProgress!!.visibility = View.VISIBLE
+        img_send.visibility = View.GONE
+        sendProgress.visibility = View.VISIBLE
         if (message.equals("", ignoreCase = true)) return
         val stringRequest: StringRequest = object : StringRequest(Method.POST, URL_SEND_MESSAGE, Response.Listener { response: String? ->
             try {
@@ -402,15 +366,15 @@ class MessageFragment : CoFragment() {
                         messageImageUpload(imageToUpload!!, messageId, deviceUsername, user_string, message)
                     } else {
                         processMessage(deviceUsername!!,message,"",messageId,user_string,"Just now")
-                        sendButton!!.visibility = View.VISIBLE
-                        sendProgress!!.visibility = View.GONE
+                        img_send.visibility = View.VISIBLE
+                        sendProgress.visibility = View.GONE
                     }
-                    messageEditText!!.setText("")
-                    launch { typedMessageDao?.updateTypedMessageUser("",userTo!!) }
+                    et_message.setText("")
+                    launch { typedMessageDao.updateTypedMessageUser("",userTo) }
                 } else {
                     Toast.makeText(mCtx, jsonObject.getString("message"), Toast.LENGTH_SHORT).show()
-                    sendButton!!.visibility = View.VISIBLE
-                    sendProgress!!.visibility = View.GONE
+                    img_send.visibility = View.VISIBLE
+                    sendProgress.visibility = View.GONE
                 }
             } catch (e: JSONException) {
                 e.printStackTrace()
@@ -451,7 +415,7 @@ class MessageFragment : CoFragment() {
                         break
                     }
                 }
-                if (blocked != "yes" && !SharedPrefManager.getInstance(mCtx!!)!!.isUserBlocked(user_to!!)) {
+                if (blocked != "yes" && !SharedPrefManager.getInstance(mCtx)!!.isUserBlocked(user_to!!)) {
 
                     launch {
                         val userEntity = MessageUserInfoEntity(userToId.toInt(),
@@ -462,10 +426,10 @@ class MessageFragment : CoFragment() {
                                 blockedArray1,
                                 username)
                         withContext(Default) {
-                            if (messageUserInfoDao!!.isRowExist(userToId.toInt())) {
-                                messageUserInfoDao!!.updateUser(userEntity)
+                            if (messageUserInfoDao.isRowExist(userToId.toInt())) {
+                                messageUserInfoDao.updateUser(userEntity)
                             } else {
-                                messageUserInfoDao!!.addUser(userEntity)
+                                messageUserInfoDao.addUser(userEntity)
                             }
                         }
                         initUserInfoDatabase(false)
@@ -485,12 +449,12 @@ class MessageFragment : CoFragment() {
 
     private fun scrollToBottom() {
         //adapter!!.notifyDataSetChanged()
-        if (adapter!!.itemCount > 1) Objects.requireNonNull(messagesRecyclerView!!.layoutManager!!).smoothScrollToPosition(messagesRecyclerView, null, 0)
+        if (adapter.itemCount > 1) Objects.requireNonNull(recycler_chat_list.layoutManager!!).smoothScrollToPosition(recycler_chat_list, null, 0)
     }
 
     private fun scrollToBottomNow() {
         //adapter!!.notifyDataSetChanged()
-        if (adapter!!.itemCount > 1) Objects.requireNonNull(messagesRecyclerView!!.layoutManager!!).scrollToPosition(0)
+        if (adapter.itemCount > 1) Objects.requireNonNull(recycler_chat_list.layoutManager!!).scrollToPosition(0)
     }
 
     private fun messageImageUpload(bitmap: Bitmap, message_id: Int, username: String?, user_string: String, message: String) {
@@ -512,11 +476,11 @@ class MessageFragment : CoFragment() {
                     rQueue!!.cache.clear()
                     try {
                         if (jsonObject.getString("error") != "true") {
-                            imgAttachment!!.setImageResource(R.drawable.ic_attach_file_grey_24dp)
+                            img_attachment!!.setImageResource(R.drawable.ic_attach_file_grey_24dp)
                             imageToUpload = null
                             imageUploaded = jsonObject.getString("imagepath")
                             processMessage(deviceUsername!!,message,imageUploaded,message_id,user_string,"Just now")
-                            sendButton?.visibility = View.VISIBLE
+                            img_send.visibility = View.VISIBLE
                             sendProgress?.visibility = View.GONE
                         }
                     } catch (e: JSONException) {
@@ -539,7 +503,7 @@ class MessageFragment : CoFragment() {
                 var bitmap1: Bitmap? = null
                 try {
                     if (Build.VERSION.SDK_INT >= 29) {
-                        val source: ImageDecoder.Source = ImageDecoder.createSource(mCtx!!.contentResolver, resultUri)
+                        val source: ImageDecoder.Source = ImageDecoder.createSource(mCtx.contentResolver, resultUri)
                         try {
                             bitmap1 = ImageDecoder.decodeBitmap(source)
                         } catch (e: IOException) {
@@ -547,16 +511,16 @@ class MessageFragment : CoFragment() {
                         }
                     } else {
                         try {
-                            bitmap1 = MediaStore.Images.Media.getBitmap(mCtx!!.contentResolver, resultUri)
+                            bitmap1 = MediaStore.Images.Media.getBitmap(mCtx.contentResolver, resultUri)
                         } catch (e: IOException) {
                             e.printStackTrace()
                         }
                     }
 
                     if (Build.VERSION.SDK_INT < 29){
-                        imgAttachment!!.setImageBitmap(bitmap1)
+                        img_attachment.setImageBitmap(bitmap1)
                     }else{
-                        imgAttachment?.setImageResource(R.drawable.icons8_question_mark_64)
+                        img_attachment.setImageResource(R.drawable.icons8_question_mark_64)
                         activity?.toastLong("Cannot display image cropped! (Android 10+ temporary issue, upload should work as usual.)")
                     }
 
@@ -578,14 +542,14 @@ class MessageFragment : CoFragment() {
                 .withListener(object : MultiplePermissionsListener {
                     override fun onPermissionsChecked(report: MultiplePermissionsReport) {
                         if (report.isAnyPermissionPermanentlyDenied) {
-                            Toast.makeText(mCtx!!.applicationContext, "No permissions granted!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(mCtx.applicationContext, "No permissions granted!", Toast.LENGTH_SHORT).show()
                         }
                     }
 
                     override fun onPermissionRationaleShouldBeShown(permissions: List<PermissionRequest>, token: PermissionToken) {
                         token.continuePermissionRequest()
                     }
-                }).withErrorListener { Toast.makeText(mCtx!!.applicationContext, "Error!", Toast.LENGTH_SHORT).show() }
+                }).withErrorListener { Toast.makeText(mCtx.applicationContext, "Error!", Toast.LENGTH_SHORT).show() }
                 .onSameThread()
                 .check()
     }
