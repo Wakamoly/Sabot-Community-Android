@@ -16,12 +16,12 @@ constructor(
         private val cacheMapper: MessagesCacheMapper,
         private val networkMapper: MessagesNetworkMapper
 ){
-    suspend fun getMessages(mContext: Context): Flow<DataState<List<MessagesDataModel>>> = flow {
+    suspend fun getMessages(dUsername: String, dUserID: String): Flow<DataState<List<MessagesDataModel>>> = flow {
         emit(DataState.Loading)
         try {
             val cachedMessages = messagesDao.get()
             if (cachedMessages.isEmpty()){
-                val networkMessages = messagesRetrofit.getMessages(mContext.deviceUsername,mContext.deviceUserID)
+                val networkMessages = messagesRetrofit.getMessages(dUsername, dUserID)
                 val messages = networkMapper.mapFromEntityList(networkMessages)
                 for (message in messages){
                     messagesDao.insert(cacheMapper.mapToEntity(message))
@@ -31,7 +31,7 @@ constructor(
                 emit(DataState.UpdateSuccess(cacheMapper.mapFromEntityList(newCachedMessages)))
             }else{
                 emit(DataState.Success(cacheMapper.mapFromEntityList(cachedMessages)))
-                val networkMessages = messagesRetrofit.getMessages(mContext.deviceUsername,mContext.deviceUserID)
+                val networkMessages = messagesRetrofit.getMessages(dUsername, dUserID)
                 val messages = networkMapper.mapFromEntityList(networkMessages)
                 for (message in messages){
                     if (message.type != "group"){
@@ -39,20 +39,16 @@ constructor(
                         if (rowExists.isNotEmpty()){
                             message.id = rowExists[0].id
                             messagesDao.updateRow(cacheMapper.mapToEntity(message))
-                            //println("UPDATING USER ROW message.id: ${message.id}, ${message.sent_by}")
                         }else {
                             messagesDao.insert(cacheMapper.mapToEntity(message))
-                            //println("INSERTING USER NEW ID: ${message.id}, ${message.sent_by}")
                         }
                     }else{
                         val rowExists = messagesDao.isRowExistGroup(message.group_id)
                         if (rowExists.isNotEmpty()){
                             message.id = rowExists[0].id
                             messagesDao.updateRow(cacheMapper.mapToEntity(message))
-                            //println("UPDATING GROUP ROW message.id: ${message.id}, ${message.group_id}")
                         }else {
                             messagesDao.insert(cacheMapper.mapToEntity(message))
-                            //println("INSERTING GROUP NEW ID: ${message.id}, ${message.group_id}")
                         }
                     }
 

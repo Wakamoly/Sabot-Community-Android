@@ -21,11 +21,11 @@ constructor(
     val dataState: LiveData<DataState<List<MessagesDataModel>>>
         get () = _dataState
 
-    fun setStateEvent(mainStateEvent: MainStateEvent, mContext: Context){
+    fun setStateEvent(mainStateEvent: MainStateEvent, dUsername: String, dUserID: String){
         viewModelScope.launch {
             when(mainStateEvent){
                 is MainStateEvent.GetMessagesEvents -> {
-                    messagesRepository.getMessages(mContext)
+                    messagesRepository.getMessages(dUsername, dUserID)
                             .onEach { dataState ->
                                 _dataState.value = dataState
                             }

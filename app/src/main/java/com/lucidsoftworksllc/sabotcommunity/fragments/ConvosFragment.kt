@@ -60,7 +60,7 @@ class ConvosFragment : Fragment() {
         initRecycler()
         initMenus()
         subscribeObservers()
-        viewModel.setStateEvent(MainStateEvent.GetMessagesEvents, mCtx!!)
+        viewModel.setStateEvent(MainStateEvent.GetMessagesEvents, deviceUsername.toString(), deviceUserID.toString())
         return convosRootView
     }
 

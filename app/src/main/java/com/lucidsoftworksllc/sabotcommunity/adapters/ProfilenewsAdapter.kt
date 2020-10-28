@@ -481,32 +481,33 @@ class ProfilenewsAdapter(private val mCtx: Context,
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         mCtx.startActivity(intent)
                     }
-                    CoroutineScope(IO).launch {
                         try {
-                            val doc = Jsoup.connect(finalItem).get()
-                            val ogTags = doc.select("meta[property^=og:]")
-                            if (ogTags.size <= 0) {
-                                return@launch
+                            CoroutineScope(IO).launch {
+                                val doc = Jsoup.connect(finalItem).get()
+                                val ogTags = doc.select("meta[property^=og:]")
+                                if (ogTags.size <= 0) {
+                                    return@launch
+                                }
+                                val metaOgTitle = doc.select("meta[property=og:title]")
+                                if (metaOgTitle != null) {
+                                    title[0] = metaOgTitle.attr("content")
+                                } else {
+                                    title[0] = doc.title()
+                                }
+                                val metaOgDesc = doc.select("meta[property=og:description]")
+                                if (metaOgDesc != null) {
+                                    desc[0] = metaOgDesc.attr("content")
+                                }
+                                val metaOgImage = doc.select("meta[property=og:image]")
+                                if (metaOgImage != null) {
+                                    imageUrl[0] = metaOgImage.attr("content")
+                                }
+                                addPostLinkBits(imageUrl[0], title[0], desc[0])
                             }
-                            val metaOgTitle = doc.select("meta[property=og:title]")
-                            if (metaOgTitle != null) {
-                                title[0] = metaOgTitle.attr("content")
-                            } else {
-                                title[0] = doc.title()
-                            }
-                            val metaOgDesc = doc.select("meta[property=og:description]")
-                            if (metaOgDesc != null) {
-                                desc[0] = metaOgDesc.attr("content")
-                            }
-                            val metaOgImage = doc.select("meta[property=og:image]")
-                            if (metaOgImage != null) {
-                                imageUrl[0] = metaOgImage.attr("content")
-                            }
-                            addPostLinkBits(imageUrl[0],title[0],desc[0])
                         } catch (e: IOException) {
                             e.printStackTrace()
                         }
-                    }
+
                     break
                 } else {
                     urlPreview.visible(false)

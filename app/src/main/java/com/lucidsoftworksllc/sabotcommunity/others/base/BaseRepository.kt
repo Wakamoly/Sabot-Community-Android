@@ -26,6 +26,18 @@ abstract class BaseRepository {
         }
     }
 
+    suspend fun <T> safeDatabaseCall(
+            databaseCall: suspend () -> T
+    ) : DataState<T>{
+        return withContext(Dispatchers.IO){
+            try {
+                DataState.Success(databaseCall.invoke())
+            }catch(throwable: Throwable){
+                DataState.Failure(false, null, null)
+            }
+        }
+    }
+
     /*suspend fun logout(api: UserApi) = safeApiCall {
         api.logout()
     }*/
