@@ -107,8 +107,8 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
     }
 
     private fun subscribeObservers(){
-        viewModel.getAds(deviceUsername.toString())
-        viewModel.ads.observe(viewLifecycleOwner, Observer{
+        viewModel.getAds(deviceUsername)
+        viewModel.ads.observe(viewLifecycleOwner, {
             when(it){
                 is DataState.Success -> {
                     dashProgressBar.visible(false)
@@ -122,8 +122,8 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
             }
         })
 
-        viewModel.getNumOnline(deviceUsername.toString())
-        viewModel.numOnline.observe(viewLifecycleOwner, Observer{
+        viewModel.getNumOnline(deviceUsername)
+        viewModel.numOnline.observe(viewLifecycleOwner, {
             when(it){
                 is DataState.Success -> {
                     updateNumOnlineUI(it.data)
@@ -132,8 +132,8 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
         })
 
 
-        viewModel.getCurrentPublics(deviceUsername.toString(), filter.toString())
-        viewModel.publics.observe(viewLifecycleOwner, Observer{
+        viewModel.getCurrentPublics(deviceUsername, filter)
+        viewModel.publics.observe(viewLifecycleOwner, {
             when(it){
                 is DataState.Success -> {
                     currentPublicsProgress.visible(false)
@@ -146,7 +146,7 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
         })
 
         postsQueryButtonClicked(followingPostsButton)
-        viewModel.feed.observe(viewLifecycleOwner, Observer{
+        viewModel.feed.observe(viewLifecycleOwner, {
             when(it){
                 is DataState.Success -> {
                     isLoading = false

@@ -24,7 +24,7 @@ import com.lucidsoftworksllc.sabotcommunity.db.publics.PublicsEntity
             MessageUserInfoEntity::class,
             UserMessagesEntity::class,
             TypedMessageEntity::class],
-        version = 18)
+        version = 19)
 abstract class SabotDatabase: RoomDatabase() {
 
     abstract fun getPublicsDao() : PublicsDao

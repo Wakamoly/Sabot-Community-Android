@@ -48,6 +48,9 @@ import com.lucidsoftworksllc.sabotcommunity.db.messages.user_messages.UserMessag
 import com.lucidsoftworksllc.sabotcommunity.db.messages.user_messages.UserMessagesEntity
 import com.lucidsoftworksllc.sabotcommunity.fragments.repositories.UserMessageRepo
 import com.lucidsoftworksllc.sabotcommunity.fragments.viewmodels.UserMessageVM
+import com.lucidsoftworksllc.sabotcommunity.models.network_autogen.SentMessageResponse
+import com.lucidsoftworksllc.sabotcommunity.models.network_autogen.UserMessageData
+import com.lucidsoftworksllc.sabotcommunity.models.network_autogen.UserMessagesFromID
 import com.lucidsoftworksllc.sabotcommunity.network.UserMessageApi
 import com.lucidsoftworksllc.sabotcommunity.others.*
 import com.lucidsoftworksllc.sabotcommunity.others.Constants.ROOT_URL
@@ -66,10 +69,8 @@ import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.*
-//import com.lucidsoftworksllc.sabotcommunity.databinding.FragmentMess
 
 class MessageFragment : BaseFragment<UserMessageVM, ContentChatBinding, UserMessageRepo>() {
-    private lateinit var mCtx: Context
     private lateinit var userTo: String
     private var imageUploaded: String = ""
     private var lastId = 0
@@ -82,6 +83,7 @@ class MessageFragment : BaseFragment<UserMessageVM, ContentChatBinding, UserMess
     private var rQueue: RequestQueue? = null
     private var jsonObject: JSONObject? = null
     private var canUpdate: Boolean = false
+    private var recyclerInit: Boolean = false
 
     override fun onPause() {
         super.onPause()
@@ -113,7 +115,7 @@ class MessageFragment : BaseFragment<UserMessageVM, ContentChatBinding, UserMess
         // TODO: 10/26/20    v REMOVE THESE v
         //initTypedMessage()
         //initUserInfoDatabase(true)
-        getMessages(true)
+        //getMessages(true)
 
         et_message.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -136,17 +138,78 @@ class MessageFragment : BaseFragment<UserMessageVM, ContentChatBinding, UserMess
             if(it.isNotBlank()) et_message.setText(it)
         })
 
-        viewModel.getUserInfo(userTo, deviceUsername.toString(), deviceUserID!!)
+        viewModel.getUserInfo(userTo, deviceUsername, deviceUserID)
         viewModel.userInfo.observe(viewLifecycleOwner, {
             when(it){
-                is DataState.Loading -> {
-
-                }
                 is DataState.Success -> {
                     updateUserInfoUI(it.data)
                 }
             }
         })
+
+        viewModel.getUserMessages(userTo, deviceUsername, deviceUserID)
+        viewModel.userMessages.observe(viewLifecycleOwner, {
+            when(it){
+                is DataState.Success -> {
+                    appendRecycler(it.data)
+                    messageProgress?.visible(false)
+                    recycler_chat_list?.visible(true)
+                }
+                is DataState.Loading -> {
+                    messageProgress?.visible(true)
+                    recycler_chat_list?.visible(false)
+                    requireView().snackbarShort("Updating messages...", "")
+                }
+                is DataState.Failure -> handleApiError(it) { errorRetry() }
+            }
+        })
+
+
+        viewModel.newUserMessages.observe(viewLifecycleOwner, {
+            when(it){
+                is DataState.Success -> {
+                    updateNewMessages(it.data)
+                }
+                is DataState.Failure -> handleApiError(it) { errorRetry() }
+            }
+        })
+
+        viewModel.sentMessage.observe(viewLifecycleOwner, {
+            when (it) {
+                is DataState.Loading -> {
+                    img_send.visible(false)
+                    sendProgress.visible(true)
+                }
+                is DataState.Success -> {
+                    updateSentMessageUI(it.data)
+                }
+                // TODO: 10/30/20 ADD RETRY FOR SENDING MESSAGES
+                is DataState.Failure -> handleApiError(it) { errorRetry() }
+            }
+        })
+
+    }
+
+    // TODO: 10/30/20 UPDATE MODEL FILE
+    private fun updateSentMessageUI(data: UserMessageData){
+        if (!data.error){
+            et_message.setText("")
+            img_attachment?.setImageResource(R.drawable.ic_attach_file_grey_24dp)
+            imageToUpload = null
+            processMessages(data.messages)
+            img_send.visible(true)
+            sendProgress?.visible(false)
+            viewModel.setTypedMessage("", userTo)
+        }
+    }
+
+    private fun errorRetry(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
+            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
+        } else {
+            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
+        }
     }
 
     private fun openCropper() {
@@ -189,10 +252,11 @@ class MessageFragment : BaseFragment<UserMessageVM, ContentChatBinding, UserMess
         img_send.setOnClickListener { view: View ->
             val body = et_message.text.toString().trim { it <= ' ' }
             if (et_message.text.toString().isNotEmpty() || imageUploaded.isNotEmpty()) {
-                sendMessage(username, body)
+                //sendMessage(username, body)
+                viewModel.sendMessage(userTo, deviceUsername, deviceUserID, body, imageToUpload)
                 hideKeyboardFrom(mCtx, view)
             } else {
-                Toast.makeText(mCtx, "You must enter text before submitting!", Toast.LENGTH_LONG).show()
+                mCtx.toastLong("You must enter text before submitting!")
             }
         }
         usernameLayout.setOnClickListener { startActivity(Intent(mCtx, FragmentContainer::class.java).putExtra("user_to_id", userToId.toString())) }
@@ -236,7 +300,7 @@ class MessageFragment : BaseFragment<UserMessageVM, ContentChatBinding, UserMess
         }
     }
 
-    private fun updateUserInfoView(userInfoEntity: MessageUserInfoEntity){
+    /*private fun updateUserInfoView(userInfoEntity: MessageUserInfoEntity){
         CoroutineScope(Main).launch {
             val profilePic1 = userInfoEntity.profile_pic
             val nickname = userInfoEntity.nickname
@@ -295,7 +359,7 @@ class MessageFragment : BaseFragment<UserMessageVM, ContentChatBinding, UserMess
                 popup.show()
             }
         }
-    }
+    }*/
 
     private fun initRecycler(){
         recycler_chat_list.setHasFixedSize(true)
@@ -303,130 +367,58 @@ class MessageFragment : BaseFragment<UserMessageVM, ContentChatBinding, UserMess
         layoutManager.reverseLayout = true
         layoutManager.stackFromEnd = true
         recycler_chat_list.layoutManager = layoutManager
-        adapter = MessagesThreadAdapter(mCtx, deviceUsername!!)
+        adapter = MessagesThreadAdapter(mCtx, deviceUsername)
         recycler_chat_list.adapter = adapter
     }
 
-    private fun appendRecycler(messageList: List<UserMessagesEntity>){
+    private fun updateNewMessages(data: UserMessagesFromID){
+        if (!data.error){
+            processMessages(data.messages)
+            if (data.userLastOnline != "null") {
+                lastOnline?.text = data.userLastOnline
+                if (data.userLastOnline == "Online now") {
+                    online_view?.visible(true)
+                } else {
+                    online_view?.visible(false)
+                }
+            }
+        }
+    }
+
+    private fun appendRecycler(data: UserMessageData){
+        val messageList = data.messages
         if (messageList.isNotEmpty()){
             lastId = messageList[0].message_id
             adapter.addItems(messageList)
-            messageProgress?.visible(false)
-            recycler_chat_list?.visible(true)
-            scrollToBottomNow()
-        }else{
-            messageProgress?.visible(false)
-            recycler_chat_list?.visible(true)
-        }
-    }
-
-    private fun getMessagesInit(init: Boolean){
-        val stringRequest = StringRequest(Request.Method.GET, "$URL_FETCH_MESSAGES?this_user=$deviceUsername&username=$userTo&userid=$deviceUserID",
-                { response: String? ->
-                    launch {
-                        try {
-                            val res = JSONObject(response!!)
-                            val thread = res.getJSONArray("messages")
-                            for (i in 0 until thread.length()) {
-                                val obj = thread.getJSONObject(i)
-                                val id = obj.getInt("id")
-                                val userTo1 = obj.getString("user_to")
-                                val userFrom = obj.getString("user_from")
-                                val body = obj.getString("body")
-                                val date = obj.getString("date")
-                                val image = obj.getString("image")
-                                val messageObject = UserMessagesEntity(id, userTo1, userFrom, body, date, image)
-                                withContext(Default){
-                                    if (userMessagesDao.isRowExist(id)){
-                                        userMessagesDao.updateMessage(messageObject)
-                                    }else{
-                                        userMessagesDao.addMessage(messageObject)
-                                    }
-                                }
-                            }
-                            if (init){
-                                getMessages(false)
-                            }else{
-                                val updatedMessages = userMessagesDao.getMessages(userTo,deviceUsername!!)
-                                withContext(Main){ appendRecycler(updatedMessages) }
-                            }
-                        } catch (e: JSONException) {
-                            e.printStackTrace()
-                        }
-                    }
-                }
-        ) { }
-        (mCtx as ChatActivity?)!!.addToRequestQueue(stringRequest)
-    }
-
-    private fun getMessages(init: Boolean) {
-        launch {
-            if (init){
-                val userMessages = withContext(IO){ userMessagesDao.getMessages(userTo,deviceUsername!!) }
-                if (userMessages.isEmpty()){
-                    getMessagesInit(true)
-                }else{
-                    withContext(Main){ appendRecycler(userMessages) }
-                    getMessagesInit(false)
-                    messagesFromID()
-                }
-            }else{
-                val userMessages = withContext(IO){ userMessagesDao.getMessages(userTo,deviceUsername!!) }
-                withContext(Main){ appendRecycler(userMessages) }
-                messagesFromID()
+            if (!recyclerInit){
+                scrollToBottomNow()
+                recyclerInit = true
             }
         }
-
+        messageProgress?.visible(false)
+        recycler_chat_list?.visible(true)
+        rllt_text_box?.visible(true)
+        newChats()
     }
 
-    private suspend fun messagesFromID(){
-        val stringRequest = StringRequest(Request.Method.GET, "$URL_FETCH_MORE_MESSAGES?this_user=$deviceUsername&username=$userTo&userid=$deviceUserID&last_id=$lastId",
-                { response: String? ->
-                    launch {
-                        try {
-                            val res = JSONObject(response!!)
-                            val lastOnline1 = res.getString("userLastOnline")
-                            if (lastOnline1 != "null") {
-                                withContext(Main){
-                                    lastOnline?.text = lastOnline1
-                                    if (lastOnline1 == "Online now") {
-                                        online_view?.visibility = View.VISIBLE
-                                    } else {
-                                        online_view?.visibility = View.GONE
-                                    }
-                                }
-                            }
-                            val thread = res.getJSONArray("messages")
-                            for (i in 0 until thread.length()) {
-                                val obj = thread.getJSONObject(i)
-                                val id = obj.getInt("id")
-                                val userFrom = obj.getString("user_from")
-                                val body = obj.getString("body")
-                                val time = obj.getString("time")
-                                val image = obj.getString("image")
-                                withContext(Main){ processMessage(userFrom, body, image, id, deviceUsername!!, time) }
-                            }
-                            newChats()
-                        } catch (e: JSONException) {
-                            e.printStackTrace()
-                        }
-                    }
-                }
-        ) { }
-        (mCtx as ChatActivity?)!!.addToRequestQueue(stringRequest)
-    }
-
-    private fun processMessage(user_from: String, message: String, image: String, message_id: Int, user_to: String, date_text: String) {
-        CoroutineScope(Main).launch {
-            lastId = message_id
-            val m = UserMessagesEntity(message_id, user_to, user_from, message, date_text, image)
-            withContext(IO){ userMessagesDao.addMessage(m) }
-            adapter.add(m)
-            scrollToBottom()
+    private fun processMessages(entityList: List<UserMessagesEntity>) {
+        if (entityList.isNotEmpty()){
+            for (data in entityList){
+                lastId = data.message_id
+            }
+            val currentPost = layoutManager.findFirstCompletelyVisibleItemPosition()
+            if (currentPost == 0){
+                adapter.addItems(entityList)
+                scrollToBottom()
+            }else{
+                adapter.addItems(entityList)
+                requireView().snackbar("New messages!", "Scroll down") { scrollToBottom() }
+            }
         }
+        newChats()
     }
 
-    private fun sendMessage(user_string: String, message: String) {
+    /*private fun sendMessage(user_string: String, message: String) {
         img_send.visibility = View.GONE
         sendProgress.visibility = View.VISIBLE
         if (message.equals("", ignoreCase = true)) return
@@ -438,9 +430,11 @@ class MessageFragment : BaseFragment<UserMessageVM, ContentChatBinding, UserMess
                     if (imageToUpload != null) {
                         messageImageUpload(imageToUpload!!, messageId, deviceUsername, user_string, message)
                     } else {
-                        processMessage(deviceUsername!!,message,"",messageId,user_string,"Just now")
+                        val m = UserMessagesEntity(messageId, userTo, deviceUsername, message, "Just now", "")
+                        processMessages(listOf(m))
                         img_send.visibility = View.VISIBLE
                         sendProgress.visibility = View.GONE
+                        viewModel.setTypedMessage("", userTo)
                     }
                     et_message.setText("")
                     launch { typedMessageDao.updateTypedMessageUser("",userTo) }
@@ -458,79 +452,23 @@ class MessageFragment : BaseFragment<UserMessageVM, ContentChatBinding, UserMess
                 val params: MutableMap<String, String> = HashMap()
                 params["user_to"] = user_string
                 params["message"] = message
-                params["user_from"] = deviceUsername.toString()
+                params["user_from"] = deviceUsername
                 params["user_id"] = deviceUserID.toString()
                 return params
             }
         }
         (mCtx as ChatActivity?)!!.addToRequestQueue(stringRequest)
-    }
-
-    /*private fun loadUserInfo(user_to: String?) {
-        val stringRequest = StringRequest(Request.Method.GET, "$URL_USER_INFO?username=$user_to&deviceuser=$deviceUsername&deviceuserid=$deviceUserID", { response: String? ->
-            try {
-                val res = JSONObject(response!!)
-                val thread = res.getJSONArray("messages")
-                val messageObject = thread.getJSONObject(0)
-                val profilePic1 = messageObject.getString("profile_pic")
-                val nickname = messageObject.getString("nickname")
-                val verified = messageObject.getString("verified")
-                val lastOnline1 = messageObject.getString("last_online")
-                val lastOnlineText = messageObject.getString("last_online_text")
-                val blockedArray1 = messageObject.getString("blocked_array")
-                val userToId = messageObject.getString("user_id")
-                val username = messageObject.getString("username")
-                var blocked = ""
-                val blockedArray = blockedArray1.split(",".toRegex()).toTypedArray()
-                for (usernameBlocked in blockedArray) {
-                    if (usernameBlocked == deviceUsername && usernameBlocked != "") {
-                        blocked = "yes"
-                        break
-                    }
-                }
-                if (blocked != "yes" && !SharedPrefManager.getInstance(mCtx)!!.isUserBlocked(user_to!!)) {
-
-                    launch {
-                        val userEntity = MessageUserInfoEntity(userToId.toInt(),
-                                profilePic1,
-                                nickname,
-                                verified,lastOnline1,
-                                lastOnlineText,
-                                blockedArray1,
-                                username)
-                        withContext(Default) {
-                            if (messageUserInfoDao.isRowExist(userToId.toInt())) {
-                                messageUserInfoDao.updateUser(userEntity)
-                            } else {
-                                messageUserInfoDao.addUser(userEntity)
-                            }
-                        }
-                        initUserInfoDatabase(false)
-                    }
-
-                } else {
-                    cannotRespondLayout!!.visibility = View.VISIBLE
-                    userMessageMenu!!.visibility = View.GONE
-                }
-
-            } catch (e: JSONException) {
-                e.printStackTrace()
-            }
-        }) { }
-        (mCtx as ChatActivity?)!!.addToRequestQueue(stringRequest)
     }*/
 
     private fun scrollToBottom() {
-        //adapter!!.notifyDataSetChanged()
         if (adapter.itemCount > 1) Objects.requireNonNull(recycler_chat_list?.layoutManager!!).smoothScrollToPosition(recycler_chat_list, null, 0)
     }
 
     private fun scrollToBottomNow() {
-        //adapter!!.notifyDataSetChanged()
         if (adapter.itemCount > 1) Objects.requireNonNull(recycler_chat_list?.layoutManager!!).scrollToPosition(0)
     }
 
-    private fun messageImageUpload(bitmap: Bitmap, message_id: Int, username: String?, user_string: String, message: String) {
+    /*private fun messageImageUpload(bitmap: Bitmap, message_id: Int, username: String?, user_string: String, message: String) {
         val byteArrayOutputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 75, byteArrayOutputStream)
         val encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT)
@@ -549,12 +487,14 @@ class MessageFragment : BaseFragment<UserMessageVM, ContentChatBinding, UserMess
                     rQueue!!.cache.clear()
                     try {
                         if (jsonObject.getString("error") != "true") {
-                            img_attachment!!.setImageResource(R.drawable.ic_attach_file_grey_24dp)
+                            img_attachment?.setImageResource(R.drawable.ic_attach_file_grey_24dp)
                             imageToUpload = null
                             imageUploaded = jsonObject.getString("imagepath")
-                            processMessage(deviceUsername!!,message,imageUploaded,message_id,user_string,"Just now")
+                            val m = UserMessagesEntity(message_id, userTo, deviceUsername, message, "Just now", imageUploaded)
+                            processMessages(listOf(m))
                             img_send.visibility = View.VISIBLE
                             sendProgress?.visibility = View.GONE
+                            viewModel.setTypedMessage("", userTo)
                         }
                     } catch (e: JSONException) {
                         e.printStackTrace()
@@ -565,7 +505,7 @@ class MessageFragment : BaseFragment<UserMessageVM, ContentChatBinding, UserMess
         jsonObjectRequest.retryPolicy = DefaultRetryPolicy(20 * 1000, 0,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
         rQueue?.add(jsonObjectRequest)
-    }
+    }*/
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -594,13 +534,13 @@ class MessageFragment : BaseFragment<UserMessageVM, ContentChatBinding, UserMess
                         img_attachment.setImageBitmap(bitmap1)
                     }else{
                         img_attachment.setImageResource(R.drawable.icons8_question_mark_64)
-                        activity?.toastLong("Cannot display image cropped! (Android 10+ temporary issue, upload should work as usual.)")
+                        mCtx.toastLong("Cannot display image cropped! (Android 10+ temporary issue, upload should work as usual.)")
                     }
 
                     imageToUpload = bitmap1
                 } catch (e: IOException) {
                     e.printStackTrace()
-                    Toast.makeText(mCtx, "Failed!", Toast.LENGTH_SHORT).show()
+                    mCtx.toastShort("Failed!")
                 }
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 val error = result.error
@@ -627,24 +567,21 @@ class MessageFragment : BaseFragment<UserMessageVM, ContentChatBinding, UserMess
                 .check()
     }
 
-    private suspend fun newChats() {
+    private fun newChats() {
         if (canUpdate) {
             val chatHandler = Handler(Looper.getMainLooper())
-            val runnableCode = Runnable { launch { messagesFromID() } }
+            val runnableCode = Runnable { viewModel.getNewUserMessages(userTo, deviceUsername, deviceUserID, lastId) }
             chatHandler.postDelayed(runnableCode, 3000)
         } else {
             val chatHandler = Handler(Looper.getMainLooper())
-            val runnableCode = Runnable { launch { newChats() } }
+            val runnableCode = Runnable { newChats() }
             chatHandler.postDelayed(runnableCode, 3000)
         }
     }
 
     companion object {
-        const val URL_FETCH_MESSAGES: String = ROOT_URL + "messages.php/messages"
-        const val URL_FETCH_MORE_MESSAGES: String = ROOT_URL + "messages.php/get_new_messages"
-        const val URL_SEND_MESSAGE: String = ROOT_URL + "messages.php/send"
-        private const val URL_USER_INFO = ROOT_URL + "messages.php/user"
-        private const val UPLOAD_IMAGE_URL = ROOT_URL + "message_image_upload.php"
+        //const val URL_SEND_MESSAGE: String = ROOT_URL + "messages.php/send"
+        //private const val UPLOAD_IMAGE_URL = ROOT_URL + "message_image_upload.php"
         fun hideKeyboardFrom(context: Context, view: View) {
             val imm = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(view.windowToken, 0)

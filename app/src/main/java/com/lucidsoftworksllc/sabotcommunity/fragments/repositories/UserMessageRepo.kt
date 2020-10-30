@@ -1,16 +1,25 @@
 package com.lucidsoftworksllc.sabotcommunity.fragments.repositories
 
+import android.graphics.Bitmap
+import android.util.Base64
+import android.util.Log
 import com.lucidsoftworksllc.sabotcommunity.db.messages.typed.TypedMessageDao
 import com.lucidsoftworksllc.sabotcommunity.db.messages.typed.TypedMessageEntity
 import com.lucidsoftworksllc.sabotcommunity.db.messages.user_info.MessageUserInfoDao
 import com.lucidsoftworksllc.sabotcommunity.db.messages.user_info.MessageUserInfoEntity
 import com.lucidsoftworksllc.sabotcommunity.db.messages.user_messages.UserMessagesDao
+import com.lucidsoftworksllc.sabotcommunity.db.messages.user_messages.UserMessagesEntity
+import com.lucidsoftworksllc.sabotcommunity.models.network_autogen.SentMessageResponse
+import com.lucidsoftworksllc.sabotcommunity.models.network_autogen.UserMessageData
+import com.lucidsoftworksllc.sabotcommunity.models.network_autogen.UserMessagesFromID
 import com.lucidsoftworksllc.sabotcommunity.network.UserMessageApi
 import com.lucidsoftworksllc.sabotcommunity.others.base.BaseRepository
 import com.lucidsoftworksllc.sabotcommunity.util.DataState
-import kotlinx.android.synthetic.main.content_chat.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import org.json.JSONException
+import org.json.JSONObject
+import java.io.ByteArrayOutputStream
+import java.util.*
+import kotlin.collections.ArrayList
 
 class UserMessageRepo (
         private val api: UserMessageApi,
@@ -46,15 +55,125 @@ class UserMessageRepo (
         val netEntity = safeApiCall { api.getUserInfoNET(userTo, dUsername, dUserID)  }
         if (netEntity is DataState.Success){
             val netEntityData = netEntity.data
-            // TODO: 10/26/20 MAKE A NEW ENTITY TO SAVE TO DB WITH NO ONLINE TEXT OR BOOLEAN
+            val newEntityData = MessageUserInfoEntity(netEntityData.user_id, netEntityData.profile_pic, netEntityData.nickname, netEntityData.verified, "", "", netEntityData.blocked_array, netEntityData.username)
+
             if (messageUserInfoDao.isRowExist(netEntityData.user_id)) {
-                val newEntityData = MessageUserInfoEntity(netEntityData.user_id, netEntityData.profile_pic, netEntityData.nickname, netEntityData.verified, "", "", netEntityData.blocked_array, netEntityData.username)
                 messageUserInfoDao.updateUser(newEntityData)
             } else {
-                messageUserInfoDao.addUser(netEntityData)
+                messageUserInfoDao.addUser(newEntityData)
             }
         }
         return netEntity
+    }
+
+    suspend fun isUserMessagesRetrievable(userTo: String, deviceUser: String) : Boolean {
+        return messagesDao.isRowExistUsername(userTo, deviceUser)
+    }
+
+    suspend fun getUserMessagesDB(userTo: String, deviceUser: String) : DataState<UserMessageData> {
+        val dbList = safeDatabaseCall { messagesDao.getMessages(userTo, deviceUser) }
+        val array: ArrayList<UserMessagesEntity> = ArrayList()
+        if (dbList is DataState.Success){
+            val data = dbList.data
+            array.addAll(data)
+        }
+        val userMessages = UserMessageData(false, array)
+        return try{
+            DataState.Success(userMessages)
+        }catch (throwable: Throwable){
+            DataState.Failure(false, null, null)
+        }
+    }
+
+    suspend fun getUserMessagesNET(userTo: String, dUsername: String, dUserID: Int) : DataState<UserMessageData> {
+        val netEntityList = safeApiCall { api.getUserMessagesNET(dUsername, userTo, dUserID)  }
+        if (netEntityList is DataState.Success){
+            val netEntityData = netEntityList.data.messages
+            for (data in netEntityData){
+                if (messagesDao.isRowExist(data.message_id)) {
+                    messagesDao.updateMessage(data)
+                } else {
+                    messagesDao.addMessage(data)
+                }
+            }
+        }
+        return netEntityList
+    }
+
+    suspend fun getNewUserMessagesNET(userTo: String, dUsername: String, dUserID: Int, lastId: Int) : DataState<UserMessagesFromID> {
+        val netEntityList = safeApiCall { api.getNewUserMessagesNET(dUsername, userTo, dUserID, lastId)  }
+        if (netEntityList is DataState.Success){
+            val netEntityData = netEntityList.data.messages
+            for (data in netEntityData){
+                if (messagesDao.isRowExist(data.message_id)) {
+                    messagesDao.updateMessage(data)
+                } else {
+                    messagesDao.addMessage(data)
+                }
+            }
+        }
+        return netEntityList
+    }
+
+    suspend fun sendMessage(userTo: String, dUsername: String, dUserID: Int, message: String, image: Bitmap?) : DataState<UserMessageData> {
+        val sentMessageData = safeApiCall { api.sendMessage(userTo, dUsername, dUserID, message) }
+        if (sentMessageData is DataState.Success){
+            val data = sentMessageData.data
+            val messageEntity = UserMessagesEntity(data.messageid, userTo, dUsername, message, "Just now", "")
+            if (image != null){
+                return sendMessageImage(image, messageEntity, dUsername)
+            }else{
+                val messageData = UserMessageData(false, listOf(messageEntity))
+                if (messagesDao.isRowExist(messageEntity.message_id)) {
+                    messagesDao.updateMessage(messageEntity)
+                } else {
+                    messagesDao.addMessage(messageEntity)
+                }
+                return try {
+                    DataState.Success(messageData)
+                }catch (throwable: Throwable){
+                    DataState.Failure(false, null, null)
+                }
+            }
+        }else{
+            return DataState.Failure(false, null, null)
+        }
+    }
+
+
+    // TODO: 10/30/20 REMOVE MESSAGE IMAGE SENDING, MERGE WITH SENDING MESSAGE
+    private suspend fun sendMessageImage(bitmap: Bitmap, messageEntity: UserMessagesEntity, dUsername: String) : DataState<UserMessageData> {
+        val jsonObject = JSONObject()
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 75, byteArrayOutputStream)
+        val encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT)
+        try {
+            val imgname = Calendar.getInstance().timeInMillis.toString()
+            jsonObject.put("name", imgname)
+            jsonObject.put("message_id", messageEntity.message_id)
+            jsonObject.put("image", encodedImage)
+            jsonObject.put("user_from", dUsername)
+        } catch (e: JSONException) {
+            Log.e("JSONObject Here", e.toString())
+        }
+        var messageData = UserMessageData(false, listOf(messageEntity))
+        val result = safeApiCall { api.sendMessageImage(jsonObject) }
+        if (result is DataState.Success){
+            if (!result.data.error){
+                val newMessageEntity = UserMessagesEntity(messageEntity.message_id, messageEntity.user_to, messageEntity.user_from, messageEntity.body, messageEntity.date, result.data.imagepath)
+                if (messagesDao.isRowExist(newMessageEntity.message_id)) {
+                    messagesDao.updateMessage(newMessageEntity)
+                } else {
+                    messagesDao.addMessage(newMessageEntity)
+                }
+                messageData = UserMessageData(false, listOf(newMessageEntity))
+            }
+        }
+        return try {
+            DataState.Success(messageData)
+        }catch (throwable: Throwable){
+            DataState.Failure(false, null, null)
+        }
     }
 
     /*suspend fun getFeed(page: Int, items: Int, username: String, userid: Int, method: String) = safeApiCall {

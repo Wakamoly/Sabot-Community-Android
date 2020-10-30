@@ -3,10 +3,12 @@ package com.lucidsoftworksllc.sabotcommunity.others
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.*
 import com.google.android.material.snackbar.Snackbar
 import com.lucidsoftworksllc.sabotcommunity.R
@@ -86,13 +88,45 @@ fun View.enable(enabled: Boolean){
     alpha = if(enabled) 1f else 0.5f
 }
 
-fun View.snackbar(message: String, action: (() -> Unit)? = null){
+fun View.snackbar(message: String, actionText: String, action: (() -> Unit)? = null){
+    val snackbar = Snackbar.make(this, message, Snackbar.LENGTH_LONG)
+    action?.let {
+        snackbar.setAction(actionText){
+            it()
+        }
+    }
+    snackbar.setActionTextColor(Color.parseColor("#45B431"))
+    snackbar.setTextColor(Color.WHITE)
+    val snackbarView = snackbar.view
+    snackbarView.setBackgroundColor(Color.parseColor("#111111"))
+    snackbar.show()
+}
+
+fun View.snackbarShort(message: String, actionText: String, action: (() -> Unit)? = null){
+    val snackbar = Snackbar.make(this, message, Snackbar.LENGTH_SHORT)
+    action?.let {
+        snackbar.setAction(actionText){
+            it()
+        }
+    }
+    snackbar.setActionTextColor(Color.parseColor("#45B431"))
+    snackbar.setTextColor(Color.WHITE)
+    val snackbarView = snackbar.view
+    snackbarView.setBackgroundColor(Color.parseColor("#111111"))
+    snackbar.show()
+}
+
+fun View.retrySnackbar(message: String, action: (() -> Unit)? = null){
     val snackbar = Snackbar.make(this, message, Snackbar.LENGTH_LONG)
     action?.let {
         snackbar.setAction("Retry"){
             it()
         }
     }
+    snackbar.setActionTextColor(Color.parseColor("#45B431"))
+    snackbar.setTextColor(Color.WHITE)
+    val snackbarView = snackbar.view
+    snackbarView.setBackgroundColor(Color.parseColor("#111111"))
     snackbar.show()
 }
 
@@ -100,14 +134,15 @@ fun Fragment.handleApiError(
         failure: DataState.Failure,
         retry: (() -> Unit)? = null
 ){
+    println("HANDLEAPIERROR: ${failure.errorBody?.string().toString()}")
     when{
-        failure.isNetworkError -> requireView().snackbar("Please check your connection!", retry)
+        failure.isNetworkError -> requireView().retrySnackbar("Please check your connection!", retry)
         failure.errorCode == 401 -> {
             (this as BaseFragment<*, *, *>).logout()
         }
         else -> {
             val error = failure.errorBody?.string().toString()
-            requireView().snackbar(error)
+            requireView().retrySnackbar(error)
         }
     }
 }

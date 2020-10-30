@@ -1,5 +1,6 @@
 package com.lucidsoftworksllc.sabotcommunity.others.base
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
+import kotlin.properties.Delegates
 
 abstract class BaseFragment<VM: BaseViewModel, B: ViewBinding, R: BaseRepository> : CoFragment() {
 
@@ -23,8 +25,9 @@ abstract class BaseFragment<VM: BaseViewModel, B: ViewBinding, R: BaseRepository
     protected lateinit var binding : B
     protected lateinit var viewModel: VM
     protected val remoteDataSource = RemoteDataSource()
-    protected var deviceUserID: Int? = null
-    protected var deviceUsername: String? = null
+    protected var deviceUserID by Delegates.notNull<Int>()
+    protected lateinit var deviceUsername: String
+    protected lateinit var mCtx: Context
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -38,8 +41,8 @@ abstract class BaseFragment<VM: BaseViewModel, B: ViewBinding, R: BaseRepository
 
         lifecycleScope.launch {
             if (userPreferences.isLoggedIn){
-                deviceUserID = userPreferences.userID?.toInt()
-                deviceUsername = userPreferences.username
+                deviceUserID = userPreferences.userID?.toInt()!!
+                deviceUsername = userPreferences.username.toString()
             }else{
                 logout()
             }

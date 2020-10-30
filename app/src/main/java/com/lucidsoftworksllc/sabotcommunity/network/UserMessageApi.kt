@@ -1,10 +1,11 @@
 package com.lucidsoftworksllc.sabotcommunity.network
 
 import com.lucidsoftworksllc.sabotcommunity.db.messages.user_info.MessageUserInfoEntity
+import com.lucidsoftworksllc.sabotcommunity.db.messages.user_messages.UserMessagesEntity
 import com.lucidsoftworksllc.sabotcommunity.models.ProfilenewsRecycler
-import com.lucidsoftworksllc.sabotcommunity.models.network_autogen.ProfileTopModel
-import retrofit2.http.GET
-import retrofit2.http.Query
+import com.lucidsoftworksllc.sabotcommunity.models.network_autogen.*
+import org.json.JSONObject
+import retrofit2.http.*
 
 interface UserMessageApi {
 
@@ -16,15 +17,46 @@ interface UserMessageApi {
             @Query("deviceuserid") dUserID: Int?
     ): MessageUserInfoEntity
 
-    /*@FormUrlEncoded
-    @POST("dashboardfeed_api.php")
-    suspend fun getDashFeed(
-            @Field("page") page: Int?,
-            @Field("items") items: Int?,
-            @Field("username") username: String?,
-            @Field("userid") userid: Int?,
-            @Field("method") method: String?
-    ): List<ProfilenewsRecycler>*/
+    //"$URL_FETCH_MESSAGES?this_user=$deviceUsername&username=$userTo&userid=$deviceUserID"
+    @GET("messages.php/messages")
+    suspend fun getUserMessagesNET(
+            @Query("this_user") dUsername: String?,
+            @Query("username") userTo: String?,
+            @Query("userid") dUserID: Int?
+    ): UserMessageData
+
+    //"$URL_FETCH_MORE_MESSAGES?this_user=$deviceUsername&username=$userTo&userid=$deviceUserID&last_id=$lastId"
+    @GET("messages.php/get_new_messages")
+    suspend fun getNewUserMessagesNET(
+            @Query("this_user") dUsername: String?,
+            @Query("username") userTo: String?,
+            @Query("userid") dUserID: Int?,
+            @Query("last_id") lastId: Int?
+    ): UserMessagesFromID
+
+
+    /*
+    * params["user_to"] = user_string
+     *           params["message"] = message
+     *           params["user_from"] = deviceUsername
+     *           params["user_id"] = deviceUserID.toString()     userTo, dUsername, dUserID, message
+    */
+    @FormUrlEncoded
+    @POST("messages.php/send")
+    suspend fun sendMessage(
+            @Field("user_to") userTo: String?,
+            @Field("user_from") dUsername: String?,
+            @Field("user_id") dUserID: Int?,
+            @Field("message") message: String?
+    ): SentMessageResponse
+
+
+    @POST("message_image_upload.php")
+    suspend fun sendMessageImage(
+            @Body jsonObject: JSONObject?
+    ): SentImageResponse
+
+
 
 
     /*@GET("profilenews_api.php")
