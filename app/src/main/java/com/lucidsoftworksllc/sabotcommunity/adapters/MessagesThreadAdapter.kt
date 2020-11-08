@@ -18,6 +18,8 @@ import com.lucidsoftworksllc.sabotcommunity.activities.ChatActivity
 import com.lucidsoftworksllc.sabotcommunity.db.messages.general.MessagesDataModel
 import com.lucidsoftworksllc.sabotcommunity.db.messages.user_messages.UserMessagesEntity
 import com.lucidsoftworksllc.sabotcommunity.fragments.PhotoViewFragment
+import com.lucidsoftworksllc.sabotcommunity.others.getTimeAgo
+import com.lucidsoftworksllc.sabotcommunity.others.visible
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -45,9 +47,9 @@ class MessagesThreadAdapter(private val context: Context, private val username: 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val message = messages[position]
         holder.textViewMessage.text = message.body
-        holder.textViewTime.text = message.date
+        holder.textViewTime.text = getTimeAgo(message.date, context)
         if (message.image != "") {
-            holder.imgMsg.visibility = View.VISIBLE
+            holder.imgMsg.visible(true)
             Glide.with((context as ChatActivity))
                     .load(Constants.BASE_URL + message.image)
                     .error(R.mipmap.ic_launcher)
@@ -63,7 +65,7 @@ class MessagesThreadAdapter(private val context: Context, private val username: 
                 fragmentTransaction.commit()
             }
         } else {
-            holder.imgMsg.visibility = View.GONE
+            holder.imgMsg.visible(false)
             holder.imgMsg.setImageDrawable(null)
         }
     }

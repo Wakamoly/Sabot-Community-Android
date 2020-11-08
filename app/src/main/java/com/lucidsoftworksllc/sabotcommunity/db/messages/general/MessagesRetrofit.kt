@@ -10,6 +10,6 @@ interface MessagesRetrofit {
     @GET("messages.php/convos")
     suspend fun getMessages(
             @Query("username") username: String?,
-            @Query("userid") userid: String?
-    ): List<MessagesNetworkEntity>
+            @Query("userid") userid: Int?
+    ): List<MessagesCacheEntity>
 }

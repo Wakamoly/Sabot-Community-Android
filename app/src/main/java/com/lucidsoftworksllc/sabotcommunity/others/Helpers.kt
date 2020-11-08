@@ -8,17 +8,25 @@ import android.os.Build
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.fragment.app.*
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import com.google.android.material.snackbar.Snackbar
 import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.others.base.BaseFragment
 import com.lucidsoftworksllc.sabotcommunity.util.DataState
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.math.abs
+import kotlin.math.roundToInt
 
-fun Context.toastShort(message:String) =
+
+fun Context.toastShort(message: String) =
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 
-fun Context.toastLong(message:String) =
+fun Context.toastLong(message: String) =
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
 
 val Context.deviceUserID: String?
@@ -34,7 +42,7 @@ val Context.fcmToken: String?
 
 
 
-fun<A : Activity> Activity.startNewActivity(activity: Class<A>){
+fun <A : Activity> Activity.startNewActivity(activity: Class<A>){
     Intent(this, activity).also {
         it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(it)
@@ -89,45 +97,57 @@ fun View.enable(enabled: Boolean){
 }
 
 fun View.snackbar(message: String, actionText: String, action: (() -> Unit)? = null){
-    val snackbar = Snackbar.make(this, message, Snackbar.LENGTH_LONG)
-    action?.let {
-        snackbar.setAction(actionText){
-            it()
+    if (Build.VERSION.SDK_INT >= 23) {
+        val snackbar = Snackbar.make(this, message, Snackbar.LENGTH_LONG)
+        action?.let {
+            snackbar.setAction(actionText) {
+                it()
+            }
         }
+        snackbar.setActionTextColor(Color.parseColor("#45B431"))
+        snackbar.setTextColor(Color.WHITE)
+        val snackbarView = snackbar.view
+        snackbarView.setBackgroundColor(Color.parseColor("#111111"))
+        snackbar.show()
+    }else{
+        context?.toastLong(message)
     }
-    snackbar.setActionTextColor(Color.parseColor("#45B431"))
-    snackbar.setTextColor(Color.WHITE)
-    val snackbarView = snackbar.view
-    snackbarView.setBackgroundColor(Color.parseColor("#111111"))
-    snackbar.show()
 }
 
 fun View.snackbarShort(message: String, actionText: String, action: (() -> Unit)? = null){
-    val snackbar = Snackbar.make(this, message, Snackbar.LENGTH_SHORT)
-    action?.let {
-        snackbar.setAction(actionText){
-            it()
+    if (Build.VERSION.SDK_INT >= 23) {
+        val snackbar = Snackbar.make(this, message, Snackbar.LENGTH_SHORT)
+        action?.let {
+            snackbar.setAction(actionText) {
+                it()
+            }
         }
+        snackbar.setActionTextColor(Color.parseColor("#45B431"))
+        snackbar.setTextColor(Color.WHITE)
+        val snackbarView = snackbar.view
+        snackbarView.setBackgroundColor(Color.parseColor("#111111"))
+        snackbar.show()
+    }else{
+        context?.toastShort(message)
     }
-    snackbar.setActionTextColor(Color.parseColor("#45B431"))
-    snackbar.setTextColor(Color.WHITE)
-    val snackbarView = snackbar.view
-    snackbarView.setBackgroundColor(Color.parseColor("#111111"))
-    snackbar.show()
 }
 
 fun View.retrySnackbar(message: String, action: (() -> Unit)? = null){
-    val snackbar = Snackbar.make(this, message, Snackbar.LENGTH_LONG)
-    action?.let {
-        snackbar.setAction("Retry"){
-            it()
+    if (Build.VERSION.SDK_INT >= 23) {
+        val snackbar = Snackbar.make(this, message, Snackbar.LENGTH_LONG)
+        action?.let {
+            snackbar.setAction("Retry"){
+                it()
+            }
         }
+        snackbar.setActionTextColor(Color.parseColor("#45B431"))
+        snackbar.setTextColor(Color.WHITE)
+        val snackbarView = snackbar.view
+        snackbarView.setBackgroundColor(Color.parseColor("#111111"))
+        snackbar.show()
+    }else{
+        context?.toastShort(message)
     }
-    snackbar.setActionTextColor(Color.parseColor("#45B431"))
-    snackbar.setTextColor(Color.WHITE)
-    val snackbarView = snackbar.view
-    snackbarView.setBackgroundColor(Color.parseColor("#111111"))
-    snackbar.show()
 }
 
 fun Fragment.handleApiError(
@@ -147,11 +167,77 @@ fun Fragment.handleApiError(
     }
 }
 
+fun stringToDate(string: String) : Date {
+    val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    return try {
+        val date: Date = format.parse(string)
+        date
+    } catch (e: ParseException) {
+        // TODO Auto-generated catch block
+        e.printStackTrace()
+        currentDate()
+    }
+}
+
+fun currentDate(): Date {
+    TimeZone.setDefault(TimeZone.getTimeZone("America/Chicago"))
+    val calendar: Calendar = Calendar.getInstance(TimeZone.getTimeZone("America/Chicago"))
+    return calendar.time
+}
+
+fun getTimeAgo(dateString: String, ctx: Context): String? {
+    val date = stringToDate(dateString)
+    val time: Long = date.time
+    val curDate: Date = currentDate()
+    val now: Long = curDate.time
+    if (time > now || time <= 0) {
+        return null
+    }
+    val timeAgo = when (val dim = getTimeDistanceInMinutes(time)) {
+        0 -> ctx.resources.getString(R.string.date_util_term_less) + " " + ctx.resources.getString(R.string.date_util_term_a) + " " + ctx.resources.getString(R.string.date_util_unit_minute)
+        1 -> "1 " + ctx.resources.getString(R.string.date_util_unit_minute)
+        in 2..50 -> dim.toString() + " " + ctx.resources.getString(R.string.date_util_unit_minutes)
+        in 51..89 -> ctx.resources.getString(R.string.date_util_prefix_about) + " " + ctx.resources.getString(R.string.date_util_term_an) + " " + ctx.resources.getString(R.string.date_util_unit_hour)
+        in 90..1439 -> ctx.resources.getString(R.string.date_util_prefix_about) + " " + (dim / 60.toFloat()).roundToInt() + " " + ctx.resources.getString(R.string.date_util_unit_hours)
+        in 1440..2519 -> "1 " + ctx.resources.getString(R.string.date_util_unit_day)
+        in 2520..43199 -> (dim / 1440.toFloat()).roundToInt().toString() + " " + ctx.resources.getString(R.string.date_util_unit_days)
+        in 43200..86399 -> ctx.resources.getString(R.string.date_util_prefix_about) + " " + ctx.resources.getString(R.string.date_util_term_a) + " " + ctx.resources.getString(R.string.date_util_unit_month)
+        in 86400..525599 -> (dim / 43200.toFloat()).roundToInt().toString() + " " + ctx.resources.getString(R.string.date_util_unit_months)
+        in 525600..655199 -> ctx.resources.getString(R.string.date_util_prefix_about) + " " + ctx.resources.getString(R.string.date_util_term_a) + " " + ctx.resources.getString(R.string.date_util_unit_year)
+        in 655200..914399 -> ctx.resources.getString(R.string.date_util_prefix_over) + " " + ctx.resources.getString(R.string.date_util_term_a) + " " + ctx.resources.getString(R.string.date_util_unit_year)
+        in 914400..1051199 -> ctx.resources.getString(R.string.date_util_prefix_almost) + " 2 " + ctx.resources.getString(R.string.date_util_unit_years)
+        else -> ctx.resources.getString(R.string.date_util_prefix_about) + " " + (dim / 525600.toFloat()).roundToInt() + " " + ctx.resources.getString(R.string.date_util_unit_years)
+    }
+    return timeAgo + " " + ctx.resources.getString(R.string.date_util_suffix)
+}
+
+fun isUserOnline(dateString: String): Boolean {
+    val date = stringToDate(dateString)
+    val time: Long = date.time
+    val curDate: Date = currentDate()
+    val now: Long = curDate.time
+    if (time > now || time <= 0) {
+        return false
+    }
+    return when (getTimeDistanceInMinutes(time)) {
+        in 0..5 -> true
+        else -> false
+    }
+}
+
+private fun getTimeDistanceInMinutes(time: Long): Int {
+    val timeDistance: Long = currentDate().time - time
+    return (abs(timeDistance) / 1000 / 60.toFloat()).roundToInt()
+}
 
 
 
-/*
-fun getTime(timeStart: String) : String{
+
+
+/*fun getTime(timeStart: String) : String{
+    val dbDateTime = ZonedDateTime.now(ZoneId.of("America/New_York"))
+
+
     val date_time_now = date("Y-m-d H:i:s");
     $start_date = new DateTime($datetime); //Time of post
     $end_date = new DateTime($date_time_now); //Current time
@@ -199,4 +285,5 @@ fun getTime(timeStart: String) : String{
         $time_message = $interval->s . " seconds ago";
     }
     }
+    return time_message
 }*/

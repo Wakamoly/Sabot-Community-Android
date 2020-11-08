@@ -240,7 +240,7 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
                         setPlatformImage(item)
                         filter = item.toString()
                         currentPublicsAdapter?.clear()
-                        viewModel.getCurrentPublics(deviceUsername.toString(), filter)
+                        viewModel.getCurrentPublics(deviceUsername, filter)
                     }
                     .show()
         }
@@ -256,7 +256,7 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
         }
         if (isAdViewed == "no") {
             adNotified!!.add(adID)
-            viewModel.setAdViewed(adID.toInt(), "view", deviceUserID!!, deviceUsername!!)
+            viewModel.setAdViewed(adID.toInt(), "view", deviceUserID, deviceUsername)
         }
     }
 
@@ -291,7 +291,7 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
                 noCurrentPublics.visible(true)
                 currentPublicsTV.setOnClickListener {
                     currentPublicsAdapter?.clear()
-                    viewModel.getCurrentPublics(deviceUsername.toString(), filter)
+                    viewModel.getCurrentPublics(deviceUsername, filter)
                 }
                 noCurrentPublics.setOnClickListener {
                     val asf = PublicsFragment()
@@ -400,7 +400,7 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
             }
             clicked = "all"
             currentPage = 1
-            viewModel.getDashboardFeed(currentPage, pageSize, deviceUsername.toString(), deviceUserID!!, clicked.toString())
+            viewModel.getDashboardFeed(currentPage, pageSize, deviceUsername, deviceUserID, clicked.toString())
 
         }
         if (click === followingPostsButton) {
@@ -418,7 +418,7 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
             }
             clicked = "following"
             currentPage = 1
-            viewModel.getDashboardFeed(currentPage, pageSize, deviceUsername.toString(), deviceUserID!!, clicked.toString())
+            viewModel.getDashboardFeed(currentPage, pageSize, deviceUsername, deviceUserID, clicked.toString())
 
         }
     }

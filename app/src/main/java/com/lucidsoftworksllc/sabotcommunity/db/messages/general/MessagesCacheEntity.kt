@@ -3,6 +3,7 @@ package com.lucidsoftworksllc.sabotcommunity.db.messages.general
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.util.*
 
 @Entity(tableName = "messages_general")
 data class MessagesCacheEntity (
@@ -38,6 +39,7 @@ data class MessagesCacheEntity (
         @ColumnInfo(name = "last_online")
         val last_online: String,
 
+        // TODO should be INT with new backend API
         @ColumnInfo(name = "viewed")
         val viewed: String,
 

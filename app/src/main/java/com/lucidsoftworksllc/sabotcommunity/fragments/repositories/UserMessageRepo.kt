@@ -55,12 +55,10 @@ class UserMessageRepo (
         val netEntity = safeApiCall { api.getUserInfoNET(userTo, dUsername, dUserID)  }
         if (netEntity is DataState.Success){
             val netEntityData = netEntity.data
-            val newEntityData = MessageUserInfoEntity(netEntityData.user_id, netEntityData.profile_pic, netEntityData.nickname, netEntityData.verified, "", "", netEntityData.blocked_array, netEntityData.username)
-
             if (messageUserInfoDao.isRowExist(netEntityData.user_id)) {
-                messageUserInfoDao.updateUser(newEntityData)
+                messageUserInfoDao.updateUser(netEntityData)
             } else {
-                messageUserInfoDao.addUser(newEntityData)
+                messageUserInfoDao.addUser(netEntityData)
             }
         }
         return netEntity

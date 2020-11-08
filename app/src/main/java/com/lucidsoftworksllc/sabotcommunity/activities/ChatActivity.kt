@@ -40,10 +40,12 @@ class ChatActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     private var requestQueue: RequestQueue? = null
     private var navView: BottomNavigationView? = null
     private lateinit var unreadMessageJob: CompletableJob
+    private var canUpdate = false
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
         requestQueue = Volley.newRequestQueue(applicationContext)
+        canUpdate = true
         if (getIntent().hasExtra("user_to")) {
             val userTo: String? = getIntent().getStringExtra("user_to")
             if (userTo!!.isNotEmpty()) {
@@ -92,6 +94,7 @@ class ChatActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             startActivity(Intent(this, LoginActivity::class.java))
         }
         requestQueue = Volley.newRequestQueue(applicationContext)
+        canUpdate = true
         getUnreadMessagesHandler(4000)
         loadFragment(ConvosFragment())
         if (intent.hasExtra("user_to")) {
@@ -149,6 +152,20 @@ class ChatActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         }, 30000, 30000); // First time start after 5 mili second and repeat after 30 seconds*/
     }
 
+    override fun onPause() {
+        super.onPause()
+        canUpdate = false
+    }
+
+    override fun onResume() {
+        super.onResume()
+        canUpdate = true
+    }
+
+    private fun shouldGetNotification(): Boolean {
+        return canUpdate
+    }
+
     fun getUnreadMessagesHandler(delay: Int) {
         val chatHandler = Handler()
         val runnableCode = Runnable {
@@ -170,7 +187,7 @@ class ChatActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     }
 
     private suspend fun unreadMessages() {
-            if (!shouldGetNotification(this)) {
+            if (shouldGetNotification()) {
                 val stringRequest: StringRequest = object : StringRequest(Method.POST, UNREAD_NUM, Response.Listener { response: String? ->
                     try {
                         val obj = JSONObject(response!!)
@@ -267,12 +284,5 @@ class ChatActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     companion object {
         private const val UNREAD_NUM = Constants.ROOT_URL + "get_messages_unread.php"
-        fun shouldGetNotification(context: Context): Boolean {
-            val myProcess = RunningAppProcessInfo()
-            ActivityManager.getMyMemoryState(myProcess)
-            if (myProcess.importance != RunningAppProcessInfo.IMPORTANCE_FOREGROUND) return true
-            val km = context.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
-            return km.inKeyguardRestrictedInputMode()
-        }
     }
 }

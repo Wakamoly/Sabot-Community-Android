@@ -3,9 +3,7 @@ package com.lucidsoftworksllc.sabotcommunity.db.messages.general
 import com.lucidsoftworksllc.sabotcommunity.util.EntityMapper
 import javax.inject.Inject
 
-class MessagesNetworkMapper
-@Inject
-constructor() : EntityMapper<MessagesNetworkEntity, MessagesDataModel> {
+class MessagesNetworkMapper : EntityMapper<MessagesNetworkEntity, MessagesDataModel> {
 
     override fun mapFromEntity(entity: MessagesNetworkEntity): MessagesDataModel {
         return MessagesDataModel(

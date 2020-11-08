@@ -10,7 +10,6 @@ data class MessageUserInfoEntity (
         var nickname: String,
         var verified: String,
         var last_online: String,
-        var last_online_text: String,
         var blocked_array: String,
         var username: String
 )

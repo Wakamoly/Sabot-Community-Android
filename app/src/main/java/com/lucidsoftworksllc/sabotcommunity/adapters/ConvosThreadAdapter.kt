@@ -22,10 +22,12 @@ import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import com.lucidsoftworksllc.sabotcommunity.activities.ChatActivity
+import com.lucidsoftworksllc.sabotcommunity.db.messages.general.MessagesCacheEntity
 import com.lucidsoftworksllc.sabotcommunity.db.messages.general.MessagesDataModel
 import kotlin.collections.indices
 import com.lucidsoftworksllc.sabotcommunity.fragments.MessageFragment
 import com.lucidsoftworksllc.sabotcommunity.fragments.MessageGroupFragment
+import com.lucidsoftworksllc.sabotcommunity.others.getTimeAgo
 import de.hdodenhof.circleimageview.CircleImageView
 import org.json.JSONException
 import org.json.JSONObject
@@ -35,7 +37,7 @@ import kotlin.collections.ArrayList
 class ConvosThreadAdapter(private val mCtx: Context) : RecyclerView.Adapter<ConvosThreadAdapter.ViewHolder>() {
     private var deviceUsername: String? = null
     private var isLoaderVisible = false
-    private val convosList: MutableList<MessagesDataModel> = ArrayList()
+    private val convosList: MutableList<MessagesCacheEntity> = ArrayList()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(mCtx)
         val view = inflater.inflate(R.layout.recycler_userslist_messages, null)
@@ -55,7 +57,7 @@ class ConvosThreadAdapter(private val mCtx: Context) : RecyclerView.Adapter<Conv
             } else {
                 holder.convoBodyPreview.setTypeface(null, Typeface.NORMAL)
             }
-            holder.convoTimeMessage.text = convos.time_message
+            holder.convoTimeMessage.text = getTimeAgo(convos.time_message, mCtx)
             holder.convoNickname.text = convos.nickname
             if (convos.viewed == "yes" || convos.user_from == deviceUsername) {
                 holder.userLayout.setBackgroundColor(Color.parseColor("#111111"))
@@ -115,7 +117,7 @@ class ConvosThreadAdapter(private val mCtx: Context) : RecyclerView.Adapter<Conv
             holder.convoUsername.setTextColor(ContextCompat.getColor(mCtx, R.color.light_blue))
 
             holder.convoBodyPreview.text = convos.body_split
-            holder.convoTimeMessage.text = convos.time_message
+            holder.convoTimeMessage.text = getTimeAgo(convos.time_message, mCtx)
             holder.convoNickname.text = convos.nickname
             if (convos.viewed == "yes" || convos.user_from == deviceUsername) {
                 holder.userLayout.setBackgroundColor(Color.parseColor("#111111"))
@@ -152,7 +154,7 @@ class ConvosThreadAdapter(private val mCtx: Context) : RecyclerView.Adapter<Conv
         return convosList.size
     }
 
-    fun addItems(items: List<MessagesDataModel>) {
+    fun addItems(items: List<MessagesCacheEntity>) {
         if (convosList.isEmpty()){
             convosList.addAll(items)
         }else{
@@ -181,14 +183,14 @@ class ConvosThreadAdapter(private val mCtx: Context) : RecyclerView.Adapter<Conv
         notifyDataSetChanged()
     }
 
-    fun addItemsToTop(items: List<MessagesDataModel>) {
+    fun addItemsToTop(items: List<MessagesCacheEntity>) {
         convosList.addAll(0, items)
         notifyDataSetChanged()
     }
 
     fun addLoading() {
         isLoaderVisible = true
-        convosList.add(MessagesDataModel(0, false, null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), 0, null.toString(), null.toString(), 0))
+        convosList.add(MessagesCacheEntity(0, false, null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), "yes", 0, null.toString(), null.toString(), 0))
         notifyItemInserted(convosList.size - 1)
     }
 
@@ -214,7 +216,7 @@ class ConvosThreadAdapter(private val mCtx: Context) : RecyclerView.Adapter<Conv
         notifyDataSetChanged()
     }
 
-    private fun getItem(position: Int): MessagesDataModel {
+    private fun getItem(position: Int): MessagesCacheEntity {
         return convosList[position]
     }
 

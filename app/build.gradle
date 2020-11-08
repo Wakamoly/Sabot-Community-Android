@@ -23,8 +23,8 @@ android {
         applicationId "com.lucidsoftworksllc.sabotcommunity"
         minSdkVersion 18
         targetSdkVersion 30
-        versionCode 63
-        versionName "v0.5.2"
+        versionCode 64
+        versionName "v0.5.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
@@ -37,10 +37,10 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-        debug {
+        /*debug {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
+        }*/
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -64,7 +64,7 @@ dependencies {
     implementation 'androidx.exifinterface:exifinterface:1.3.1'
     implementation 'com.android.volley:volley:1.1.1'
     implementation 'com.karumi:dexter:5.0.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
@@ -77,7 +77,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.1'
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.1'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'com.google.firebase:firebase-messaging:20.3.0'
+    implementation 'com.google.firebase:firebase-messaging:21.0.0'
     implementation 'org.jsoup:jsoup:1.12.2'
     implementation 'com.yarolegovich:lovely-dialog:1.1.0'
     implementation "ch.acra:acra-http:$acraVersion"
@@ -85,7 +85,7 @@ dependencies {
     //implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
     implementation 'com.github.ravindu1024:Android-Image-Cropper:2.8.2'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
-    implementation 'com.google.firebase:firebase-analytics:17.6.0'
+    implementation 'com.google.firebase:firebase-analytics:18.0.0'
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation "androidx.benchmark:benchmark-junit4:1.0.0"

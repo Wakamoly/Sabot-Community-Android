@@ -24,9 +24,8 @@ import com.lucidsoftworksllc.sabotcommunity.fragments.ClanFragment
 import com.lucidsoftworksllc.sabotcommunity.fragments.FragmentProfile
 import com.lucidsoftworksllc.sabotcommunity.fragments.ProfilePostFragment
 import com.lucidsoftworksllc.sabotcommunity.fragments.PublicsTopicFragment
+import com.lucidsoftworksllc.sabotcommunity.others.*
 import com.lucidsoftworksllc.sabotcommunity.others.base.BaseViewHolder
-import com.lucidsoftworksllc.sabotcommunity.others.Constants
-import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import de.hdodenhof.circleimageview.CircleImageView
 import org.json.JSONException
 import org.json.JSONObject
@@ -48,8 +47,6 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationDa
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         holder.onBind(position)
-        //TODO Temporary v
-        //holder.setIsRecyclable(false)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -172,16 +169,12 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationDa
 
             nickname.text = notification.nickname
             body.text = notification.message
-            datetime.text = notification.datetime
+            datetime.text = getTimeAgo(notification.datetime, context)
+            online.visible(isUserOnline(notification.last_online))
             if (notification.verified == "yes") {
                 verified.visibility = View.VISIBLE
             } else {
                 verified.visibility = View.GONE
-            }
-            if (notification.last_online == "yes") {
-                online.visibility = View.VISIBLE
-            } else {
-                online.visibility = View.GONE
             }
             if (notification.opened == "yes") {
                 notiLayout.setBackgroundColor(Color.parseColor("#111111"))
