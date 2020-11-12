@@ -23,6 +23,13 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 
 
+/*
+*
+* CONTEXT FUNCTIONS AND GETTERS
+*
+*
+ */
+
 fun Context.toastShort(message: String) =
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 
@@ -39,6 +46,14 @@ val Context.fcmToken: String?
     get() { return SharedPrefManager.getInstance(this)!!.fCMToken }
 
 
+
+
+/*
+*
+* GENERAL VIEW FUNCTIONS
+*
+*
+ */
 
 
 
@@ -167,6 +182,15 @@ fun Fragment.handleApiError(
     }
 }
 
+
+/*
+*
+* TIME-SINCE FUNCTIONS
+*
+*
+ */
+
+
 fun stringToDate(string: String) : Date {
     val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
     return try {
@@ -183,6 +207,18 @@ fun currentDate(): Date {
     TimeZone.setDefault(TimeZone.getTimeZone("America/Chicago"))
     val calendar: Calendar = Calendar.getInstance(TimeZone.getTimeZone("America/Chicago"))
     return calendar.time
+}
+
+fun currentDateSendMessage(): String {
+    TimeZone.setDefault(TimeZone.getTimeZone("America/Chicago"))
+    // TODO: 11/9/20 Remove this timezone getter? v
+    val calendar: Calendar = Calendar.getInstance(TimeZone.getTimeZone("America/Chicago"))
+    return calendar.time.toFormattedString()
+}
+
+fun Date.toFormattedString(): String {
+    val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    return formatter.format(this)
 }
 
 fun getTimeAgo(dateString: String, ctx: Context): String? {
@@ -230,60 +266,9 @@ private fun getTimeDistanceInMinutes(time: Long): Int {
     return (abs(timeDistance) / 1000 / 60.toFloat()).roundToInt()
 }
 
-
-
-
-
-/*fun getTime(timeStart: String) : String{
-    val dbDateTime = ZonedDateTime.now(ZoneId.of("America/New_York"))
-
-
-    val date_time_now = date("Y-m-d H:i:s");
-    $start_date = new DateTime($datetime); //Time of post
-    $end_date = new DateTime($date_time_now); //Current time
-    $interval = $start_date->diff($end_date); //Difference between dates
-    if($interval->y >= 1) {
-        if($interval == 1)
-        $time_message = $interval->y . " year ago"; //1 year ago
-        else
-        $time_message = $interval->y . " years ago"; //1+ year ago
-    }else if ($interval->m >= 1) {
-        if($interval->d == 0) {
-        $days = " ago";
-    }else if($interval->d == 1) {
-        $days = $interval->d . " day ago";
-    }else {
-        $days = $interval->d . " days ago";
-    }
-        if($interval->m == 1) {
-        $time_message = $interval->m . " month ". $days;
-    }else {
-        $time_message = $interval->m . " months ". $days;
-    }
-    }else if($interval->d >= 1) {
-        if($interval->d == 1) {
-        $time_message = "Yesterday";
-    }else {
-        $time_message = $interval->d . " days ago";
-    }
-    }else if($interval->h >= 1) {
-        if($interval->h == 1) {
-        $time_message = $interval->h . " hour ago";
-    }else {
-        $time_message = $interval->h . " hours ago";
-    }
-    }else if($interval->i >= 1) {
-        if($interval->i == 1) {
-        $time_message = $interval->i . " minute ago";
-    }else {
-        $time_message = $interval->i . " minutes ago";
-    }
-    }else{
-        if($interval->s < 30) {
-        $time_message = "Just now";
-    }else {
-        $time_message = $interval->s . " seconds ago";
-    }
-    }
-    return time_message
-}*/
+/*
+*
+* LINKIFY FUNCTIONS
+*
+*
+ */

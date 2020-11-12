@@ -77,7 +77,8 @@ class PhotoViewFragment : Fragment() {
         val permissionExternalMemory = ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
         if (permissionExternalMemory != PackageManager.PERMISSION_GRANTED) {
             val STORAGE_PERMISSIONS = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            // If permission not granted then ask for permission real time.
+            // If permission not granted then ask for permission in real time.
+            requireView().snackbarShort(resources.getString(R.string.crop_image_activity_no_permissions), "")
             ActivityCompat.requestPermissions(requireActivity(), STORAGE_PERMISSIONS, 1)
             return false
         }

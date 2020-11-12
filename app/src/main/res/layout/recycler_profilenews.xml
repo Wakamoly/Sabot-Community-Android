@@ -165,16 +165,19 @@
                                     android:visibility="gone"
                                     tools:visibility="visible" />
 
-                                <TextView
+                                <com.hendraanggrian.appcompat.widget.SocialTextView
                                     android:id="@+id/textViewBody"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:autoLink="web"
                                     android:ellipsize="end"
                                     android:maxLines="20"
                                     tools:text="Post body here"
                                     android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                    android:textColor="#fff" />
+                                    android:textColor="#fff"
+                                    app:socialFlags="hashtag|mention|hyperlink"
+                                    app:hashtagColor="@color/dark_blue"
+                                    app:mentionColor="@color/green"
+                                    app:hyperlinkColor="@color/colorAccent"/>
 
                             </RelativeLayout>
 

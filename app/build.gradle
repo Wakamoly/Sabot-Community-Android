@@ -23,8 +23,8 @@ android {
         applicationId "com.lucidsoftworksllc.sabotcommunity"
         minSdkVersion 18
         targetSdkVersion 30
-        versionCode 64
-        versionName "v0.5.3"
+        versionCode 65
+        versionName "v0.5.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
@@ -122,6 +122,11 @@ dependencies {
 
     //Paging
     implementation 'android.arch.paging:runtime:1.0.1'
+
+    //Mentions and hashtags for textviews and edittexts
+    def socialview_version = "0.3-rc1"
+    implementation "com.hendraanggrian.appcompat:socialview:$socialview_version"
+    implementation "com.hendraanggrian.appcompat:socialview-commons:$socialview_version"
 }
 
 kapt {

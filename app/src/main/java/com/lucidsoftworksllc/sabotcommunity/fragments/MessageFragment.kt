@@ -105,23 +105,15 @@ class MessageFragment : BaseFragment<UserMessageVM, ContentChatBinding, UserMess
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         canUpdate = true
         userTo = requireArguments().getString("user_to").toString()
-
         initRecycler()
         subscribeObservers()
-
-        // TODO: 10/26/20    v REMOVE THESE v
-        //initTypedMessage()
-        //initUserInfoDatabase(true)
-        //getMessages(true)
-
         et_message.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {            }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 viewModel.setTypedMessage(s.toString(), userTo)
             }
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {}
         })
 

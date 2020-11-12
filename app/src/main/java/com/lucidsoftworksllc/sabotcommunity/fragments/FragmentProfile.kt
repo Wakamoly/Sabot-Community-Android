@@ -213,14 +213,15 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                         val postId = jsonObject.getString("postid")
                         postImageUpload(imageToUpload!!, postId, deviceUsername)
                     }
+                    statusUpdate?.setText("")
+                    profileCover?.requestFocus()
+                    // TODO: 11/11/20 CREATE METHOD FOR REFRESHING FEED, NOT WHOLE FRAGMENT
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
                         (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
                     } else {
                         (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
                     }
-                    statusUpdate.setText("")
-                    profileCover.requestFocus()
                 } else {
                     profileLoadingScreen.visible(false)
                 }

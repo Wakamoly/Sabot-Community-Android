@@ -80,8 +80,6 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
         followingPostsButton?.setOnClickListener { postsQueryButtonClicked(followingPostsButton) }
         allPostsButton?.setOnClickListener { postsQueryButtonClicked(allPostsButton) }
         filter = SharedPrefManager.getInstance(mContext)!!.currentPublics.toString()
-
-
         dashSwipe.setOnRefreshListener { refreshDash() }
 
         initDashFeedRecycler()
@@ -165,22 +163,22 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
 
     private fun initDashFeedRecycler(){
         dashboardfeedView?.layoutManager = LinearLayoutManager(this@DashboardFragment.context)
-        ViewCompat.setNestedScrollingEnabled(dashboardfeedView!!, false)
         dashboardfeedadapter = ProfilenewsAdapter(mContext, this@DashboardFragment)
         dashboardfeedView?.adapter = dashboardfeedadapter
-        // TODO: 10/21/20 FIX THIS
+        dashboardfeedView?.isNestedScrollingEnabled = false
 
-        /*dashScroll?.viewTreeObserver?.addOnScrollChangedListener {
-            if (dashScroll?.viewTreeObserver?.isAlive!!){
+        // TODO: 11/10/20 Pagination works, but is very slow and blocks UI thread
+        dashScroll?.viewTreeObserver?.addOnScrollChangedListener {
+            if (dashScroll?.viewTreeObserver?.isAlive == true){
                 if (dashScroll?.getChildAt(0)?.bottom!! <= dashScroll?.height!! + dashScroll?.scrollY!!) {
                     if (!isLoading && !isLastPage) {
                         isLoading = true
                         currentPage++
-                        viewModel.getDashboardFeed(currentPage, pageSize, deviceUsername.toString(), deviceUserID!!, clicked.toString())
+                        viewModel.getDashboardFeed(currentPage, pageSize, deviceUsername, deviceUserID, clicked.toString())
                     }
                 }
             }
-        }*/
+        }
 
         /*dashboardfeedView.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -321,6 +319,8 @@ class DashboardFragment : BaseFragment<DashboardVM, FragmentDashboardBinding, Da
 
     private fun updateDashFeedUI(data: List<ProfilenewsRecycler>){
         if (data.isEmpty()){
+            dashboardfeedadapter.removeLoading()
+            postsProgress.visible(false)
             noPosts.visible(true)
         }else{
             if (currentPage != PaginationOnScroll.PAGE_START) dashboardfeedadapter.removeLoading()

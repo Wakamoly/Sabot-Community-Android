@@ -47,14 +47,15 @@ interface UserMessageApi {
             @Field("user_to") userTo: String?,
             @Field("user_from") dUsername: String?,
             @Field("user_id") dUserID: Int?,
-            @Field("message") message: String?
+            @Field("message") message: String?,
+            @Field("image") jsonObject: JSONObject?
     ): SentMessageResponse
 
 
-    @POST("message_image_upload.php")
+    /*@POST("message_image_upload.php")
     suspend fun sendMessageImage(
             @Body jsonObject: JSONObject?
-    ): SentImageResponse
+    ): SentImageResponse*/
 
 
 

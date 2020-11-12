@@ -14,6 +14,8 @@ import com.lucidsoftworksllc.sabotcommunity.models.network_autogen.UserMessageDa
 import com.lucidsoftworksllc.sabotcommunity.models.network_autogen.UserMessagesFromID
 import com.lucidsoftworksllc.sabotcommunity.network.UserMessageApi
 import com.lucidsoftworksllc.sabotcommunity.others.base.BaseRepository
+import com.lucidsoftworksllc.sabotcommunity.others.currentDate
+import com.lucidsoftworksllc.sabotcommunity.others.currentDateSendMessage
 import com.lucidsoftworksllc.sabotcommunity.util.DataState
 import org.json.JSONException
 import org.json.JSONObject
@@ -113,13 +115,13 @@ class UserMessageRepo (
         return netEntityList
     }
 
-    suspend fun sendMessage(userTo: String, dUsername: String, dUserID: Int, message: String, image: Bitmap?) : DataState<UserMessageData> {
+    /*suspend fun sendMessageOLD(userTo: String, dUsername: String, dUserID: Int, message: String, image: Bitmap?) : DataState<UserMessageData> {
         val sentMessageData = safeApiCall { api.sendMessage(userTo, dUsername, dUserID, message) }
         if (sentMessageData is DataState.Success){
             val data = sentMessageData.data
-            val messageEntity = UserMessagesEntity(data.messageid, userTo, dUsername, message, "Just now", "")
-            if (image != null){
-                return sendMessageImage(image, messageEntity, dUsername)
+            val messageEntity = UserMessagesEntity(data.messageid, userTo, dUsername, message, currentDateSendMessage(), "")
+            return if (image != null){
+                sendMessageImage(image, messageEntity, dUsername)
             }else{
                 val messageData = UserMessageData(false, listOf(messageEntity))
                 if (messagesDao.isRowExist(messageEntity.message_id)) {
@@ -127,7 +129,7 @@ class UserMessageRepo (
                 } else {
                     messagesDao.addMessage(messageEntity)
                 }
-                return try {
+                try {
                     DataState.Success(messageData)
                 }catch (throwable: Throwable){
                     DataState.Failure(false, null, null)
@@ -136,11 +138,54 @@ class UserMessageRepo (
         }else{
             return DataState.Failure(false, null, null)
         }
+    }*/
+
+    suspend fun sendMessage(userTo: String, dUsername: String, dUserID: Int, message: String, image: Bitmap?) : DataState<UserMessageData> {
+        var jsonObject: JSONObject? = null
+        if (image != null){
+            jsonObject = prepareImageJSON(image, dUsername)
+        }
+
+        val sentMessageData = safeApiCall { api.sendMessage(userTo, dUsername, dUserID, message, jsonObject) }
+        if (sentMessageData is DataState.Success){
+            val data = sentMessageData.data
+            val messageEntity = UserMessagesEntity(data.messageid, userTo, dUsername, message, currentDateSendMessage(), data.imagepath)
+
+            val messageData = UserMessageData(false, listOf(messageEntity))
+            if (messagesDao.isRowExist(messageEntity.message_id)) {
+                messagesDao.updateMessage(messageEntity)
+            } else {
+                messagesDao.addMessage(messageEntity)
+            }
+            return try {
+                DataState.Success(messageData)
+            }catch (throwable: Throwable){
+                DataState.Failure(false, null, null)
+            }
+        }else{
+            return DataState.Failure(false, null, null)
+        }
     }
 
 
-    // TODO: 10/30/20 REMOVE MESSAGE IMAGE SENDING, MERGE WITH SENDING MESSAGE
-    private suspend fun sendMessageImage(bitmap: Bitmap, messageEntity: UserMessagesEntity, dUsername: String) : DataState<UserMessageData> {
+    private fun prepareImageJSON(bitmap: Bitmap, dUsername: String) : JSONObject {
+        val jsonObject = JSONObject()
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 75, byteArrayOutputStream)
+        val encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT)
+        try {
+            val imgname = Calendar.getInstance().timeInMillis.toString()
+            jsonObject.put("name", imgname)
+            jsonObject.put("image", encodedImage)
+            jsonObject.put("user_from", dUsername)
+        } catch (e: JSONException) {
+            Log.e("JSONObject Here", e.toString())
+        }
+        return jsonObject
+    }
+
+
+    /*private suspend fun sendMessageImageOLD(bitmap: Bitmap, messageEntity: UserMessagesEntity, dUsername: String) : DataState<UserMessageData> {
         val jsonObject = JSONObject()
         val byteArrayOutputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 75, byteArrayOutputStream)
@@ -172,7 +217,7 @@ class UserMessageRepo (
         }catch (throwable: Throwable){
             DataState.Failure(false, null, null)
         }
-    }
+    }*/
 
     /*suspend fun getFeed(page: Int, items: Int, username: String, userid: Int, method: String) = safeApiCall {
         api.getDashFeed(page, items, username, userid, method)
