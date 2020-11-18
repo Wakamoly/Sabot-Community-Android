@@ -625,7 +625,7 @@ class ClanFragment : Fragment() {
                     clanNewsRecyclerList!!.add(clanpostsRecycler)
                 }
                 clanNewsAdapter = ProfilenewsAdapter(mContext!!)
-                clanNewsAdapter?.addItems(clanNewsRecyclerList)
+                clanNewsAdapter?.addItems(clanNewsRecyclerList!!)
                 clanNewsRecycler!!.adapter = clanNewsAdapter
                 if (clannews.length() == 0) {
                     clanNewsSpotlight!!.visibility = View.GONE

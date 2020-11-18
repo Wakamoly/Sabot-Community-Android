@@ -1,0 +1,64 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/urlPreview"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:layout_below="@id/contentLayout"
+    android:layout_marginStart="3dp"
+    android:layout_marginEnd="3dp"
+    android:background="@drawable/grey_transparent_blob"
+    android:orientation="vertical">
+
+    <ProgressBar
+        android:indeterminateDrawable="@drawable/sabot_progress"
+        android:id="@+id/urlProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="30dp" />
+
+    <LinearLayout
+        android:id="@+id/urlBits"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="4dp"
+        android:visibility="invisible"
+        tools:visibility="visible">
+
+        <ImageView
+            android:id="@+id/urlImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:background="@drawable/darker_gray_transparent_blob"
+            android:orientation="vertical"
+            android:layout_height="40dp"
+            android:layout_marginTop="-38dp"
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent">
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:id="@+id/urlTitle"
+                android:layout_width="match_parent"
+                android:textSize="14sp"
+                android:singleLine="true"
+                android:textStyle="bold|italic"
+                tools:text="@string/title" />
+
+            <TextView
+                android:id="@+id/urlDesc"
+                android:singleLine="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                tools:text="@string/etdescription" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</LinearLayout>

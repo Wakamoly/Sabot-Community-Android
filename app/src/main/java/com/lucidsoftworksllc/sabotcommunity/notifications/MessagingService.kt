@@ -12,7 +12,6 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
-@SuppressLint("MissingFirebaseInstanceTokenRefresh")
 class MessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         if (remoteMessage.data.isNotEmpty()) {
@@ -23,12 +22,19 @@ class MessagingService : FirebaseMessagingService() {
                 e.printStackTrace()
             }
         } else if (remoteMessage.notification != null) {
-            handleNotification(remoteMessage.notification)
+            handleNotification(remoteMessage.notification!!)
         }
     }
 
-    private fun handleNotification(RemoteMsgNotification: RemoteMessage.Notification?) {
-        val message = RemoteMsgNotification!!.body
+    override fun onNewToken(token: String){
+        super.onNewToken(token)
+        if (token != SharedPrefManager.getInstance(applicationContext)!!.fCMToken) {
+            SharedPrefManager.getInstance(applicationContext)!!.updateToken(token)
+        }
+    }
+
+    private fun handleNotification(RemoteMsgNotification: RemoteMessage.Notification) {
+        val message = RemoteMsgNotification.body
         val title = RemoteMsgNotification.title
         val notificationVO = NotificationVO()
         notificationVO.title = title

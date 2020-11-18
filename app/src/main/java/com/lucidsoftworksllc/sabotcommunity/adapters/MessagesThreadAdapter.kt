@@ -18,7 +18,9 @@ import com.lucidsoftworksllc.sabotcommunity.activities.ChatActivity
 import com.lucidsoftworksllc.sabotcommunity.db.messages.general.MessagesDataModel
 import com.lucidsoftworksllc.sabotcommunity.db.messages.user_messages.UserMessagesEntity
 import com.lucidsoftworksllc.sabotcommunity.fragments.PhotoViewFragment
+import com.lucidsoftworksllc.sabotcommunity.others.active_label.SocialTextView
 import com.lucidsoftworksllc.sabotcommunity.others.getTimeAgo
+import com.lucidsoftworksllc.sabotcommunity.others.setClicks
 import com.lucidsoftworksllc.sabotcommunity.others.visible
 import java.util.*
 import kotlin.collections.ArrayList
@@ -47,6 +49,7 @@ class MessagesThreadAdapter(private val context: Context, private val username: 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val message = messages[position]
         holder.textViewMessage.text = message.body
+        holder.textViewMessage.setClicks(context)
         holder.textViewTime.text = getTimeAgo(message.date, context)
         if (message.image != "") {
             holder.imgMsg.visible(true)
@@ -101,7 +104,7 @@ class MessagesThreadAdapter(private val context: Context, private val username: 
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var textViewMessage: TextView = itemView.findViewById<View>(R.id.tv_message_content) as TextView
+        var textViewMessage: SocialTextView = itemView.findViewById(R.id.tv_message_content)
         var textViewTime: TextView = itemView.findViewById<View>(R.id.tv_time) as TextView
         var imgMsg: ImageView = itemView.findViewById(R.id.img_msg)
     }

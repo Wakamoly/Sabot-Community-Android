@@ -89,7 +89,7 @@ class ChatActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         navView!!.setOnNavigationItemSelectedListener(this)
         deviceUsername = SharedPrefManager.getInstance(this)!!.username
         deviceUserID = SharedPrefManager.getInstance(this)!!.userID
-        if (!SharedPrefManager.getInstance(this)!!.isLoggedIn) {
+        if (!SharedPrefManager.getInstance(this)!!.isLoggedIn()) {
             finish()
             startActivity(Intent(this, LoginActivity::class.java))
         }
@@ -186,7 +186,7 @@ class ChatActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         requestQueue!!.add(stringRequest)
     }
 
-    private suspend fun unreadMessages() {
+    private fun unreadMessages() {
             if (shouldGetNotification()) {
                 val stringRequest: StringRequest = object : StringRequest(Method.POST, UNREAD_NUM, Response.Listener { response: String? ->
                     try {

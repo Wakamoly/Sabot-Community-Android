@@ -31,7 +31,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
-import com.lucidsoftworksllc.sabotcommunity.*
+import com.google.firebase.installations.FirebaseInstallations
+import com.google.firebase.messaging.FirebaseMessaging
+import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.fragments.*
 import com.lucidsoftworksllc.sabotcommunity.others.*
 import com.paypal.android.sdk.payments.PayPalConfiguration
@@ -80,20 +82,23 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
         deviceUsername = SharedPrefManager.getInstance(this)!!.username
         mDrawerLayout = findViewById(R.id.drawer_layout)
         val navigationView = findViewById<NavigationView>(R.id.side_nav_view)
-        if (!SharedPrefManager.getInstance(this)!!.isLoggedIn) {
+        if (!SharedPrefManager.getInstance(this)!!.isLoggedIn()) {
             finish()
             startActivity(Intent(this, LoginActivity::class.java))
         }
-        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task: Task<InstanceIdResult?> ->
-            if (!task.isSuccessful) {
-                Log.w("FCM", "getInstanceId failed", task.exception)
-                return@addOnCompleteListener
-            }
-            val token = Objects.requireNonNull(task.result)?.token
-            if (token != SharedPrefManager.getInstance(applicationContext)!!.fCMToken) {
-                SharedPrefManager.getInstance(applicationContext)!!.updateToken(token!!)
+
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val fbToken = task.result!!
+                Log.d("Installations", "Installation auth token: $fbToken")
+                if (fbToken != SharedPrefManager.getInstance(applicationContext)!!.fCMToken) {
+                    SharedPrefManager.getInstance(applicationContext)!!.updateToken(fbToken)
+                }
+            } else {
+                Log.e("Installations", "Unable to get Installation auth token")
             }
         }
+
         requestQueue = Volley.newRequestQueue(applicationContext)
         unreadNotificationsHandler(1000)
         loadFragment(DashboardFragment())
@@ -486,6 +491,14 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
                     val ldf = PublicsTopicFragment()
                     val args = Bundle()
                     args.putString("PublicsId", linkID)
+                    ldf.arguments = args
+                    addFragment(R.id.fragment_container, ldf)
+                }
+                link.contains("pcat=") -> {
+                    val linkID = link.replace("pcat=", "")
+                    val ldf = FragmentPublicsCat()
+                    val args = Bundle()
+                    args.putString("PublicsTag", linkID)
                     ldf.arguments = args
                     addFragment(R.id.fragment_container, ldf)
                 }

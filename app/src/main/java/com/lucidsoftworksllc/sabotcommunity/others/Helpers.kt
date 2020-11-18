@@ -4,8 +4,12 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Build
+import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -14,6 +18,11 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.google.android.material.snackbar.Snackbar
 import com.lucidsoftworksllc.sabotcommunity.R
+import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
+import com.lucidsoftworksllc.sabotcommunity.fragments.FragmentProfile
+import com.lucidsoftworksllc.sabotcommunity.fragments.FragmentPublicsCat
+import com.lucidsoftworksllc.sabotcommunity.others.active_label.SocialTextView
+import com.lucidsoftworksllc.sabotcommunity.others.active_label.SocialView
 import com.lucidsoftworksllc.sabotcommunity.others.base.BaseFragment
 import com.lucidsoftworksllc.sabotcommunity.util.DataState
 import java.text.ParseException
@@ -23,7 +32,7 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 
 
-/*
+/**
 *
 * CONTEXT FUNCTIONS AND GETTERS
 *
@@ -48,13 +57,17 @@ val Context.fcmToken: String?
 
 
 
-/*
+/**
 *
 * GENERAL VIEW FUNCTIONS
 *
 *
  */
 
+
+infix fun View.below(view: View) {
+    (this.layoutParams as? RelativeLayout.LayoutParams)?.addRule(RelativeLayout.BELOW, view.id)
+}
 
 
 fun <A : Activity> Activity.startNewActivity(activity: Class<A>){
@@ -183,7 +196,7 @@ fun Fragment.handleApiError(
 }
 
 
-/*
+/**
 *
 * TIME-SINCE FUNCTIONS
 *
@@ -266,9 +279,52 @@ private fun getTimeDistanceInMinutes(time: Long): Int {
     return (abs(timeDistance) / 1000 / 60.toFloat()).roundToInt()
 }
 
-/*
+/**
 *
-* LINKIFY FUNCTIONS
+* LINK FUNCTIONS
 *
 *
  */
+
+fun SocialTextView.setClicks(mCtx: Context){
+    this.setOnHashtagClickListener(object : Function2<SocialView?, CharSequence?, Unit> {
+        override fun invoke(p1: SocialView?, p2: CharSequence?) {
+            mCtx.toastShort("Hashtag support coming soon! #${p2.toString()}")
+        }
+    })
+
+    this.setOnMentionClickListener(object : Function2<SocialView?, CharSequence?, Unit> {
+        override fun invoke(p1: SocialView?, p2: CharSequence?) {
+            if (mCtx is FragmentContainer) {
+                val ldf = FragmentProfile()
+                val args = Bundle()
+                args.putString("Username", p2.toString())
+                ldf.arguments = args
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+            }else{
+                mCtx.startActivity(Intent(mCtx, FragmentContainer::class.java).putExtra("link", "user=${p2.toString()}"))
+            }
+        }
+    })
+
+    this.setOnDoubleMentionClickListener(object : Function2<SocialView?, CharSequence?, Unit> {
+        override fun invoke(p1: SocialView?, p2: CharSequence?) {
+            if (mCtx is FragmentContainer) {
+                Log.d("setClicks", "invoke double: PUBLICS TAG: ${p2.toString()}")
+                val ldf = FragmentProfile()
+                val args = Bundle()
+                args.putString("PublicsTag", p2.toString())
+                ldf.arguments = args
+                (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+            } else {
+                mCtx.startActivity(Intent(mCtx, FragmentContainer::class.java).putExtra("link", "user=${p2.toString()}"))
+            }
+        }
+    })
+
+    this.setOnHyperlinkClickListener(object : Function2<SocialView?, CharSequence?, Unit> {
+        override fun invoke(p1: SocialView?, p2: CharSequence?) {
+            mCtx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(p2.toString())))
+        }
+    })
+}

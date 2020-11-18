@@ -123,10 +123,16 @@ dependencies {
     //Paging
     implementation 'android.arch.paging:runtime:1.0.1'
 
-    //Mentions and hashtags for textviews and edittexts
-    def socialview_version = "0.3-rc1"
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
+    ///Mentions and hashtags for textviews and edittexts
+    /*def socialview_version = "0.3-rc1"
     implementation "com.hendraanggrian.appcompat:socialview:$socialview_version"
     implementation "com.hendraanggrian.appcompat:socialview-commons:$socialview_version"
+
+    implementation project(':app:social_view:socialview')
+    implementation project(':app:social_view:socialview-commons')*/
+
 }
 
 kapt {

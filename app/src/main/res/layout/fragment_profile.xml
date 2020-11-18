@@ -1317,7 +1317,7 @@
                         android:visibility="gone"
                         tools:visibility="visible">
 
-                        <com.hendraanggrian.appcompat.widget.SocialEditText
+                        <com.lucidsoftworksllc.sabotcommunity.others.active_label.SocialEditText
                             android:id="@+id/statusUpdate"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -1336,9 +1336,10 @@
                             android:textCursorDrawable="@drawable/cursor_color"
                             android:textSize="14sp"
                             app:socialFlags="hashtag|mention|hyperlink"
-                            app:hashtagColor="@color/dark_blue"
-                            app:mentionColor="@color/green"
-                            app:hyperlinkColor="@color/colorAccent"/>
+                            app:hashtagColor="@color/hashtag"
+                            app:mentionColor="@color/usermention"
+                            app:hyperlinkColor="@color/hyperlink"
+                            app:doubleMentionColor="@color/gamemention"/>
 
                         <LinearLayout
                             android:layout_width="match_parent"

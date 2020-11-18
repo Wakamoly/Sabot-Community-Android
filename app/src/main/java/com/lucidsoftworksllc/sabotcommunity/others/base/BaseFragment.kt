@@ -40,7 +40,7 @@ abstract class BaseFragment<VM: BaseViewModel, B: ViewBinding, R: BaseRepository
         viewModel = ViewModelProvider(this, factory).get(getViewModel())
 
         lifecycleScope.launch {
-            if (userPreferences.isLoggedIn){
+            if (userPreferences.isLoggedIn()){
                 deviceUserID = userPreferences.userID?.toInt()!!
                 deviceUsername = userPreferences.username.toString()
             }else{

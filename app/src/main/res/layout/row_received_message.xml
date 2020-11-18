@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -19,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
+            <com.lucidsoftworksllc.sabotcommunity.others.active_label.SocialTextView
                 android:id="@+id/tv_message_content"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -35,7 +36,12 @@
                 android:textColor="@color/colorPrimary"
                 android:textColorHighlight="@color/grey"
                 android:textIsSelectable="true"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                app:socialFlags="hashtag|mention|hyperlink"
+                app:hashtagColor="@color/hashtag"
+                app:mentionColor="@color/usermention"
+                app:hyperlinkColor="@color/hyperlink"
+                app:doubleMentionColor="@color/gamemention" />
 
             <ImageView
                 android:id="@+id/img_msg"

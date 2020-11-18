@@ -1,12 +1,8 @@
 package com.lucidsoftworksllc.sabotcommunity.adapters
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
-import android.text.util.Linkify
-import android.util.Patterns.WEB_URL
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -26,24 +22,15 @@ import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.fragments.*
 import com.lucidsoftworksllc.sabotcommunity.models.ProfilenewsRecycler
-import com.lucidsoftworksllc.sabotcommunity.others.Constants
+import com.lucidsoftworksllc.sabotcommunity.others.*
+import com.lucidsoftworksllc.sabotcommunity.others.active_label.SocialTextView
 import com.lucidsoftworksllc.sabotcommunity.others.base.BaseViewHolder
-import com.lucidsoftworksllc.sabotcommunity.others.deviceUserID
-import com.lucidsoftworksllc.sabotcommunity.others.deviceUsername
-import com.lucidsoftworksllc.sabotcommunity.others.visible
 import com.yarolegovich.lovelydialog.LovelyStandardDialog
 import de.hdodenhof.circleimageview.CircleImageView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.launch
+import kotlinx.android.synthetic.main.add_layout_profilenewsimage.view.*
 import org.json.JSONException
 import org.json.JSONObject
-import org.jsoup.Jsoup
-import java.io.IOException
 import java.util.*
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 import kotlin.collections.ArrayList
 
 class ProfilenewsAdapter(private val mCtx: Context,
@@ -140,8 +127,8 @@ class ProfilenewsAdapter(private val mCtx: Context,
         notifyDataSetChanged()
     }
 
-    fun addItems(items: List<ProfilenewsRecycler>?) {
-        profilenewsList.addAll(items!!)
+    fun addItems(items: List<ProfilenewsRecycler>) {
+        profilenewsList.addAll(items)
         notifyDataSetChanged()
     }
 
@@ -155,7 +142,14 @@ class ProfilenewsAdapter(private val mCtx: Context,
         isLoaderVisible = false
         if (profilenewsList.size != 0) {
             val position = profilenewsList.size - 1
-            val item = getItem(position)
+            //val item = getItem(position)
+            profilenewsList.removeAt(position)
+            notifyItemRemoved(position)
+        }
+    }
+
+    private fun removeItem(position: Int){
+        if (profilenewsList.isNotEmpty()){
             profilenewsList.removeAt(position)
             notifyItemRemoved(position)
         }
@@ -168,28 +162,23 @@ class ProfilenewsAdapter(private val mCtx: Context,
     inner class ViewHolder(itemView: View) : BaseViewHolder(itemView) {
         private var verified: CircleImageView = itemView.findViewById(R.id.verified)
         private var online: CircleImageView = itemView.findViewById(R.id.online)
-        private var urlBits: LinearLayout = itemView.findViewById(R.id.urlBits)
-        private var urlPreview: LinearLayout = itemView.findViewById(R.id.urlPreview)
-        private var publicsTopicList: RelativeLayout = itemView.findViewById(R.id.publicsTopicList)
         private var contentLayout: MaterialRippleLayout = itemView.findViewById(R.id.contentLayout)
+        private var postContext: RelativeLayout = itemView.findViewById(R.id.postContext)
         private var likeProgress: ProgressBar = itemView.findViewById(R.id.likeProgress)
-        private var urlProgress: ProgressBar = itemView.findViewById(R.id.urlProgress)
-        private var imageProfilenewsView: ImageView = itemView.findViewById(R.id.profileNewsImage)
+        private var imageInflater: View? = null
+        //private var imageProfilenewsView: ImageView = itemView.findViewById(R.id.profileNewsImage)
         private var imageViewProfilenewsPic: ImageView = itemView.findViewById(R.id.imageViewProfilenewsPic)
         private var notiType: ImageView = itemView.findViewById(R.id.platformType)
         private var likeView: ImageView = itemView.findViewById(R.id.like)
         private var likedView: ImageView = itemView.findViewById(R.id.liked)
-        private var urlImage: ImageView = itemView.findViewById(R.id.urlImage)
         private var tvEdited: TextView = itemView.findViewById(R.id.tvEdited)
-        private var textViewBody: TextView = itemView.findViewById(R.id.textViewBody)
+        private var textViewBody: SocialTextView = itemView.findViewById(R.id.textViewBody)
         private var textviewaddedBy: TextView = itemView.findViewById(R.id.textViewProfileName)
         private var textviewdateAdded: TextView = itemView.findViewById(R.id.profileCommentsDateTime_top)
         private var textviewuserTo: TextView = itemView.findViewById(R.id.textViewToUserName)
         private var textViewLikes: TextView = itemView.findViewById(R.id.textViewNumLikes)
         private var postusernameTop: TextView = itemView.findViewById(R.id.postUsername_top)
         private var textViewNumComments: TextView = itemView.findViewById(R.id.textViewNumComments)
-        private var urlTitle: TextView = itemView.findViewById(R.id.urlTitle)
-        private var urlDesc: TextView = itemView.findViewById(R.id.urlDesc)
         private var textViewComments: TextView = itemView.findViewById(R.id.textViewComments)
         private var textViewLikesText: TextView = itemView.findViewById(R.id.textViewLikes)
         override fun clear() {}
@@ -202,6 +191,7 @@ class ProfilenewsAdapter(private val mCtx: Context,
             textviewdateAdded.text = profilenews.date_added
             textViewLikes.text = profilenews.likes
             postusernameTop.text = String.format("@%s", profilenews.added_by)
+
             val userTo = profilenews.user_to
             if (userTo != "none") {
                 when (profilenews.form) {
@@ -211,11 +201,13 @@ class ProfilenewsAdapter(private val mCtx: Context,
                         textviewuserTo.setTextColor(ContextCompat.getColor(mCtx, R.color.pin))
                     }
                     "event" -> {
+                        // TODO: 11/12/20 Not implemented
                     }
                 }
             } else {
                 textviewuserTo.visible(false)
             }
+
             when (profilenews.type) {
                 "Xbox" -> {
                     notiType.setImageResource(R.drawable.icons8_xbox_50)
@@ -241,13 +233,13 @@ class ProfilenewsAdapter(private val mCtx: Context,
                     notiType.setImageResource(R.drawable.icons8_nintendo_switch_48)
                     notiType.visible(true)
                 }
-                "General" -> {
-                }
+                "General" -> { }
                 else -> {
                     notiType.setImageResource(R.drawable.icons8_question_mark_64)
                     notiType.visible(true)
                 }
             }
+
             contentLayout.setOnLongClickListener { v: View? ->
                 val popup = PopupMenu(mCtx, v)
                 val inflater = popup.menuInflater
@@ -267,7 +259,7 @@ class ProfilenewsAdapter(private val mCtx: Context,
                                                 val jsonObject = JSONObject(response!!)
                                                 if (jsonObject.getString("error") == "false") {
                                                     Toast.makeText(mCtx, "Post deleted!", Toast.LENGTH_LONG).show()
-                                                    contentLayout.visible(false)
+                                                    removeItem(position)
                                                 } else {
                                                     Toast.makeText(mCtx, jsonObject.getString("message"), Toast.LENGTH_SHORT).show()
                                                 }
@@ -323,8 +315,9 @@ class ProfilenewsAdapter(private val mCtx: Context,
                     }
                 }
                 popup.show()
-                false
+                true
             }
+
             contentLayout.setOnClickListener {
                 val ldf = ProfilePostFragment()
                 val args = Bundle()
@@ -334,6 +327,7 @@ class ProfilenewsAdapter(private val mCtx: Context,
                 ldf.arguments = args
                 (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
             }
+
             textviewaddedBy.setOnClickListener {
                 val ldf = FragmentProfile()
                 val args = Bundle()
@@ -342,25 +336,37 @@ class ProfilenewsAdapter(private val mCtx: Context,
                 ldf.arguments = args
                 (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
             }
+
             val profilePic = profilenews.profile_pic.substring(0, profilenews.profile_pic.length - 4) + "_r.JPG"
             Glide.with(mCtx)
                     .load(Constants.BASE_URL + profilePic)
                     .into(imageViewProfilenewsPic)
+
             if (profilenews.image.isNotEmpty()) {
-                imageProfilenewsView.visible(true)
+                if (imageInflater == null){
+                    imageInflater = LayoutInflater.from(mCtx).inflate(R.layout.add_layout_profilenewsimage, null, false)
+                    postContext.addView(imageInflater)
+                    imageInflater?.below(textViewBody)
+                }
                 Glide.with(mCtx)
                         .load(Constants.BASE_URL + profilenews.image).override(1000)
-                        .into(imageProfilenewsView)
-            } else {
-                imageProfilenewsView.visible(false)
+                        .into(imageInflater!!.profileNewsImage)
+            }else if (imageInflater != null) {
+                postContext.removeView(imageInflater)
+                imageInflater = null
             }
-            if (profilenews.likedbyuseryes == "yes") {
-                likeView.visible(false)
-                likedView.visible(true)
-            } else {
-                likeView.visible(true)
-                likedView.visible(false)
+
+            when (profilenews.likedbyuseryes){
+                "yes" -> {
+                    likeView.visible(false)
+                    likedView.visible(true)
+                }
+                else -> {
+                    likeView.visible(true)
+                    likedView.visible(false)
+                }
             }
+
             likeView.setOnClickListener {
                 likeView.isEnabled = false
                 likeView.visible(false)
@@ -453,143 +459,19 @@ class ProfilenewsAdapter(private val mCtx: Context,
                 }
                 (mCtx as FragmentContainer).addToRequestQueue(stringRequest)
             }
-            if (profilenews.online == "yes") {
-                online.visible(true)
-            } else {
-                online.visible(false)
+            when (profilenews.online){
+                "yes" -> online.visible(true)
+                else -> online.visible(false)
             }
-            if (profilenews.verified == "yes") {
-                verified.visible(true)
-            } else {
-                verified.visible(false)
+            when (profilenews.verified){
+                "yes" -> verified.visible(true)
+                else -> verified.visible(false)
             }
 
-            /*val filter: Linkify.TransformFilter = Linkify.TransformFilter { match, url -> match.group() }
+            textViewBody.setClicks(mCtx)
 
-            val mentionPattern = Pattern.compile("@([A-Za-z0-9_-]+)")
-            val mentionScheme = "https://www.twitter.com/"
-            Linkify.addLinks(textViewBody, mentionPattern, mentionScheme, null, filter)
-
-            val hashtagPattern = Pattern.compile("#([A-Za-z0-9_-]+)")
-            val hashtagScheme = "https://www.twitter.com/search/"
-            Linkify.addLinks(textViewBody, hashtagPattern, hashtagScheme, null, filter)
-
-            val urlPattern = WEB_URL
-            Linkify.addLinks(textViewBody, urlPattern, null, null, filter)*/
-
-            // TODO: 11/11/20 WRITE THE SAME BIT FOR @MENTIONS AND #HASHTAGS
-            // TODO: 11/11/20 MULTIPLE WEB URLS STRUNG TOGETHER SEEM TO CAUSE CRASH
-            val pattern: Pattern = Pattern.compile(WEB_URL.pattern())
-            val matcher: Matcher = pattern.matcher(profilenews.body)
-            if (matcher.find()) {
-                val item = profilenews.body.substring(matcher.start(), matcher.end())
-                val finalItem: String = if (!item.contains("http://") && !item.contains("https://")) {
-                    "https://$item"
-                } else {
-                    if (item.contains("http://")) {
-                        item.replace("http://", "https://")
-                    } else {
-                        item
-                    }
-                }
-                if (item.contains("https://")) {
-                    var imageUrl: String? = null
-                    var title: String? = null
-                    var desc: String? = null
-                    urlPreview.visible(true)
-                    urlImage.setOnClickListener {
-                        val uri = Uri.parse(finalItem)
-                        val intent = Intent(Intent.ACTION_VIEW, uri)
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        mCtx.startActivity(intent)
-                    }
-
-                    CoroutineScope(IO).launch {
-                        try {
-                            val doc = Jsoup.connect(finalItem).get()
-                            val ogTag = doc.select("meta[property^=og:]").first()
-                                    ?: return@launch
-                            title = doc.title()
-                            val metaOgDesc = doc.select("meta[property=og:description]")
-                            if (metaOgDesc != null) {
-                                desc = metaOgDesc.attr("content")
-                            }
-                            val metaOgImage = doc.select("meta[property=og:image]")
-                            if (metaOgImage != null) {
-                                imageUrl = metaOgImage.attr("content")
-                            }
-                            addPostLinkBits(imageUrl, title, desc)
-                        } catch (e: IOException) {
-                            e.printStackTrace()
-                        }
-                    }
-
-                } else {
-                    urlPreview.visible(false)
-                }
-
-            } else {
-                urlPreview.visible(false)
-            }
-
-
-            /*val bodybits = profilenews.body.split("\\s+".toRegex()).toTypedArray()
-            for (item in bodybits) {
-                if (Patterns.WEB_URL.matcher(item).matches()) {
-                    val finalItem: String = if (!item.contains("http://") && !item.contains("https://")) {
-                        "https://$item"
-                    } else {
-                        if (item.contains("http://")){
-                            item.replace("http://","https://")
-                        }else{
-                            item
-                        }
-                    }
-                    val imageUrl = arrayOfNulls<String>(1)
-                    val title = arrayOfNulls<String>(1)
-                    val desc = arrayOfNulls<String>(1)
-                    urlPreview.visible(true)
-                    urlImage.setOnClickListener {
-                        val uri = Uri.parse(finalItem)
-                        val intent = Intent(Intent.ACTION_VIEW, uri)
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        mCtx.startActivity(intent)
-                    }
-                        try {
-                            CoroutineScope(IO).launch {
-                                val doc = Jsoup.connect(finalItem).get()
-                                val ogTags = doc.select("meta[property^=og:]")
-                                if (ogTags.size <= 0) {
-                                    return@launch
-                                }
-                                val metaOgTitle = doc.select("meta[property=og:title]")
-                                if (metaOgTitle != null) {
-                                    title[0] = metaOgTitle.attr("content")
-                                } else {
-                                    title[0] = doc.title()
-                                }
-                                val metaOgDesc = doc.select("meta[property=og:description]")
-                                if (metaOgDesc != null) {
-                                    desc[0] = metaOgDesc.attr("content")
-                                }
-                                val metaOgImage = doc.select("meta[property=og:image]")
-                                if (metaOgImage != null) {
-                                    imageUrl[0] = metaOgImage.attr("content")
-                                }
-                                addPostLinkBits(imageUrl[0], title[0], desc[0])
-                            }
-                        } catch (e: IOException) {
-                            e.printStackTrace()
-                        }
-
-                    break
-                } else {
-                    urlPreview.visible(false)
-                }
-                break
-            }*/
-
-
+            // TODO: 11/11/20 remove url preview, disable hyperlink clicks and enable both on profile post frag
+            //urlPreview.visible(false)
 
             textViewLikesText.setOnClickListener {
                 val asf: Fragment = UserListFragment()
@@ -618,22 +500,6 @@ class ProfilenewsAdapter(private val mCtx: Context,
             }
         }
 
-        private fun addPostLinkBits(imageUrl: String?, title: String?, desc: String?){
-            CoroutineScope(Main).launch {
-                if (imageUrl.isNullOrEmpty()) {
-                    urlImage.setImageResource(R.drawable.ic_error)
-                } else {
-                    Glide.with(mCtx)
-                            .load(imageUrl)
-                            .error(R.drawable.ic_error)
-                            .into(urlImage)
-                }
-                urlTitle.text = title ?: ""
-                urlDesc.text = desc ?: ""
-                urlProgress.visible(false)
-                urlBits.visible(true)
-            }
-        }
 
     }
 

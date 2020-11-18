@@ -77,9 +77,9 @@ class ProfilePostFragment : Fragment() {
     private var commentEditText: EditText? = null
     private var mCtx: Context? = null
     private var profilePostView: RecyclerView? = null
-    private var adapter: PostCommentsAdapter? = null
+    private lateinit var adapter: PostCommentsAdapter
     private var profilePostsSwipe: SwipeRefreshLayout? = null
-    private var profilePostPostList: MutableList<PostCommentRecycler>? = null
+    private lateinit var profilePostPostList: List<PostCommentRecycler>
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val profilePostRootView = inflater.inflate(R.layout.fragment_profile_post, null)
         urlBits = profilePostRootView.findViewById(R.id.urlBits)
@@ -114,9 +114,11 @@ class ProfilePostFragment : Fragment() {
         thisUserID = SharedPrefManager.getInstance(mCtx!!)!!.userID
         thisUsername = SharedPrefManager.getInstance(mCtx!!)!!.username
         profilePostPostList = ArrayList()
+        adapter = PostCommentsAdapter(mCtx!!)
         profilePostView = profilePostRootView.findViewById(R.id.profileCommentsPostRecyclerView)
         profilePostView?.setHasFixedSize(true)
         profilePostView?.layoutManager = LinearLayoutManager(activity)
+        profilePostView?.adapter = adapter
         commentEditText?.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 if (s.toString().trim { it <= ' ' }.isEmpty()) {
@@ -548,10 +550,8 @@ class ProfilePostFragment : Fragment() {
                     val verified = profilePostObject.getString("verified")
                     val edited = profilePostObject.getString("edited")
                     val profilePostPostResult = PostCommentRecycler(id, body, postedBy, postedTo, time, postId, likes, likedBy, userId, profilePic, nickname, username, likedbyuser, online, verified, edited)
-                    profilePostPostList!!.add(profilePostPostResult)
+                    adapter.addItem(profilePostPostResult)
                 }
-                adapter = PostCommentsAdapter(mCtx!!, profilePostPostList!!)
-                profilePostView!!.adapter = adapter
                 profilePostsSwipe!!.isRefreshing = false
             } catch (e: JSONException) {
                 e.printStackTrace()

@@ -152,7 +152,7 @@ class SeeAllFragment : Fragment() {
                     nothingToShow!!.visibility = View.VISIBLE
                 }
                 newsadapter = ProfilenewsAdapter(mCtx!!)
-                newsadapter?.addItems(profilenewsRecyclerList)
+                newsadapter?.addItems(profilenewsRecyclerList!!)
                 recyclerSeeAll!!.adapter = newsadapter
                 progressBar!!.visibility = View.GONE
             } catch (e: JSONException) {
@@ -192,7 +192,7 @@ class SeeAllFragment : Fragment() {
                     clanNewsRecyclerList!!.add(clanpostsRecycler)
                 }
                 clanNewsAdapter = ProfilenewsAdapter(mCtx!!)
-                clanNewsAdapter?.addItems(clanNewsRecyclerList)
+                clanNewsAdapter?.addItems(clanNewsRecyclerList!!)
                 recyclerSeeAll!!.adapter = clanNewsAdapter
                 if (clannews.length() == 0) {
                     nothingToShow!!.visibility = View.VISIBLE

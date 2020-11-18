@@ -18,23 +18,28 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.balysv.materialripple.MaterialRippleLayout
 import com.bumptech.glide.Glide
-import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.models.PostCommentRecycler
 import com.lucidsoftworksllc.sabotcommunity.R
-import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
 import com.lucidsoftworksllc.sabotcommunity.adapters.PostCommentsAdapter.ProfileCommentsViewHolder
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.fragments.FragmentProfile
 import com.lucidsoftworksllc.sabotcommunity.fragments.UserListFragment
+import com.lucidsoftworksllc.sabotcommunity.others.*
+import com.lucidsoftworksllc.sabotcommunity.others.active_label.SocialTextView
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlinx.android.synthetic.main.add_layout_profilenewsimage.view.*
 import org.json.JSONException
 import org.json.JSONObject
 import org.jsoup.Jsoup
 import java.io.IOException
 import java.util.*
+import kotlin.collections.ArrayList
 
-class PostCommentsAdapter(private val mCtx: Context, private val postCommentsList: List<PostCommentRecycler>) : RecyclerView.Adapter<ProfileCommentsViewHolder>() {
+class PostCommentsAdapter(private val mCtx: Context) : RecyclerView.Adapter<ProfileCommentsViewHolder>() {
     private val isLoadingAdded = false
+    private val postCommentsList: MutableList<PostCommentRecycler> = ArrayList()
+    private val userID = mCtx.deviceUserID
+    private val username = mCtx.deviceUsername
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProfileCommentsViewHolder {
         var holder: ProfileCommentsViewHolder? = null
         val inflater = LayoutInflater.from(mCtx)
@@ -48,6 +53,16 @@ class PostCommentsAdapter(private val mCtx: Context, private val postCommentsLis
         return holder!!
     }
 
+    fun addItems(items: List<PostCommentRecycler>) {
+        postCommentsList.addAll(items)
+        notifyDataSetChanged()
+    }
+
+    fun addItem(item: PostCommentRecycler) {
+        postCommentsList.add(item)
+        notifyDataSetChanged()
+    }
+
     private fun getViewHolder(inflater: LayoutInflater): ProfileCommentsViewHolder {
         val holder: ProfileCommentsViewHolder
         val v1 = inflater.inflate(R.layout.recycler_profilenews, null)
@@ -59,7 +74,8 @@ class PostCommentsAdapter(private val mCtx: Context, private val postCommentsLis
         val comment = postCommentsList[position]
         holder.textViewNickname.text = comment.nickname
         holder.textViewPostBody.text = comment.body
-        val bodybits = comment.body.split("\\s+".toRegex()).toTypedArray()
+        holder.textViewPostBody.setClicks(mCtx)
+        /*val bodybits = comment.body.split("\\s+".toRegex()).toTypedArray()
         for (item in bodybits) {
             if (Patterns.WEB_URL.matcher(item).matches()) {
                 val finalItem: String = if (!item.contains("http://") && !item.contains("https://")) {
@@ -121,7 +137,7 @@ class PostCommentsAdapter(private val mCtx: Context, private val postCommentsLis
                 }, 5000)
                 break
             }
-        }
+        }*/
         holder.textViewPostDateTime.text = comment.time
         holder.textViewUsername.text = String.format("@%s", comment.username)
         holder.textViewNumLikes.text = comment.likes
@@ -146,6 +162,18 @@ class PostCommentsAdapter(private val mCtx: Context, private val postCommentsLis
             holder.likeView.visibility = View.GONE
             holder.likedView.visibility = View.VISIBLE
         }
+
+        /** Add comment images at a later date
+        if (comment.image.isNotEmpty()) {
+            val imageInflater = LayoutInflater.from(mCtx).inflate(R.layout.add_layout_profilenewsimage, null, false)
+            val params: RelativeLayout.LayoutParams = postContext.layoutParams as RelativeLayout.LayoutParams
+            params.addRule(RelativeLayout.BELOW, R.id.textViewBody)
+            imageInflater.profileNewsImage.layoutParams = params
+            Glide.with(mCtx)
+                    .load(Constants.BASE_URL + profilenews.image).override(1000)
+                    .into(imageInflater.profileNewsImage)
+        }*/
+
         holder.likeView.setOnClickListener {
             holder.likeView.visibility = View.GONE
             holder.likeProgress.visibility = View.VISIBLE
@@ -182,8 +210,8 @@ class PostCommentsAdapter(private val mCtx: Context, private val postCommentsLis
                     params["comment_id"] = comment.id
                     params["method"] = "like"
                     params["user_to"] = comment.username
-                    params["user_id"] = holder.userID
-                    params["username"] = holder.username
+                    params["user_id"] = this@PostCommentsAdapter.userID.toString()
+                    params["username"] = this@PostCommentsAdapter.username.toString()
                     params["body"] = comment.body
                     params["post_id"] = comment.post_id
                     return params
@@ -227,8 +255,8 @@ class PostCommentsAdapter(private val mCtx: Context, private val postCommentsLis
                     params["comment_id"] = comment.id
                     params["method"] = "unlike"
                     params["user_to"] = comment.username
-                    params["user_id"] = holder.userID
-                    params["username"] = holder.username
+                    params["user_id"] = this@PostCommentsAdapter.userID.toString()
+                    params["username"] = this@PostCommentsAdapter.username.toString()
                     params["body"] = comment.body
                     params["post_id"] = comment.post_id
                     return params
@@ -272,61 +300,38 @@ class PostCommentsAdapter(private val mCtx: Context, private val postCommentsLis
     }
 
     open inner class ProfileCommentsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var verified: CircleImageView
-        var online: CircleImageView
-        private var contentLayout: MaterialRippleLayout
-        var urlBits: LinearLayout
-        var urlPreview: LinearLayout
-        private var likesLayout: LinearLayout
-        var imageView: ImageView
-        var urlImage: ImageView
-        var visIfPost: RelativeLayout
-        var likeProgress: ProgressBar
-        var urlProgress: ProgressBar
-        var likeView: ImageView
-        var likedView: ImageView
-        var contentDivider: ImageView
-        var tvEdited: TextView
-        var textViewNickname: TextView
-        var textViewUsername: TextView
-        var textViewUsernameTo: TextView
-        var textViewPostBody: TextView
-        var textViewPostDateTime: TextView
-        var textViewNumLikes: TextView
-        var urlTitle: TextView
-        var urlDesc: TextView
-        var textViewLikes: TextView
-        var userID: String
-        var username: String
-        private var sharedPrefManager: SharedPrefManager = SharedPrefManager.getInstance(mCtx)!!
+        var verified: CircleImageView = itemView.findViewById(R.id.verified)
+        var online: CircleImageView = itemView.findViewById(R.id.online)
+        private var contentLayout: MaterialRippleLayout = itemView.findViewById(R.id.contentLayout)
+        private var likesLayout: LinearLayout = itemView.findViewById(R.id.likesLayout)
+        var imageView: ImageView = itemView.findViewById(R.id.imageViewProfilenewsPic)
+        var visIfPost: RelativeLayout = itemView.findViewById(R.id.visIfPost)
+        var likeProgress: ProgressBar = itemView.findViewById(R.id.likeProgress)
+        var likeView: ImageView = itemView.findViewById(R.id.like)
+        var likedView: ImageView = itemView.findViewById(R.id.liked)
+        var contentDivider: ImageView = itemView.findViewById(R.id.contentDivider)
+        var tvEdited: TextView = itemView.findViewById(R.id.tvEdited)
+        var textViewNickname: TextView = itemView.findViewById(R.id.textViewProfileName)
+        var textViewUsername: TextView = itemView.findViewById(R.id.postUsername_top)
+        var textViewUsernameTo: TextView = itemView.findViewById(R.id.textViewToUserName)
+        var textViewPostBody: SocialTextView = itemView.findViewById(R.id.textViewBody)
+        var textViewPostDateTime: TextView = itemView.findViewById(R.id.profileCommentsDateTime_top)
+        var textViewNumLikes: TextView = itemView.findViewById(R.id.textViewNumLikes)
+        var textViewLikes: TextView = itemView.findViewById(R.id.textViewLikes)
+        //var urlTitle: TextView
+        //var urlDesc: TextView
+        //var urlProgress: ProgressBar
+        //var urlImage: ImageView
+        //var urlBits: LinearLayout
+        //var urlPreview: LinearLayout
 
         init {
-            userID = sharedPrefManager.userID!!
-            verified = itemView.findViewById(R.id.verified)
-            online = itemView.findViewById(R.id.online)
-            username = sharedPrefManager.username!!
-            visIfPost = itemView.findViewById(R.id.visIfPost)
-            imageView = itemView.findViewById(R.id.imageViewProfilenewsPic)
-            likeProgress = itemView.findViewById(R.id.likeProgress)
-            likeView = itemView.findViewById(R.id.like)
-            likedView = itemView.findViewById(R.id.liked)
-            textViewNickname = itemView.findViewById(R.id.textViewProfileName)
-            textViewUsername = itemView.findViewById(R.id.postUsername_top)
-            textViewUsernameTo = itemView.findViewById(R.id.textViewToUserName)
-            textViewPostBody = itemView.findViewById(R.id.textViewBody)
-            textViewPostDateTime = itemView.findViewById(R.id.profileCommentsDateTime_top)
-            textViewNumLikes = itemView.findViewById(R.id.textViewNumLikes)
-            urlPreview = itemView.findViewById(R.id.urlPreview)
-            urlProgress = itemView.findViewById(R.id.urlProgress)
-            urlImage = itemView.findViewById(R.id.urlImage)
-            urlTitle = itemView.findViewById(R.id.urlTitle)
-            urlDesc = itemView.findViewById(R.id.urlDesc)
-            urlBits = itemView.findViewById(R.id.urlBits)
-            likesLayout = itemView.findViewById(R.id.likesLayout)
-            contentLayout = itemView.findViewById(R.id.contentLayout)
-            textViewLikes = itemView.findViewById(R.id.textViewLikes)
-            contentDivider = itemView.findViewById(R.id.contentDivider)
-            tvEdited = itemView.findViewById(R.id.tvEdited)
+            //urlPreview = itemView.findViewById(R.id.urlPreview)
+            //urlProgress = itemView.findViewById(R.id.urlProgress)
+            //urlImage = itemView.findViewById(R.id.urlImage)
+            //urlTitle = itemView.findViewById(R.id.urlTitle)
+            //urlDesc = itemView.findViewById(R.id.urlDesc)
+            //urlBits = itemView.findViewById(R.id.urlBits)
         }
     }
 

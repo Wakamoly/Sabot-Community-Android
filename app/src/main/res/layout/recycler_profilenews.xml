@@ -152,20 +152,7 @@
                                 android:layout_below="@id/profileView"
                                 android:padding="2dp">
 
-                                <ImageView
-                                    android:id="@+id/profileNewsImage"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_below="@id/textViewBody"
-                                    android:layout_centerHorizontal="true"
-                                    android:layout_marginTop="5dp"
-                                    android:maxWidth="400dp"
-                                    android:maxHeight="300dp"
-                                    android:scaleType="fitCenter"
-                                    android:visibility="gone"
-                                    tools:visibility="visible" />
-
-                                <com.hendraanggrian.appcompat.widget.SocialTextView
+                                <com.lucidsoftworksllc.sabotcommunity.others.active_label.SocialTextView
                                     android:id="@+id/textViewBody"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
@@ -175,9 +162,10 @@
                                     android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                                     android:textColor="#fff"
                                     app:socialFlags="hashtag|mention|hyperlink"
-                                    app:hashtagColor="@color/dark_blue"
-                                    app:mentionColor="@color/green"
-                                    app:hyperlinkColor="@color/colorAccent"/>
+                                    app:hashtagColor="@color/hashtag"
+                                    app:mentionColor="@color/usermention"
+                                    app:hyperlinkColor="@color/hyperlink"
+                                    app:doubleMentionColor="@color/gamemention"/>
 
                             </RelativeLayout>
 
@@ -321,74 +309,6 @@
                 </RelativeLayout>
 
             </com.balysv.materialripple.MaterialRippleLayout>
-
-
-            <LinearLayout
-                android:id="@+id/urlPreview"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_below="@id/contentLayout"
-                android:layout_marginStart="3dp"
-                android:layout_marginEnd="3dp"
-                android:background="@drawable/grey_transparent_blob"
-                android:orientation="vertical"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <ProgressBar
-                        android:indeterminateDrawable="@drawable/sabot_progress"
-                    android:id="@+id/urlProgress"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="30dp"
-                    tools:visibility="gone" />
-
-                <LinearLayout
-                    android:id="@+id/urlBits"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:padding="4dp"
-                    android:visibility="invisible"
-                    tools:visibility="visible">
-
-                    <ImageView
-                        android:id="@+id/urlImage"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-
-                    <LinearLayout
-                        android:background="@drawable/darker_gray_transparent_blob"
-                        android:orientation="vertical"
-                        android:layout_height="40dp"
-                        android:layout_marginTop="-38dp"
-                        android:layout_gravity="bottom"
-                        android:layout_width="match_parent">
-
-                        <TextView
-                            android:layout_height="wrap_content"
-                            android:id="@+id/urlTitle"
-                            android:layout_width="match_parent"
-                            android:textSize="14sp"
-                            android:singleLine="true"
-                            android:textStyle="bold|italic"
-                            tools:text="@string/title" />
-
-                        <TextView
-                            android:id="@+id/urlDesc"
-                            android:singleLine="true"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="12sp"
-                            tools:text="@string/etdescription" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-
-            </LinearLayout>
 
             <TextView
                 android:id="@+id/profileCommentsDateTime_top"
