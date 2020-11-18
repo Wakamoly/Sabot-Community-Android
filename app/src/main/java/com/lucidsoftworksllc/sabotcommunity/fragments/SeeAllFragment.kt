@@ -151,7 +151,8 @@ class SeeAllFragment : Fragment() {
                 if (profilenews.length() == 0) {
                     nothingToShow!!.visibility = View.VISIBLE
                 }
-                newsadapter = ProfilenewsAdapter(mCtx!!, profilenewsRecyclerList)
+                newsadapter = ProfilenewsAdapter(mCtx!!)
+                newsadapter?.addItems(profilenewsRecyclerList!!)
                 recyclerSeeAll!!.adapter = newsadapter
                 progressBar!!.visibility = View.GONE
             } catch (e: JSONException) {
@@ -190,7 +191,8 @@ class SeeAllFragment : Fragment() {
                     val clanpostsRecycler = ProfilenewsRecycler(id, type, likes, body, addedBy, userTo, dateAdded, userClosed, deleted, image, userId, profilePic, verified, online, nickname, username, commentcount, likedbyuserYes, form, edited)
                     clanNewsRecyclerList!!.add(clanpostsRecycler)
                 }
-                clanNewsAdapter = ProfilenewsAdapter(mCtx!!, clanNewsRecyclerList)
+                clanNewsAdapter = ProfilenewsAdapter(mCtx!!)
+                clanNewsAdapter?.addItems(clanNewsRecyclerList!!)
                 recyclerSeeAll!!.adapter = clanNewsAdapter
                 if (clannews.length() == 0) {
                     nothingToShow!!.visibility = View.VISIBLE

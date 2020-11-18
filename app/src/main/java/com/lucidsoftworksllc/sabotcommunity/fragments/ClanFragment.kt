@@ -624,7 +624,8 @@ class ClanFragment : Fragment() {
                     val clanpostsRecycler = ProfilenewsRecycler(id, type, likes, body, addedBy, userTo, dateAdded, userClosed, deleted, image, userId, profilePic, verified, online, nickname, username, commentcount, likedbyuserYes, form, edited)
                     clanNewsRecyclerList!!.add(clanpostsRecycler)
                 }
-                clanNewsAdapter = ProfilenewsAdapter(mContext!!, clanNewsRecyclerList)
+                clanNewsAdapter = ProfilenewsAdapter(mContext!!)
+                clanNewsAdapter?.addItems(clanNewsRecyclerList!!)
                 clanNewsRecycler!!.adapter = clanNewsAdapter
                 if (clannews.length() == 0) {
                     clanNewsSpotlight!!.visibility = View.GONE

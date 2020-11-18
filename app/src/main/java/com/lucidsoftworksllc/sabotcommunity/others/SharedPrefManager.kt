@@ -25,20 +25,14 @@ class SharedPrefManager private constructor(private val mCtx: Context) {
         editor.putString(KEY_USERNAME, username)
         editor.putString(KEY_NICKNAME, nickname)
         editor.putString(KEY_PROFILE_PIC, profilepic)
-        //editor.putString(KEY_USERS_FOLLOWED, usersfollowed);
-        //editor.putString(KEY_GAMES_FOLLOWED, gamesfollowed);
-        //editor.putString(KEY_USERS_FRIENDS, usersfriends);
         editor.putString(KEY_BLOCKED_ARRAY, blockarray)
-        //editor.putString(KEY_ADS_CLICKED, ",");
-        //editor.putString(KEY_ADS_VIEWED, ",");
         editor.apply()
     }
 
-    val isLoggedIn: Boolean
-        get() {
-            val sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_USER, Context.MODE_PRIVATE)
-            return sharedPreferences.getString(KEY_USERNAME, null) != null
-        }
+    fun isLoggedIn() : Boolean {
+        val sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_USER, Context.MODE_PRIVATE)
+        return sharedPreferences.getString(KEY_USERNAME, null) != null
+    }
 
     fun isUserBlocked(username: String): Boolean {
         val sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_USER, Context.MODE_PRIVATE)
@@ -49,18 +43,40 @@ class SharedPrefManager private constructor(private val mCtx: Context) {
 
     fun logout() {
         val sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_USER, Context.MODE_PRIVATE)
+        val token = sharedPreferences.getString(KEY_FCM_TOKEN, null).toString()
+        val userId = sharedPreferences.getString(KEY_USER_ID, null).toString()
+        val username = sharedPreferences.getString(KEY_USERNAME, null).toString()
+        removefcmtoken(token, userId, username)
         val editor = sharedPreferences.edit()
         editor.clear()
         editor.apply()
         CoroutineScope(IO).launch { SabotDatabase(mCtx).clearAllTables() }
     }
 
+    private fun removefcmtoken(token : String, userid: String, username: String){
+        val stringRequest: StringRequest = object : StringRequest(Method.POST, REMOVE_FCM_TOKEN, Response.Listener {
+            println("FCM token revoked $token")
+        }, Response.ErrorListener { error: VolleyError -> Log.d("update_token", "onErrorResponse: $error") }) {
+            override fun getParams(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["token"] = token
+                params["user_id"] = userid
+                params["username"] = username
+                return params
+            }
+        }
+        val requestQueue = Volley.newRequestQueue(mCtx)
+        requestQueue.add(stringRequest)
+    }
+
     fun updateToken(fcm_token: String) {
         val sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_USER, Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString(KEY_FCM_TOKEN, fcm_token)
+        editor.apply()
+        println("Updating FCM token $fcm_token")
         val stringRequest: StringRequest = object : StringRequest(Method.POST, STORE_FCM_TOKEN, Response.Listener {
-            val editor = sharedPreferences.edit()
-            editor.putString(KEY_FCM_TOKEN, fcm_token)
-            editor.apply()
+            Log.d("SHAREDPREFS", "updateToken: $it")
         }, Response.ErrorListener { error: VolleyError -> Log.d("update_token", "onErrorResponse: $error") }) {
             override fun getParams(): Map<String, String> {
                 val params: MutableMap<String, String> = HashMap()
@@ -73,6 +89,23 @@ class SharedPrefManager private constructor(private val mCtx: Context) {
         val requestQueue = Volley.newRequestQueue(mCtx)
         requestQueue.add(stringRequest)
     }
+
+    /*private fun networkUpdateToken(){
+        val sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_USER, Context.MODE_PRIVATE)
+        val stringRequest: StringRequest = object : StringRequest(Method.POST, STORE_FCM_TOKEN, Response.Listener {
+            println("FCM token updated")
+        }, Response.ErrorListener { error: VolleyError -> Log.d("update_token", "onErrorResponse: $error") }) {
+            override fun getParams(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["token"] = Objects.requireNonNull(sharedPreferences.getString(KEY_FCM_TOKEN, null)!!)
+                params["user_id"] = Objects.requireNonNull(sharedPreferences.getString(KEY_USER_ID, null)!!)
+                params["username"] = Objects.requireNonNull(sharedPreferences.getString(KEY_USERNAME, null)!!)
+                return params
+            }
+        }
+        val requestQueue = Volley.newRequestQueue(mCtx)
+        requestQueue.add(stringRequest)
+    }*/
 
     fun blockUser(username: String) {
         val sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_USER, Context.MODE_PRIVATE)
@@ -366,24 +399,17 @@ class SharedPrefManager private constructor(private val mCtx: Context) {
     companion object {
         private var mInstance: SharedPrefManager? = null
         private const val BLOCK_USER_URL = Constants.ROOT_URL + "user_block.php"
-        private const val GET_USER_FRIENDS = Constants.ROOT_URL + "sharedprefs_getfriendarray.php"
         private const val SET_SHIPMENT_INFO = Constants.ROOT_URL + "sharedprefs_saveshipmentinfo.php"
         private const val STORE_FCM_TOKEN = Constants.ROOT_URL + "messages.php/storefcmtoken"
+        private const val REMOVE_FCM_TOKEN = Constants.ROOT_URL + "messages.php/removefcmtoken"
         private const val SHARED_PREF_USER = "userpref"
         private const val KEY_USERNAME = "username"
         private const val KEY_NICKNAME = "nickname"
         private const val KEY_USER_EMAIL = "useremail"
         private const val KEY_PROFILE_PIC = "profilepic"
         private const val KEY_USER_ID = "userid"
-
-        //private static final String KEY_USERS_FOLLOWED = "usersfollowed";
-        //private static final String KEY_GAMES_FOLLOWED = "gamesfollowed";
-        //private static final String KEY_USERS_FRIENDS = "usersfriends";
         private const val KEY_FCM_TOKEN = "fcmtoken"
         private const val KEY_BLOCKED_ARRAY = "blockedarray"
-
-        //private static final String KEY_ADS_VIEWED = "adsviewed";
-        //private static final String KEY_ADS_CLICKED = "adsclicked";
         private const val KEY_DASH_CURRENT_PUBLICS = "currentpublics"
         private const val KEY_FIRST_PUBLICS_FRAG = "firstpublics"
         private const val KEY_NOTI_FREQUENCY = "notifrequency"

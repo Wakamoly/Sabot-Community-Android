@@ -58,6 +58,7 @@
         </RelativeLayout>
 
         <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
             android:id="@+id/clanAdminPanelProgress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

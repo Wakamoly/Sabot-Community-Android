@@ -3,7 +3,7 @@ package com.lucidsoftworksllc.sabotcommunity.db.messages.user_messages
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity
+@Entity(tableName = "messages_user")
 class UserMessagesEntity (
     @PrimaryKey(autoGenerate = false) var message_id: Int,
     val user_to: String,

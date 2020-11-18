@@ -24,18 +24,12 @@
     <color name="sponsored">#FF8500</color>
     <color name="pin">#DB4437</color>
 
-    <!-- added for version 3.7 -->
-
     <color name="overlay_white">#656668</color>
-
-    <!-- added for version 4.7 -->
 
     <color name="grey_20">#cccccc</color>
     <color name="grey_40">#999999</color>
     <color name="grey_80">#464646</color>
     <color name="grey_90">#2C2C2C</color>
-
-    <!-- added for version 4.8 -->
 
     <color name="grey_medium">#BDBFC1</color>
     <color name="grey_dark">#262626</color>
@@ -45,6 +39,12 @@
     <color name="profile_action_icon_bg">#EBEDF0</color>
     <color name="profile_action_icon_tint">#1C1E21</color>
 
-    <!-- For version 4.9 -->
+
+    <color name="usermention">#1E88E5</color>
+    <color name="hyperlink">#7C7C7C</color>
+    <color name="hashtag">#45B431</color>
+    <color name="clanmention">#DB4437</color>
+    <color name="gamemention">#1E88E5</color>
+    <!--<color name="gamemention">#FF8500</color> somehow broke usermentions, this is the original color of gamementions-->
 
 </resources>

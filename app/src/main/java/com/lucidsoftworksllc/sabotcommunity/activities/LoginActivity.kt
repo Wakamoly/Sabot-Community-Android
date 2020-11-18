@@ -44,7 +44,7 @@ class LoginActivity : FragmentActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (SharedPrefManager.getInstance(applicationContext)!!.isLoggedIn) {
+        if (SharedPrefManager.getInstance(applicationContext)!!.isLoggedIn()) {
             finish()
             startActivity(Intent(this, FragmentContainer::class.java))
             return

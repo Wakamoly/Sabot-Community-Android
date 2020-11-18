@@ -61,6 +61,7 @@
                             android:src="@drawable/notify_reply" />
 
                         <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                             android:id="@+id/chatroomFollowProg"
                             android:layout_width="30dp"
                             android:layout_height="30dp"
@@ -133,6 +134,7 @@
             android:background="@color/colorAccent" />
 
         <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
             android:id="@+id/messageProgress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -222,6 +224,7 @@
                     android:src="@drawable/ic_send_grayed" />
 
                 <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                     android:id="@+id/sendProgress"
                     android:layout_width="30dp"
                     android:layout_height="35dp"

@@ -14,10 +14,13 @@ interface UserMessagesDao {
     @Delete
     suspend fun deleteMessage(message: UserMessagesEntity)
 
-    @Query("SELECT * FROM usermessagesentity WHERE (user_to = :username AND user_from = :deviceUser) OR (user_from = :username AND user_to = :deviceUser) ORDER BY message_id DESC")
+    @Query("SELECT * FROM messages_user WHERE (user_to = :username AND user_from = :deviceUser) OR (user_from = :username AND user_to = :deviceUser) ORDER BY message_id DESC")
     suspend fun getMessages(username: String, deviceUser: String): List<UserMessagesEntity>
 
-    @Query("SELECT EXISTS(SELECT message_id FROM usermessagesentity WHERE message_id = :id)")
+    @Query("SELECT EXISTS(SELECT message_id FROM messages_user WHERE message_id = :id)")
     suspend fun isRowExist(id: Int): Boolean
+
+    @Query("SELECT EXISTS(SELECT * FROM messages_user WHERE (user_to = :username AND user_from = :deviceUser) OR (user_from = :username AND user_to = :deviceUser) ORDER BY message_id DESC LIMIT 1)")
+    suspend fun isRowExistUsername(username: String, deviceUser: String) : Boolean
 
 }

@@ -57,6 +57,7 @@
                     android:textSize="18sp" />
 
                 <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                     android:id="@+id/spinnerProgress"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
@@ -142,6 +143,7 @@
         </LinearLayout>
 
         <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
             android:id="@+id/newPublicsTopicProgressBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

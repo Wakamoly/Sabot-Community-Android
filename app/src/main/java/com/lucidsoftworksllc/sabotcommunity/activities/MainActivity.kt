@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private var privacyLinkTV: TextView? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (SharedPrefManager.getInstance(this)!!.isLoggedIn) {
+        if (SharedPrefManager.getInstance(this)!!.isLoggedIn()) {
             finish()
             startActivity(Intent(this, FragmentContainer::class.java))
             return

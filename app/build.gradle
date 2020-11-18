@@ -17,25 +17,30 @@ apply plugin: 'kotlin-kapt'
 
 android {
     android.ndkVersion "21.3.6528147"
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         multiDexEnabled true
         applicationId "com.lucidsoftworksllc.sabotcommunity"
         minSdkVersion 18
-        targetSdkVersion 29
-        versionCode 62
-        versionName "v0.5.1"
+        targetSdkVersion 30
+        versionCode 65
+        versionName "v0.5.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments["room.incremental"] = "true"
+            }
+        }
     }
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-        debug {
+        /*debug {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
+        }*/
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -45,6 +50,10 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
+
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 def acraVersion = '5.7.0'
@@ -52,10 +61,10 @@ def acraVersion = '5.7.0'
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.exifinterface:exifinterface:1.3.0'
+    implementation 'androidx.exifinterface:exifinterface:1.3.1'
     implementation 'com.android.volley:volley:1.1.1'
     implementation 'com.karumi:dexter:5.0.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
@@ -65,10 +74,10 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.iarcuschin:simpleratingbar:0.1.5'
     implementation 'com.chabbal:slidingdotsplash:1.0.2'
-    implementation 'androidx.navigation:navigation-fragment:2.3.0'
-    implementation 'androidx.navigation:navigation-ui:2.3.0'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.1'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.3.1'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'com.google.firebase:firebase-messaging:20.2.4'
+    implementation 'com.google.firebase:firebase-messaging:21.0.0'
     implementation 'org.jsoup:jsoup:1.12.2'
     implementation 'com.yarolegovich:lovely-dialog:1.1.0'
     implementation "ch.acra:acra-http:$acraVersion"
@@ -76,15 +85,15 @@ dependencies {
     //implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
     implementation 'com.github.ravindu1024:Android-Image-Cropper:2.8.2'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
-    implementation 'com.google.firebase:firebase-analytics:17.5.0'
-    testImplementation 'junit:junit:4.12'
+    implementation 'com.google.firebase:firebase-analytics:18.0.0'
+    testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation "androidx.benchmark:benchmark-junit4:1.0.0"
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     implementation "androidx.core:core-ktx:+"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.7"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     def room_version = "2.2.5"
@@ -93,12 +102,10 @@ dependencies {
     implementation "androidx.room:room-ktx:$room_version"
     testImplementation "androidx.room:room-testing:$room_version"
 
-    def fragment_ktx = "1.2.5"
-    implementation "androidx.fragment:fragment-ktx:$fragment_ktx"
+    implementation "androidx.fragment:fragment-ktx:1.2.5"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"
 
-    def fragment_version = "1.3.0-alpha08"
-    debugImplementation "androidx.fragment:fragment-testing:$fragment_version"
+    debugImplementation "androidx.fragment:fragment-testing:1.3.0-beta01"
 
     def hilt_version = "2.28-alpha"
     implementation "com.google.dagger:hilt-android:$hilt_version"
@@ -107,6 +114,25 @@ dependencies {
     def hilt_viewmodels = "1.0.0-alpha02"
     implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hilt_viewmodels"
     kapt "androidx.hilt:hilt-compiler:$hilt_viewmodels"
+
+    implementation "com.squareup.okhttp3:logging-interceptor:4.9.0"
+
+    // ViewModel and LiveData
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+
+    //Paging
+    implementation 'android.arch.paging:runtime:1.0.1'
+
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
+    ///Mentions and hashtags for textviews and edittexts
+    /*def socialview_version = "0.3-rc1"
+    implementation "com.hendraanggrian.appcompat:socialview:$socialview_version"
+    implementation "com.hendraanggrian.appcompat:socialview-commons:$socialview_version"
+
+    implementation project(':app:social_view:socialview')
+    implementation project(':app:social_view:socialview-commons')*/
+
 }
 
 kapt {

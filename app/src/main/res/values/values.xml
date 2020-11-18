@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Widget.SocialView" parent="android:Widget.TextView">
+        <item name="hashtagColor">?colorAccent</item>
+        <item name="mentionColor">?colorAccent</item>
+        <item name="doubleMentionColor">?colorAccent</item>
+        <item name="hyperlinkColor">?colorAccent</item>
+    </style>
+    <declare-styleable name="SocialView">
+        <!-- Determine whether each feature should be turned on/off.
+             Default is `hashtag|mention|hyperlink`. -->
+        <attr name="socialFlags">
+            <flag name="hashtag" value="1"/>
+            <flag name="mention" value="2"/>
+            <flag name="doublemention" value="3"/>
+            <flag name="hyperlink" value="4"/>
+        </attr>
+
+        <!-- Color of each feature.
+             If particular feature is not enabled, this value will be ignored.
+             Default is color accent of current theme. -->
+        <attr format="color" name="hashtagColor"/>
+        <attr format="color" name="mentionColor"/>
+        <attr format="color" name="doubleMentionColor"/>
+        <attr format="color" name="hyperlinkColor"/>
+    </declare-styleable>
+    <declare-styleable name="SocialViewStyle">
+        <attr format="reference" name="socialViewStyle"/>
+    </declare-styleable>
+
+    <plurals name="posts">
+        <item quantity="one">%,d post</item>
+        <item quantity="other">%,d posts</item>
+    </plurals>
+    <string name="mention">Mention</string>
+</resources>

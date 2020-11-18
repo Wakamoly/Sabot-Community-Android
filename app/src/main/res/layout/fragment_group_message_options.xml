@@ -211,6 +211,7 @@
                     android:textColor="@android:color/white" />
 
                 <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                     android:id="@+id/submitGroupOptionsProg"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -223,6 +224,7 @@
         </LinearLayout>
 
         <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
             android:id="@+id/groupOptionsLoading"
             android:layout_marginTop="300dp"
             android:layout_gravity="center"

@@ -3,7 +3,7 @@ package com.lucidsoftworksllc.sabotcommunity.db.messages.typed
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity
+@Entity(tableName = "messages_typed")
 data class TypedMessageEntity (
         val type: String,
         val username: String,

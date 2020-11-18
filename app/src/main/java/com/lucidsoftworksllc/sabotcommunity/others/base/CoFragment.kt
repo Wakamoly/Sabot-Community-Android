@@ -1,4 +1,4 @@
-package com.lucidsoftworksllc.sabotcommunity.others
+package com.lucidsoftworksllc.sabotcommunity.others.base
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

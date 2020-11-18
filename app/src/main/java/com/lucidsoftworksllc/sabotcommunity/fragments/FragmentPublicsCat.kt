@@ -75,6 +75,7 @@ class FragmentPublicsCat : Fragment() {
     private var userID: String? = null
     private var username: String? = null
     private var publicsCatID: String? = null
+    private var publicsCatTag: String? = null
     private val statusUpdate: EditText? = null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val publicsCatRootView = inflater.inflate(R.layout.fragment_publics_cat, container, false)
@@ -114,6 +115,7 @@ class FragmentPublicsCat : Fragment() {
         username = SharedPrefManager.getInstance(mContext!!)!!.username
         publicsRecyclerList = ArrayList()
         publicsCatID = requireArguments().getString("PublicsId")
+        publicsCatTag = requireArguments().getString("PublicsTag")
         recyclerPublicsCatBottom = publicsCatRootView.findViewById(R.id.recyclerPublicsTopics)
         recyclerPublicsCatBottom?.setHasFixedSize(true)
         recyclerPublicsCatBottom?.layoutManager = LinearLayoutManager(mContext)

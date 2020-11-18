@@ -20,6 +20,7 @@ import com.lucidsoftworksllc.sabotcommunity.db.publics.PublicsDao
 import com.lucidsoftworksllc.sabotcommunity.db.publics.PublicsEntity
 import com.lucidsoftworksllc.sabotcommunity.db.SabotDatabase
 import com.lucidsoftworksllc.sabotcommunity.others.*
+import com.lucidsoftworksllc.sabotcommunity.others.base.CoFragment
 import com.yarolegovich.lovelydialog.LovelyChoiceDialog
 import com.yarolegovich.lovelydialog.LovelyStandardDialog
 import kotlinx.coroutines.CoroutineScope
@@ -38,7 +39,7 @@ class PublicsFragment : CoFragment() {
     private var isLastPageFrag = false
     private var isLoadingFrag = false
     private var currentPage = PaginationOnScroll.PAGE_START
-    private val pageSize = PaginationOnScroll.PAGE_SIZE
+    private val pageSize = PaginationOnScroll.PAGE_SIZE_LARGE
     private var publicsPlatformFilter: ImageView? = null
     private var publicsNewGame: ImageView? = null
     private var username: String? = null

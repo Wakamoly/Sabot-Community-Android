@@ -19,30 +19,42 @@ import com.bumptech.glide.request.target.Target
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
-import com.lucidsoftworksllc.sabotcommunity.models.SliderUtilsDash
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.fragments.FragmentPublicsCat
 import com.lucidsoftworksllc.sabotcommunity.fragments.MerchFragment
+import com.lucidsoftworksllc.sabotcommunity.models.network_autogen.DashboardAdModelItem
+import com.lucidsoftworksllc.sabotcommunity.others.Constants.BASE_URL
 import java.util.*
+import kotlin.collections.ArrayList
 
-class DashViewPagerAdapter(private val sliderImg: ArrayList<SliderUtilsDash?>, private val context: Context) : PagerAdapter() {
+class DashViewPagerAdapter(private val sliderImgAdsModel: ArrayList<DashboardAdModelItem?>, private val context: Context) : PagerAdapter() {
     private var layoutInflater: LayoutInflater? = null
     override fun getCount(): Int {
-        return sliderImg.size
+        return sliderImgAdsModel.size
     }
 
     override fun isViewFromObject(view: View, `object`: Any): Boolean {
         return view === `object`
     }
 
+    fun addItems(items: List<DashboardAdModelItem>){
+        sliderImgAdsModel.addAll(items)
+        notifyDataSetChanged()
+    }
+
+    fun clear() {
+        sliderImgAdsModel.clear()
+        notifyDataSetChanged()
+    }
+
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val view = layoutInflater!!.inflate(R.layout.layout_viewpager_slider_dash, null)
-        val utils = sliderImg[position]
+        val utils = sliderImgAdsModel[position]
         val imageView = view.findViewById<ImageView>(R.id.sliderImageView)
         val textViewTitle = view.findViewById<TextView>(R.id.textViewSliderTitle)
         val textViewDescription = view.findViewById<TextView>(R.id.textViewSliderDesc)
-        val finalBackImage = utils?.sliderImageUrl
+        val finalBackImage = BASE_URL + utils?.cat_image
         /*if (utils.getSliderImageUrl().contains(".jpg")){
             finalBackImage = finalBackImage.substring(0, utils.getSliderImageUrl().length() - 4)+"_r.jpg";
         }else if (utils.getSliderImageUrl().contains(".png")){
@@ -55,25 +67,25 @@ class DashViewPagerAdapter(private val sliderImg: ArrayList<SliderUtilsDash?>, p
                 .override(Target.SIZE_ORIGINAL)
                 .into(imageView)
         view.setOnClickListener {
-            if (utils?.sliderType == "public") {
+            if (utils?.type == "public") {
                 val ldf = FragmentPublicsCat()
                 val args = Bundle()
-                args.putString("PublicsId", utils.sliderID)
+                args.putString("PublicsId", utils.cat_id.toString())
                 ldf.arguments = args
                 (context as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
             }
-            if (utils?.sliderType == "fragment") {
-                if (utils.sliderTag == "merch") {
+            if (utils?.type == "fragment") {
+                if (utils.tag == "merch") {
                     val ldf = MerchFragment()
                     val args = Bundle()
                     ldf.arguments = args
                     (context as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
             }
-            if (utils?.sliderType == "url") {
-                (context as? FragmentContainer)?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(utils.sliderTag)))
+            if (utils?.type == "url") {
+                (context as? FragmentContainer)?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(utils.tag)))
             }
-            utils?.sliderAdID?.let { it1 -> newAdClick(it1) }
+            utils?.ad_id?.let { it1 -> newAdClick(it1) }
         }
         val vp = container as ViewPager
         vp.addView(view, 0)
@@ -90,8 +102,8 @@ class DashViewPagerAdapter(private val sliderImg: ArrayList<SliderUtilsDash?>, p
         sb.deleteCharAt(sb.length() - 1);
 
         textViewGenre.setText(sb);*/
-        textViewDescription.text = utils?.sliderDescription
-        textViewTitle.text = utils?.sliderTitle
+        textViewDescription.text = utils?.cat_description
+        textViewTitle.text = utils?.cat_name
         return view
     }
 

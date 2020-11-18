@@ -18,10 +18,16 @@ import com.lucidsoftworksllc.sabotcommunity.activities.ChatActivity
 import com.lucidsoftworksllc.sabotcommunity.db.messages.general.MessagesDataModel
 import com.lucidsoftworksllc.sabotcommunity.db.messages.user_messages.UserMessagesEntity
 import com.lucidsoftworksllc.sabotcommunity.fragments.PhotoViewFragment
+import com.lucidsoftworksllc.sabotcommunity.others.active_label.SocialTextView
+import com.lucidsoftworksllc.sabotcommunity.others.getTimeAgo
+import com.lucidsoftworksllc.sabotcommunity.others.setClicks
+import com.lucidsoftworksllc.sabotcommunity.others.visible
 import java.util.*
+import kotlin.collections.ArrayList
 
-class MessagesThreadAdapter(private val context: Context, private val messages: MutableList<UserMessagesEntity>, private val username: String) : RecyclerView.Adapter<MessagesThreadAdapter.ViewHolder>() {
+class MessagesThreadAdapter(private val context: Context, private val username: String) : RecyclerView.Adapter<MessagesThreadAdapter.ViewHolder>() {
     private val SELF = 786
+    private val messages: MutableList<UserMessagesEntity> = ArrayList()
     override fun getItemViewType(position: Int): Int {
         val message = messages[position]
         return if (message.user_from == username) {
@@ -43,9 +49,10 @@ class MessagesThreadAdapter(private val context: Context, private val messages: 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val message = messages[position]
         holder.textViewMessage.text = message.body
-        holder.textViewTime.text = message.date
+        holder.textViewMessage.setClicks(context)
+        holder.textViewTime.text = getTimeAgo(message.date, context)
         if (message.image != "") {
-            holder.imgMsg.visibility = View.VISIBLE
+            holder.imgMsg.visible(true)
             Glide.with((context as ChatActivity))
                     .load(Constants.BASE_URL + message.image)
                     .error(R.mipmap.ic_launcher)
@@ -61,7 +68,7 @@ class MessagesThreadAdapter(private val context: Context, private val messages: 
                 fragmentTransaction.commit()
             }
         } else {
-            holder.imgMsg.visibility = View.GONE
+            holder.imgMsg.visible(false)
             holder.imgMsg.setImageDrawable(null)
         }
     }
@@ -97,7 +104,7 @@ class MessagesThreadAdapter(private val context: Context, private val messages: 
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var textViewMessage: TextView = itemView.findViewById<View>(R.id.tv_message_content) as TextView
+        var textViewMessage: SocialTextView = itemView.findViewById(R.id.tv_message_content)
         var textViewTime: TextView = itemView.findViewById<View>(R.id.tv_time) as TextView
         var imgMsg: ImageView = itemView.findViewById(R.id.img_msg)
     }

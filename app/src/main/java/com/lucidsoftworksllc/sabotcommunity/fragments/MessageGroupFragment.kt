@@ -44,7 +44,7 @@ import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.activities.ChatActivity
 import com.lucidsoftworksllc.sabotcommunity.adapters.GroupMessagesThreadAdapter
 import com.lucidsoftworksllc.sabotcommunity.models.GroupMessagesHelper
-import com.lucidsoftworksllc.sabotcommunity.others.CoFragment
+import com.lucidsoftworksllc.sabotcommunity.others.base.CoFragment
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.others.Constants.ROOT_URL
 import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager

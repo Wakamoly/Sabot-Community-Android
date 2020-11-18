@@ -24,7 +24,7 @@ import com.lucidsoftworksllc.sabotcommunity.db.publics.PublicsEntity
             MessageUserInfoEntity::class,
             UserMessagesEntity::class,
             TypedMessageEntity::class],
-        version = 17)
+        version = 22)
 abstract class SabotDatabase: RoomDatabase() {
 
     abstract fun getPublicsDao() : PublicsDao
@@ -48,13 +48,6 @@ abstract class SabotDatabase: RoomDatabase() {
                 instance = it
             }
         }
-
-        /*fun clearTables() {
-            GlobalScope.launch(Dispatchers.IO) {
-                instance?.clearAllTables()
-                println("CLEARING ALL TABLES")
-            }
-        }*/
 
         private fun buildDatabase(context: Context) = Room.databaseBuilder(
                 context.applicationContext,

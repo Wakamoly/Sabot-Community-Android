@@ -31,11 +31,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
-import com.lucidsoftworksllc.sabotcommunity.*
+import com.google.firebase.installations.FirebaseInstallations
+import com.google.firebase.messaging.FirebaseMessaging
+import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.fragments.*
-import com.lucidsoftworksllc.sabotcommunity.others.Constants
-import com.lucidsoftworksllc.sabotcommunity.others.PayPalConfig
-import com.lucidsoftworksllc.sabotcommunity.others.SharedPrefManager
+import com.lucidsoftworksllc.sabotcommunity.others.*
 import com.paypal.android.sdk.payments.PayPalConfiguration
 import com.paypal.android.sdk.payments.PaymentActivity
 import com.paypal.android.sdk.payments.PaymentConfirmation
@@ -63,80 +63,12 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
         requestQueue = Volley.newRequestQueue(applicationContext)
         unreadNotificationsHandler(1000)
         loadFragment(DashboardFragment())
-        if (getIntent().hasExtra("user_to_id")) {
+        if (intent.hasExtra("user_to_id")) {
             val userTo = getIntent().getStringExtra("user_to_id")
-            if (userTo != null && userTo.isNotEmpty()) {
-                val ldf = FragmentProfile()
-                val args = Bundle()
-                args.putString("UserId", userTo)
-                ldf.arguments = args
-                supportFragmentManager
-                        .beginTransaction()
-                        .replace(R.id.fragment_container, ldf)
-                        .commit()
-            }
-        } else if (getIntent().hasExtra("link") && getIntent().getStringExtra("link") != null) {
+            userIdIntent(userTo)
+        } else if (intent.hasExtra("link") && getIntent().getStringExtra("link") != null) {
             val link = getIntent().getStringExtra("link")
-            when {
-                link!!.contains("post.php?id=") -> {
-                    val linkID = link.replace("post.php?id=", "")
-                    val ldf = ProfilePostFragment()
-                    val args = Bundle()
-                    args.putString("id", linkID)
-                    ldf.arguments = args
-                    this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
-                }
-                link.contains("publics_topic.php?id=") -> {
-                    val linkID = link.replace("publics_topic.php?id=", "")
-                    val ldf = PublicsTopicFragment()
-                    val args = Bundle()
-                    args.putString("PublicsId", linkID)
-                    ldf.arguments = args
-                    this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
-                }
-                link.contains("clan=") -> {
-                    val linkID = link.replace("clan=", "")
-                    val ldf = ClanFragment()
-                    val args = Bundle()
-                    args.putString("ClanId", linkID)
-                    ldf.arguments = args
-                    this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
-                }
-                link.contains("user=") -> {
-                    val linkID = link.replace("user=", "")
-                    val ldf = FragmentProfile()
-                    val args = Bundle()
-                    args.putString("Username", linkID)
-                    ldf.arguments = args
-                    this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
-                }
-                link.contains("ptopic=") -> {
-                    val linkID = link.replace("ptopic=", "")
-                    val ldf = PublicsTopicFragment()
-                    val args = Bundle()
-                    args.putString("PublicsId", linkID)
-                    ldf.arguments = args
-                    this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
-                }
-                link.contains("pchatroom=") -> {
-                    val linkID = link.replace("pchatroom=", "")
-                    val ldf = PublicsChatRoom()
-                    val args = Bundle()
-                    args.putString("GameId", linkID)
-                    ldf.arguments = args
-                    this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
-                }
-                link.contains("review") -> {
-                    val ldf = FragmentProfile()
-                    val args = Bundle()
-                    args.putString("UserId", SharedPrefManager.getInstance(this)!!.userID)
-                    ldf.arguments = args
-                    this.supportFragmentManager
-                            .beginTransaction()
-                            .replace(R.id.fragment_container, ldf)
-                            .commit()
-                }
-            }
+            linkIntent(link)
         }
     }
 
@@ -150,96 +82,32 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
         deviceUsername = SharedPrefManager.getInstance(this)!!.username
         mDrawerLayout = findViewById(R.id.drawer_layout)
         val navigationView = findViewById<NavigationView>(R.id.side_nav_view)
-        if (!SharedPrefManager.getInstance(this)!!.isLoggedIn) {
+        if (!SharedPrefManager.getInstance(this)!!.isLoggedIn()) {
             finish()
             startActivity(Intent(this, LoginActivity::class.java))
         }
-        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task: Task<InstanceIdResult?> ->
-            if (!task.isSuccessful) {
-                Log.w("FCM", "getInstanceId failed", task.exception)
-                return@addOnCompleteListener
-            }
-            val token = Objects.requireNonNull(task.result)?.token
-            if (token != SharedPrefManager.getInstance(applicationContext)!!.fCMToken) {
-                SharedPrefManager.getInstance(applicationContext)!!.updateToken(token!!)
+
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val fbToken = task.result!!
+                Log.d("Installations", "Installation auth token: $fbToken")
+                if (fbToken != SharedPrefManager.getInstance(applicationContext)!!.fCMToken) {
+                    SharedPrefManager.getInstance(applicationContext)!!.updateToken(fbToken)
+                }
+            } else {
+                Log.e("Installations", "Unable to get Installation auth token")
             }
         }
+
         requestQueue = Volley.newRequestQueue(applicationContext)
         unreadNotificationsHandler(1000)
         loadFragment(DashboardFragment())
         if (intent.hasExtra("user_to_id")) {
             val userTo = intent.getStringExtra("user_to_id")
-            if (userTo != null && userTo.isNotEmpty()) {
-                val ldf = FragmentProfile()
-                val args = Bundle()
-                args.putString("UserId", userTo)
-                ldf.arguments = args
-                supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).replace(R.id.fragment_container, ldf).commit()
-            }
+            userIdIntent(userTo)
         } else if (intent.hasExtra("link") && intent.getStringExtra("link") != null) {
             val link = intent.getStringExtra("link")
-            if (link != null) {
-                when {
-                    link.contains("post.php?id=") -> {
-                        val linkID = link.replace("post.php?id=", "")
-                        val ldf = ProfilePostFragment()
-                        val args = Bundle()
-                        args.putString("id", linkID)
-                        ldf.arguments = args
-                        this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
-                    }
-                    link.contains("publics_topic.php?id=") -> {
-                        val linkID = link.replace("publics_topic.php?id=", "")
-                        val ldf = PublicsTopicFragment()
-                        val args = Bundle()
-                        args.putString("PublicsId", linkID)
-                        ldf.arguments = args
-                        this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
-                    }
-                    link.contains("clan=") -> {
-                        val linkID = link.replace("clan=", "")
-                        val ldf = ClanFragment()
-                        val args = Bundle()
-                        args.putString("ClanId", linkID)
-                        ldf.arguments = args
-                        this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
-                    }
-                    link.contains("user=") -> {
-                        val linkID = link.replace("user=", "")
-                        val ldf = FragmentProfile()
-                        val args = Bundle()
-                        args.putString("Username", linkID)
-                        ldf.arguments = args
-                        this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
-                    }
-                    link.contains("ptopic=") -> {
-                        val linkID = link.replace("ptopic=", "")
-                        val ldf = PublicsTopicFragment()
-                        val args = Bundle()
-                        args.putString("PublicsId", linkID)
-                        ldf.arguments = args
-                        this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
-                    }
-                    link.contains("pchatroom=") -> {
-                        val linkID = link.replace("pchatroom=", "")
-                        val ldf = PublicsChatRoom()
-                        val args = Bundle()
-                        args.putString("GameId", linkID)
-                        ldf.arguments = args
-                        this.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
-                    }
-                    link.contains("review") -> {
-                        val ldf = FragmentProfile()
-                        val args = Bundle()
-                        args.putString("UserId", SharedPrefManager.getInstance(this)!!.userID)
-                        ldf.arguments = args
-                        this.supportFragmentManager
-                                .beginTransaction()
-                                .replace(R.id.fragment_container, ldf)
-                                .commit()
-                    }
-                }
-            }
+            linkIntent(link)
         }
         if (intent.hasExtra("registered")) {
             LovelyStandardDialog(this, LovelyStandardDialog.ButtonLayout.VERTICAL)
@@ -403,10 +271,11 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
 
     private fun loadFragment(fragment: Fragment?): Boolean {
         if (fragment != null) {
-            supportFragmentManager
+            replaceFragment(R.id.fragment_container, fragment)
+            /*supportFragmentManager
                     .beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out)
                     .replace(R.id.fragment_container, fragment)
-                    .commit()
+                    .commit()*/
             return true
         }
         return false
@@ -441,10 +310,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
             }
             if (item.itemId == R.id.menuSettings) {
                 val asf: Fragment = AccountSettingsFragment()
-                val fragmentTransaction = supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                fragmentTransaction.replace(R.id.fragment_container, asf)
-                fragmentTransaction.addToBackStack(null)
-                fragmentTransaction.commit()
+                replaceFragment(R.id.fragment_container, asf)
             }
             true
         }
@@ -573,6 +439,87 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
             }
             addToRequestQueue(stringRequest)
         }
+
+    private fun userIdIntent(profileId: String?){
+        println("USER ID INTENT: $profileId")
+        if (profileId != null && profileId.isNotEmpty()) {
+            val ldf = FragmentProfile()
+            val args = Bundle()
+            args.putString("UserId", profileId)
+            ldf.arguments = args
+            replaceFragment(R.id.fragment_container, ldf)
+        }
+    }
+
+    private fun linkIntent(link: String?){
+        if (link != null){
+            when {
+                link.contains("post.php?id=") -> {
+                    val linkID = link.replace("post.php?id=", "")
+                    val ldf = ProfilePostFragment()
+                    val args = Bundle()
+                    args.putString("id", linkID)
+                    ldf.arguments = args
+                    addFragment(R.id.fragment_container, ldf)
+                }
+                link.contains("publics_topic.php?id=") -> {
+                    val linkID = link.replace("publics_topic.php?id=", "")
+                    val ldf = PublicsTopicFragment()
+                    val args = Bundle()
+                    args.putString("PublicsId", linkID)
+                    ldf.arguments = args
+                    addFragment(R.id.fragment_container, ldf)
+                }
+                link.contains("clan=") -> {
+                    val linkID = link.replace("clan=", "")
+                    val ldf = ClanFragment()
+                    val args = Bundle()
+                    args.putString("ClanId", linkID)
+                    ldf.arguments = args
+                    addFragment(R.id.fragment_container, ldf)
+                }
+                link.contains("user=") -> {
+                    val linkID = link.replace("user=", "")
+                    val ldf = FragmentProfile()
+                    val args = Bundle()
+                    args.putString("Username", linkID)
+                    ldf.arguments = args
+                    addFragment(R.id.fragment_container, ldf)
+                }
+                link.contains("ptopic=") -> {
+                    val linkID = link.replace("ptopic=", "")
+                    val ldf = PublicsTopicFragment()
+                    val args = Bundle()
+                    args.putString("PublicsId", linkID)
+                    ldf.arguments = args
+                    addFragment(R.id.fragment_container, ldf)
+                }
+                link.contains("pcat=") -> {
+                    val linkID = link.replace("pcat=", "")
+                    val ldf = FragmentPublicsCat()
+                    val args = Bundle()
+                    args.putString("PublicsTag", linkID)
+                    ldf.arguments = args
+                    addFragment(R.id.fragment_container, ldf)
+                }
+                link.contains("pchatroom=") -> {
+                    val linkID = link.replace("pchatroom=", "")
+                    val ldf = PublicsChatRoom()
+                    val args = Bundle()
+                    args.putString("GameId", linkID)
+                    ldf.arguments = args
+                    addFragment(R.id.fragment_container, ldf)
+                }
+                link.contains("review") -> {
+                    val ldf = FragmentProfile()
+                    val args = Bundle()
+                    args.putString("UserId", SharedPrefManager.getInstance(this)!!.userID)
+                    ldf.arguments = args
+                    addFragment(R.id.fragment_container, ldf)
+                }
+            }
+        }
+    }
 
     companion object {
         //Paypal intent request code to track onActivityResult method

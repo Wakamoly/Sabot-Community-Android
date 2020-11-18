@@ -16,18 +16,31 @@ import com.lucidsoftworksllc.sabotcommunity.models.ClansRecycler
 import com.lucidsoftworksllc.sabotcommunity.others.Constants
 import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.fragments.ClanFragment
+import java.util.*
+import kotlin.collections.ArrayList
 
 //Class extending RecyclerviewAdapter
-class JoinedClansAdapter(private val mCtx: Context, private val clansList: List<ClansRecycler>) : RecyclerView.Adapter<JoinedClansAdapter.ViewHolder>() {
+class JoinedClansAdapter(private val mCtx: Context) : RecyclerView.Adapter<JoinedClansAdapter.ViewHolder>() {
+    private var clansList: MutableList<ClansRecycler> = ArrayList()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(mCtx)
         val view = inflater.inflate(R.layout.recycler_clans, null)
         return ViewHolder(view)
     }
 
+    fun clear() {
+        clansList.clear()
+        notifyDataSetChanged()
+    }
+
+    fun addItems(items: List<ClansRecycler>?) {
+        clansList.addAll(items!!)
+        notifyDataSetChanged()
+    }
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val clans = clansList[position]
-        val clanTag = clans.tag.capitalize()
+        val clanTag = clans.tag.capitalize(Locale.getDefault())
         val clanTagFull = "[$clanTag]"
         holder.textViewTag.text = clanTagFull
         holder.textViewTag.isAllCaps = true

@@ -987,6 +987,7 @@
                                             android:paddingBottom="@dimen/spacing_medium">
 
                                             <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                                                 android:layout_width="wrap_content"
                                                 android:layout_height="wrap_content" />
 
@@ -1316,7 +1317,7 @@
                         android:visibility="gone"
                         tools:visibility="visible">
 
-                        <EditText
+                        <com.lucidsoftworksllc.sabotcommunity.others.active_label.SocialEditText
                             android:id="@+id/statusUpdate"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -1333,7 +1334,12 @@
                             android:textColor="@color/white"
                             android:textColorHint="@color/grey_medium"
                             android:textCursorDrawable="@drawable/cursor_color"
-                            android:textSize="14sp" />
+                            android:textSize="14sp"
+                            app:socialFlags="hashtag|mention|hyperlink"
+                            app:hashtagColor="@color/hashtag"
+                            app:mentionColor="@color/usermention"
+                            app:hyperlinkColor="@color/hyperlink"
+                            app:doubleMentionColor="@color/gamemention"/>
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -1738,6 +1744,7 @@
             tools:visibility="gone">
 
             <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                 android:progressDrawable="@drawable/progressbarcolor"
                 android:id="@+id/profileLoadingScreenProgressBar"
                 android:layout_width="wrap_content"

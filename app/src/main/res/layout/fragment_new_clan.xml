@@ -190,6 +190,7 @@
                     android:textColor="@android:color/white" />
 
                 <ProgressBar
+                        android:indeterminateDrawable="@drawable/sabot_progress"
                     android:id="@+id/newClanProgressBar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
