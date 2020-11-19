@@ -422,17 +422,17 @@ class ProfilenewsAdapter(private val mCtx: Context,
                 likeView.visible(true)
                 likeView.startAnimation(likedAppear)
                 likeView.isEnabled = false
-                Handler().postDelayed({ likeView.isEnabled = true }, 3500)
+                Handler(Looper.getMainLooper()).postDelayed({ likeView.isEnabled = true }, 3500)
                 val stringRequest: StringRequest = object : StringRequest(Method.POST, LIKE_URL, Response.Listener { response: String? ->
                     val obj: JSONObject
                     try {
                         obj = JSONObject(response!!)
                         if (!obj.getBoolean("error")) {
-                            Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show()
+//                            Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show()
                             likeProgress.visible(false)
                             likedView.visible(true)
                             likedView.isEnabled = false
-                            Handler().postDelayed({ likedView.isEnabled = true }, 3000)
+                            Handler(Looper.getMainLooper()).postDelayed({ likedView.isEnabled = true }, 3000)
                         }
                     } catch (e: JSONException) {
                         e.printStackTrace()
@@ -442,7 +442,7 @@ class ProfilenewsAdapter(private val mCtx: Context,
                     likeProgress.visible(false)
                     likedView.visible(true)
                     likedView.isEnabled = false
-                    Handler().postDelayed({ likeView.isEnabled = true }, 3000)
+                    Handler(Looper.getMainLooper()).postDelayed({ likeView.isEnabled = true }, 3000)
                 }) {
                     override fun getParams(): Map<String, String> {
                         val params: MutableMap<String, String> = HashMap()

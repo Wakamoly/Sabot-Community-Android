@@ -19,21 +19,31 @@ import com.balysv.materialripple.MaterialRippleLayout
 import com.bumptech.glide.Glide
 import com.lucidsoftworksllc.sabotcommunity.R
 import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
+import com.lucidsoftworksllc.sabotcommunity.db.SabotDatabase
+import com.lucidsoftworksllc.sabotcommunity.db.notifications.NotificationCacheEntity
 import com.lucidsoftworksllc.sabotcommunity.db.notifications.NotificationDataModel
 import com.lucidsoftworksllc.sabotcommunity.fragments.ClanFragment
 import com.lucidsoftworksllc.sabotcommunity.fragments.FragmentProfile
 import com.lucidsoftworksllc.sabotcommunity.fragments.ProfilePostFragment
 import com.lucidsoftworksllc.sabotcommunity.fragments.PublicsTopicFragment
 import com.lucidsoftworksllc.sabotcommunity.others.*
+import com.lucidsoftworksllc.sabotcommunity.others.active_label.SocialTextView
 import com.lucidsoftworksllc.sabotcommunity.others.base.BaseViewHolder
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
+import kotlin.collections.ArrayList
 
 
-class NotificationsAdapter(private val notifications: MutableList<NotificationDataModel>, private val context: Context) : RecyclerView.Adapter<BaseViewHolder>() {
+class NotificationsAdapter(private val context: Context) : RecyclerView.Adapter<BaseViewHolder>() {
     private var isLoaderVisible = false
+    private val userID = context.deviceUserID
+    private val username = context.deviceUsername
+    private val notifications: MutableList<NotificationCacheEntity> = ArrayList()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (viewType) {
             VIEW_TYPE_NORMAL -> ViewHolder(
@@ -61,7 +71,7 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationDa
         return notifications.size
     }
 
-    fun addItems(items: List<NotificationDataModel>) {
+    fun addItems(items: List<NotificationCacheEntity>) {
         if (notifications.isEmpty()){
             notifications.addAll(items)
         }else{
@@ -86,14 +96,14 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationDa
         notifyDataSetChanged()
     }
 
-    fun addItemsToTop(items: List<NotificationDataModel>) {
+    fun addItemsToTop(items: List<NotificationCacheEntity>) {
         notifications.addAll(0, items)
-        notifyDataSetChanged()
+        notifyItemRangeInserted(0, items.size)
     }
 
     fun addLoading() {
         isLoaderVisible = true
-        notifications.add(NotificationDataModel(0, null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString()))
+        notifications.add(NotificationCacheEntity(0, null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString(), null.toString()))
         notifyItemInserted(notifications.size - 1)
     }
 
@@ -114,27 +124,28 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationDa
         }
     }
 
+    fun size(): Int {
+        return notifications.size
+    }
+
     fun clear() {
         notifications.clear()
         notifyDataSetChanged()
     }
 
-    private fun getItem(position: Int): NotificationDataModel {
+    private fun getItem(position: Int): NotificationCacheEntity {
         return notifications[position]
     }
 
     inner class ViewHolder(itemView: View) : BaseViewHolder(itemView) {
         var nickname: TextView = itemView.findViewById(R.id.notificationsNickname)
-        var body: TextView = itemView.findViewById(R.id.notificationsBody)
+        var body: SocialTextView = itemView.findViewById(R.id.notificationsBody)
         private var datetime: TextView = itemView.findViewById(R.id.notificationsDateTime)
         private var profilePicView: ImageView = itemView.findViewById(R.id.notificationsImageView)
         var online: CircleImageView = itemView.findViewById(R.id.online)
         private var notiType: CircleImageView = itemView.findViewById(R.id.notiType)
         var verified: CircleImageView = itemView.findViewById(R.id.verified)
         private var notiLayout: MaterialRippleLayout = itemView.findViewById(R.id.notiLayout)
-        private var sharedPrefManager: SharedPrefManager = SharedPrefManager.getInstance(context)!!
-        var username: String
-        var userid: String
         override fun clear() {}
         override fun onBind(position: Int) {
             super.onBind(position)
@@ -169,6 +180,7 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationDa
 
             nickname.text = notification.nickname
             body.text = notification.message
+            body.setClicks(context)
             datetime.text = getTimeAgo(notification.datetime, context)
             online.visible(isUserOnline(notification.last_online))
             if (notification.verified == "yes") {
@@ -184,7 +196,7 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationDa
             when (notification.type) {
                 "post_comment", "profile_post" -> notiType.setImageResource(R.drawable.notify_comment)
                 "comment_like", "like" -> notiType.setImageResource(R.drawable.notify_like)
-                "new_follower", "new_connection_request" -> notiType.setImageResource(R.drawable.notify_follower)
+                "new_follower", "new_connection_request", "publics_topic_submitted" -> notiType.setImageResource(R.drawable.notify_follower)
                 "publics_comment", "comment" -> notiType.setImageResource(R.drawable.notify_reply)
             }
             val profilePic = notification.profile_pic.substring(0, notification.profile_pic.length - 4) + "_r.JPG"
@@ -263,18 +275,14 @@ class NotificationsAdapter(private val notifications: MutableList<NotificationDa
                     if (context is FragmentContainer) {
                         val ldf = FragmentProfile()
                         val args = Bundle()
-                        args.putString("UserId", userid)
+                        args.putString("UserId", userID)
                         ldf.arguments = args
                         (context as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).replace(R.id.fragment_container, ldf).commit()
                     }
                 }
             }
+            CoroutineScope(Dispatchers.IO).launch { SabotDatabase.invoke(context).getNotificationsDao().setOpened(notification.id) }
             setAnimation(itemView, position)
-        }
-
-        init {
-            userid = sharedPrefManager.userID!!
-            username = sharedPrefManager.username!!
         }
     }
 

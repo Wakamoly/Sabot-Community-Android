@@ -119,7 +119,7 @@ class PostCommentsAdapter(private val mCtx: Context) : RecyclerView.Adapter<Prof
                     }
                 }).start()
 
-                val handler = Handler()
+                val handler = Handler(Looper.getMainLooper())
                 handler.postDelayed({
                     Glide.with(mCtx)
                             .load(imageUrl[0])

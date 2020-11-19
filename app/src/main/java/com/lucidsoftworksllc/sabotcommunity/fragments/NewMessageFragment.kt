@@ -62,20 +62,17 @@ class NewMessageFragment : Fragment() {
                 } else {
                     searchMessageLayout?.visibility = View.INVISIBLE
                 }
-                return false
+                return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                val handler = Handler()
-                handler.postDelayed({
-                    fetchUser("users_only", newText)
-                    if (newText.isNotEmpty()) {
-                        searchMessageLayout?.visibility = View.VISIBLE
-                    } else {
-                        searchMessageLayout?.visibility = View.INVISIBLE
-                    }
-                }, 100)
-                return false
+                fetchUser("users_only", newText)
+                if (newText.isNotEmpty()) {
+                    searchMessageLayout?.visibility = View.VISIBLE
+                } else {
+                    searchMessageLayout?.visibility = View.INVISIBLE
+                }
+                return true
             }
         })
         return newMessageRootView
@@ -114,20 +111,17 @@ class NewMessageFragment : Fragment() {
                 } else {
                     searchMessageLayout!!.visibility = View.INVISIBLE
                 }
-                return false
+                return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                val handler = Handler()
-                handler.postDelayed({
-                    fetchUser("users_only", newText)
-                    if (newText.isNotEmpty()) {
-                        searchMessageLayout!!.visibility = View.VISIBLE
-                    } else {
-                        searchMessageLayout!!.visibility = View.INVISIBLE
-                    }
-                }, 100)
-                return false
+                fetchUser("users_only", newText)
+                if (newText.isNotEmpty()) {
+                    searchMessageLayout!!.visibility = View.VISIBLE
+                } else {
+                    searchMessageLayout!!.visibility = View.INVISIBLE
+                }
+                return true
             }
         })
         super.onCreateOptionsMenu(menu, inflater)

@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
@@ -343,8 +344,8 @@ class ProfilePostFragment : Fragment() {
                                 e.printStackTrace()
                             }
                         }).start()
-                        //Fucking code wouldn't work any other way than I'm currently capable. Fuck it, have a delay
-                        val handler = Handler()
+
+                        val handler = Handler(Looper.getMainLooper())
                         handler.postDelayed({
                             Glide.with(mCtx!!)
                                     .load(imageUrl[0])
@@ -411,13 +412,13 @@ class ProfilePostFragment : Fragment() {
                                 likeProgress!!.visibility = View.GONE
                                 likedView!!.visibility = View.VISIBLE
                                 likedView!!.isEnabled = false
-                                Handler().postDelayed({ likedView!!.isEnabled = true }, 3500)
+                                Handler(Looper.getMainLooper()).postDelayed({ likedView!!.isEnabled = true }, 3500)
                             } else {
                                 Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show()
                                 likeProgress!!.visibility = View.GONE
                                 likeView!!.visibility = View.VISIBLE
                                 likeView!!.isEnabled = false
-                                Handler().postDelayed({ likeView!!.isEnabled = true }, 3000)
+                                Handler(Looper.getMainLooper()).postDelayed({ likeView!!.isEnabled = true }, 3000)
                             }
                         } catch (e: JSONException) {
                             e.printStackTrace()
@@ -427,7 +428,7 @@ class ProfilePostFragment : Fragment() {
                         likeProgress!!.visibility = View.GONE
                         likeView!!.visibility = View.VISIBLE
                         likeView!!.isEnabled = false
-                        Handler().postDelayed({ likeView!!.isEnabled = true }, 3000)
+                        Handler(Looper.getMainLooper()).postDelayed({ likeView!!.isEnabled = true }, 3000)
                     }) {
                         override fun getParams(): MutableMap<String, String?> {
                             val params: MutableMap<String, String?> = HashMap()
@@ -454,13 +455,13 @@ class ProfilePostFragment : Fragment() {
                                 likeProgress!!.visibility = View.GONE
                                 likeView!!.visibility = View.VISIBLE
                                 likeView!!.isEnabled = false
-                                Handler().postDelayed({ likeView!!.isEnabled = true }, 3500)
+                                Handler(Looper.getMainLooper()).postDelayed({ likeView!!.isEnabled = true }, 3500)
                             } else {
                                 Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show()
                                 likeProgress!!.visibility = View.GONE
                                 likedView!!.visibility = View.VISIBLE
                                 likedView!!.isEnabled = false
-                                Handler().postDelayed({ likedView!!.isEnabled = true }, 3000)
+                                Handler(Looper.getMainLooper()).postDelayed({ likedView!!.isEnabled = true }, 3000)
                             }
                         } catch (e: JSONException) {
                             e.printStackTrace()
@@ -470,7 +471,7 @@ class ProfilePostFragment : Fragment() {
                         likeProgress!!.visibility = View.GONE
                         likedView!!.visibility = View.VISIBLE
                         likedView!!.isEnabled = false
-                        Handler().postDelayed({ likeView!!.isEnabled = true }, 3000)
+                        Handler(Looper.getMainLooper()).postDelayed({ likeView!!.isEnabled = true }, 3000)
                     }) {
                         override fun getParams(): MutableMap<String, String?> {
                             val params: MutableMap<String, String?> = HashMap()

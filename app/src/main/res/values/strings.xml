@@ -377,5 +377,6 @@
     <string name="image_saved">Image Saved!</string>
     <string name="image_saving">Saving Image...</string>
     <string name="image_failed_downloading">Failed to Download Image! Please try again later.</string>
+    <string name="updating_notifications">Updating notifications</string>
 
 </resources>

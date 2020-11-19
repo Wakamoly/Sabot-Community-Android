@@ -7,6 +7,7 @@ import android.content.DialogInterface
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
@@ -783,7 +784,7 @@ class PublicsTopicFragment : Fragment() {
                                 publicsPostsDownvoteWhite!!.visibility = View.VISIBLE
                                 publicspostsupvotegreenTop!!.isEnabled = false
                                 publicsPostsDownvoteWhite!!.isEnabled = false
-                                Handler().postDelayed({
+                                Handler(Looper.getMainLooper()).postDelayed({
                                     publicspostsupvotegreenTop!!.isEnabled = true
                                     publicsPostsDownvoteWhite!!.isEnabled = true
                                 }, 3000)
@@ -796,7 +797,7 @@ class PublicsTopicFragment : Fragment() {
                                 publicspostsdownvoteredTop!!.visibility = View.VISIBLE
                                 publicspostsupvotewhiteTop!!.isEnabled = false
                                 publicspostsdownvoteredTop!!.isEnabled = false
-                                Handler().postDelayed({
+                                Handler(Looper.getMainLooper()).postDelayed({
                                     publicspostsupvotewhiteTop!!.isEnabled = true
                                     publicspostsdownvoteredTop!!.isEnabled = true
                                 }, 3000)
@@ -814,7 +815,7 @@ class PublicsTopicFragment : Fragment() {
                                 voteProgress!!.visibility = View.GONE
                                 publicspostsupvotewhiteTop!!.isEnabled = false
                                 publicsPostsDownvoteWhite!!.isEnabled = false
-                                Handler().postDelayed({
+                                Handler(Looper.getMainLooper()).postDelayed({
                                     publicspostsupvotewhiteTop!!.isEnabled = true
                                     publicsPostsDownvoteWhite!!.isEnabled = true
                                 }, 3000)
@@ -828,7 +829,7 @@ class PublicsTopicFragment : Fragment() {
                     publicsPostsDownvoteWhite!!.visibility = View.VISIBLE
                     publicspostsupvotewhiteTop!!.isEnabled = false
                     publicsPostsDownvoteWhite!!.isEnabled = false
-                    Handler().postDelayed({
+                    Handler(Looper.getMainLooper()).postDelayed({
                         publicspostsupvotewhiteTop!!.isEnabled = true
                         publicsPostsDownvoteWhite!!.isEnabled = true
                     }, 3000)
@@ -843,7 +844,7 @@ class PublicsTopicFragment : Fragment() {
             publicsPostsDownvoteWhite!!.visibility = View.VISIBLE
             publicspostsupvotewhiteTop!!.isEnabled = false
             publicsPostsDownvoteWhite!!.isEnabled = false
-            Handler().postDelayed({
+            Handler(Looper.getMainLooper()).postDelayed({
                 publicspostsupvotewhiteTop!!.isEnabled = true
                 publicsPostsDownvoteWhite!!.isEnabled = true
             }, 3000)

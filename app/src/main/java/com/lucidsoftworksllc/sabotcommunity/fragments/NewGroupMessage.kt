@@ -181,20 +181,17 @@ class NewGroupMessage : Fragment(), NewGroupMessageUserAdapter.AdapterCallback, 
                 } else {
                     recyclerSearch?.visibility = View.GONE
                 }
-                return false
+                return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                val handler = Handler()
-                handler.postDelayed({
-                    fetchUser("users_only", newText)
-                    if (newText.isNotEmpty()) {
-                        recyclerSearch?.visibility = View.VISIBLE
-                    } else {
-                        recyclerSearch?.visibility = View.GONE
-                    }
-                }, 100)
-                return false
+                fetchUser("users_only", newText)
+                if (newText.isNotEmpty()) {
+                    recyclerSearch?.visibility = View.VISIBLE
+                } else {
+                    recyclerSearch?.visibility = View.GONE
+                }
+                return true
             }
         })
         return newGroupRootView
@@ -233,20 +230,17 @@ class NewGroupMessage : Fragment(), NewGroupMessageUserAdapter.AdapterCallback, 
                 } else {
                     recyclerSearch!!.visibility = View.GONE
                 }
-                return false
+                return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                val handler = Handler()
-                handler.postDelayed({
-                    fetchUser("users_only", newText)
-                    if (newText.isNotEmpty()) {
-                        recyclerSearch!!.visibility = View.VISIBLE
-                    } else {
-                        recyclerSearch!!.visibility = View.GONE
-                    }
-                }, 100)
-                return false
+                fetchUser("users_only", newText)
+                if (newText.isNotEmpty()) {
+                    recyclerSearch!!.visibility = View.VISIBLE
+                } else {
+                    recyclerSearch!!.visibility = View.GONE
+                }
+                return true
             }
         })
         super.onCreateOptionsMenu(menu, inflater)

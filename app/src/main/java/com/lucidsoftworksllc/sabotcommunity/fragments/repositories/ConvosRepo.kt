@@ -52,6 +52,7 @@ class ConvosRepo (
                 val networkMessages = api.getMessages(dUsername, dUserID)
                 for (message in networkMessages){
                     if (message.type != "group"){
+                        // TODO: 11/19/20 Update DB so user is not online until update
                         val rowExists = generalMessagesDao.isRowExist(message.sent_by)
                         if (rowExists.isNotEmpty()){
                             message.id = rowExists[0].id
@@ -73,6 +74,7 @@ class ConvosRepo (
                 val newCachedMessages = generalMessagesDao.get()
                 generalMessagesDao.setAllLoaded()
                 if (newCachedMessages.isNotEmpty()){
+                    // TODO: 11/19/20 Emit network entity list 
                     emit(DataState.UpdateSuccess(newCachedMessages))
                 }
 

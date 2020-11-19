@@ -80,8 +80,6 @@ class MessageFragment : BaseFragment<UserMessageVM, ContentChatBinding, UserMess
     private lateinit var messageUserInfoDao: MessageUserInfoDao
     private lateinit var userMessagesDao: UserMessagesDao
     private lateinit var typedMessageDao: TypedMessageDao
-    private var rQueue: RequestQueue? = null
-    private var jsonObject: JSONObject? = null
     private var canUpdate: Boolean = false
     private var recyclerInit: Boolean = false
 

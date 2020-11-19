@@ -183,20 +183,17 @@ class SearchFragment : Fragment() {
                 } else {
                     searchSwipe!!.visibility = View.INVISIBLE
                 }
-                return false
+                return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                val handler = Handler()
-                handler.postDelayed({
-                    fetchUser("users", newText)
-                    if (newText.isNotEmpty()) {
-                        searchSwipe!!.visibility = View.VISIBLE
-                    } else {
-                        searchSwipe!!.visibility = View.INVISIBLE
-                    }
-                }, 100)
-                return false
+                fetchUser("users", newText)
+                if (newText.isNotEmpty()) {
+                    searchSwipe!!.visibility = View.VISIBLE
+                } else {
+                    searchSwipe!!.visibility = View.INVISIBLE
+                }
+                return true
             }
         })
         super.onCreateOptionsMenu(menu, inflater)

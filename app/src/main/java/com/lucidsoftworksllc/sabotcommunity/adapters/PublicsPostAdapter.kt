@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -72,7 +73,7 @@ class PublicsPostAdapter(private val mCtx: Context, private val publicsPostList:
                                 holder.publicsPostsDownvoteWhite.visibility = View.VISIBLE
                                 holder.publicsPostsUpvoteGreen.isEnabled = false
                                 holder.publicsPostsDownvoteWhite.isEnabled = false
-                                Handler().postDelayed({
+                                Handler(Looper.getMainLooper()).postDelayed({
                                     holder.publicsPostsUpvoteGreen.isEnabled = true
                                     holder.publicsPostsDownvoteWhite.isEnabled = true
                                 }, 3000)
@@ -85,7 +86,7 @@ class PublicsPostAdapter(private val mCtx: Context, private val publicsPostList:
                                 holder.publicsPostsDownvoteRed.visibility = View.VISIBLE
                                 holder.publicsPostsUpvoteWhite.isEnabled = false
                                 holder.publicsPostsDownvoteRed.isEnabled = false
-                                Handler().postDelayed({
+                                Handler(Looper.getMainLooper()).postDelayed({
                                     holder.publicsPostsUpvoteWhite.isEnabled = true
                                     holder.publicsPostsDownvoteRed.isEnabled = true
                                 }, 3000)
@@ -103,7 +104,7 @@ class PublicsPostAdapter(private val mCtx: Context, private val publicsPostList:
                                 holder.voteProgress.visibility = View.GONE
                                 holder.publicsPostsUpvoteWhite.isEnabled = false
                                 holder.publicsPostsDownvoteWhite.isEnabled = false
-                                Handler().postDelayed({
+                                Handler(Looper.getMainLooper()).postDelayed({
                                     holder.publicsPostsUpvoteWhite.isEnabled = true
                                     holder.publicsPostsDownvoteWhite.isEnabled = true
                                 }, 3000)
@@ -117,7 +118,7 @@ class PublicsPostAdapter(private val mCtx: Context, private val publicsPostList:
                     holder.publicsPostsDownvoteWhite.visibility = View.VISIBLE
                     holder.publicsPostsUpvoteWhite.isEnabled = false
                     holder.publicsPostsDownvoteWhite.isEnabled = false
-                    Handler().postDelayed({
+                    Handler(Looper.getMainLooper()).postDelayed({
                         holder.publicsPostsUpvoteWhite.isEnabled = true
                         holder.publicsPostsDownvoteWhite.isEnabled = true
                     }, 3000)
@@ -132,7 +133,7 @@ class PublicsPostAdapter(private val mCtx: Context, private val publicsPostList:
             holder.publicsPostsDownvoteWhite.visibility = View.VISIBLE
             holder.publicsPostsUpvoteWhite.isEnabled = false
             holder.publicsPostsDownvoteWhite.isEnabled = false
-            Handler().postDelayed({
+            Handler(Looper.getMainLooper()).postDelayed({
                 holder.publicsPostsUpvoteWhite.isEnabled = true
                 holder.publicsPostsDownvoteWhite.isEnabled = true
             }, 3000)

@@ -81,6 +81,7 @@ class SharedPrefManager private constructor(private val mCtx: Context) {
             override fun getParams(): Map<String, String> {
                 val params: MutableMap<String, String> = HashMap()
                 params["token"] = fcm_token
+                params["old_token"] = Objects.requireNonNull(sharedPreferences.getString(KEY_FCM_TOKEN, null)!!)
                 params["user_id"] = Objects.requireNonNull(sharedPreferences.getString(KEY_USER_ID, null)!!)
                 params["username"] = Objects.requireNonNull(sharedPreferences.getString(KEY_USERNAME, null)!!)
                 return params

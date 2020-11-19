@@ -9,6 +9,7 @@ import android.graphics.ImageDecoder
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
@@ -114,7 +115,7 @@ class NewClanFragment : Fragment() {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 val clantag = etNewClanTag?.text.toString()
                 newClanTag?.text = String.format("[%s]", clantag)
-                val handler = Handler()
+                val handler = Handler(Looper.getMainLooper())
                 handler.postDelayed({
                     val clantag1 = etNewClanTag?.text.toString()
                     val stringRequest = StringRequest(Request.Method.GET, "$URL_TAG_IN_USE?userid=$userID&username=$username&tag=$clantag1", { response: String? ->

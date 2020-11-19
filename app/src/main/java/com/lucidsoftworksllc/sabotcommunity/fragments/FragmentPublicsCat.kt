@@ -7,6 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -355,7 +356,7 @@ class FragmentPublicsCat : Fragment() {
                     val buttonAppear: Animation = AnimationUtils.loadAnimation(mContext, R.anim.expand_in)
                     gameActionBtnFollowed?.visibility = View.VISIBLE
                     gameActionBtnFollowed?.startAnimation(buttonAppear)
-                    Handler().postDelayed({ gameActionBtnFollowed?.isEnabled = true }, 3500)
+                    Handler(Looper.getMainLooper()).postDelayed({ gameActionBtnFollowed?.isEnabled = true }, 3500)
 
                     val userID = SharedPrefManager.getInstance(mContext!!)!!.userID
                     val username = SharedPrefManager.getInstance(mContext!!)!!.username
@@ -398,7 +399,7 @@ class FragmentPublicsCat : Fragment() {
                                 val buttonAppear: Animation = AnimationUtils.loadAnimation(mContext, R.anim.expand_in)
                                 gameActionBtn?.visibility = View.VISIBLE
                                 gameActionBtn?.startAnimation(buttonAppear)
-                                Handler().postDelayed({ gameActionBtn?.isEnabled = true }, 3500)
+                                Handler(Looper.getMainLooper()).postDelayed({ gameActionBtn?.isEnabled = true }, 3500)
 
                                 val userID = SharedPrefManager.getInstance(mContext!!)!!.userID
                                 val username = SharedPrefManager.getInstance(mContext!!)!!.username
