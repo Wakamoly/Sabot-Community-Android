@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.widget.TextView
@@ -167,7 +168,7 @@ class ChatActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     }
 
     fun getUnreadMessagesHandler(delay: Int) {
-        val chatHandler = Handler()
+        val chatHandler = Handler(Looper.getMainLooper())
         val runnableCode = Runnable {
             if(!::unreadMessageJob.isInitialized){
                 unreadMessageJob = Job()

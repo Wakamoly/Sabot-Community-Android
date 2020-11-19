@@ -8,6 +8,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -338,12 +339,12 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
     }
 
     fun unreadNotificationsHandler(delay: Int) {
-        val chatHandler = Handler()
+        val chatHandler = Handler(Looper.getMainLooper())
         val runnableCode = Runnable {
             if(!::unreadNotiJob.isInitialized){
                 unreadNotiJob = Job()
             }
-            CoroutineScope(Dispatchers.IO + unreadNotiJob).launch {
+            CoroutineScope(IO + unreadNotiJob).launch {
                 unreadNotifications()
             }
         }
