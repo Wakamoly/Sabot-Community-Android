@@ -74,7 +74,7 @@ class ConvosRepo (
                 val newCachedMessages = generalMessagesDao.get()
                 generalMessagesDao.setAllLoaded()
                 if (newCachedMessages.isNotEmpty()){
-                    // TODO: 11/19/20 Emit network entity list 
+                    // TODO: 11/19/20 Emit network entity list
                     emit(DataState.UpdateSuccess(newCachedMessages))
                 }
 

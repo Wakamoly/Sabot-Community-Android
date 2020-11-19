@@ -71,6 +71,7 @@ class SharedPrefManager private constructor(private val mCtx: Context) {
 
     fun updateToken(fcm_token: String) {
         val sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_USER, Context.MODE_PRIVATE)
+        val oldFCMToken = sharedPreferences.getString(KEY_FCM_TOKEN, null) ?: ""
         val editor = sharedPreferences.edit()
         editor.putString(KEY_FCM_TOKEN, fcm_token)
         editor.apply()
@@ -80,8 +81,9 @@ class SharedPrefManager private constructor(private val mCtx: Context) {
         }, Response.ErrorListener { error: VolleyError -> Log.d("update_token", "onErrorResponse: $error") }) {
             override fun getParams(): Map<String, String> {
                 val params: MutableMap<String, String> = HashMap()
+                // TODO: 11/19/20 Update backend to receive and remove old FCM token
                 params["token"] = fcm_token
-                params["old_token"] = Objects.requireNonNull(sharedPreferences.getString(KEY_FCM_TOKEN, null)!!)
+                params["old_token"] = oldFCMToken
                 params["user_id"] = Objects.requireNonNull(sharedPreferences.getString(KEY_USER_ID, null)!!)
                 params["username"] = Objects.requireNonNull(sharedPreferences.getString(KEY_USERNAME, null)!!)
                 return params

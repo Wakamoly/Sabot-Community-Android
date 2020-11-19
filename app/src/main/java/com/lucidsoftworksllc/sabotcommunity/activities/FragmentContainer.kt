@@ -30,6 +30,7 @@ import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.FirebaseApp
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
 import com.google.firebase.installations.FirebaseInstallations
@@ -88,6 +89,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
             startActivity(Intent(this, LoginActivity::class.java))
         }
 
+        FirebaseApp.initializeApp(this)
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val fbToken = task.result!!
