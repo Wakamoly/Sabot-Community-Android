@@ -72,43 +72,62 @@ import java.io.IOException
 import java.util.*
 
 class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileRepo>() {
-    private var newsadapter: ProfilenewsAdapter? = null
-    private var publicsnewsadapter: PublicsTopicAdapter? = null
-    private var clansAdapter: JoinedClansAdapter? = null
+    private lateinit var newsadapter: ProfilenewsAdapter
+    private lateinit var publicsnewsadapter: PublicsTopicAdapter
+    private lateinit var clansAdapter: JoinedClansAdapter
     private var profilenewsRecyclerList: MutableList<ProfilenewsRecycler>? = null
     private var profilepublicsnewsRecyclerList: MutableList<PublicsTopicRecycler>? = null
     private var clans: MutableList<ClansRecycler>? = null
-
-    private var mContext: Context? = null
     private var imageToUpload: Bitmap? = null
     private var profileUsername: String? = null
     private var rQueue: RequestQueue? = null
     private var jsonObject: JSONObject? = null
     private var userProfileID: String? = null
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mCtx = requireContext()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mContext = activity
-
-        //imageToUpload = null
 
         profilenewsRecyclerList = ArrayList()
         profilepublicsnewsRecyclerList = ArrayList()
         clans = ArrayList()
 
         recyclerProfilenews.setHasFixedSize(true)
-        recyclerProfilenews.layoutManager = LinearLayoutManager(mContext)
+        recyclerProfilenews.layoutManager = LinearLayoutManager(mCtx)
 
+        setOnClickListeners()
+        subscribeObservers()
+    }
+
+    private fun refreshProfile(){
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
+            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
+        } else {
+            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
+        }*/
+
+        viewModel.getProfileTop(deviceUserID, userProfileID!!.toInt(), deviceUsername)
+        statusUpdate?.setText("")
+        profileRefreshLayout.isRefreshing = false
+        profileCover.requestFocus()
+    }
+
+    private fun setOnClickListeners(){
         profileRefreshLayout.setOnRefreshListener { refreshProfile() }
 
         addItemButton?.setOnClickListener {
             if (addPostLayout.visibility != View.GONE) {
-                addPostLayout.visibility = View.GONE
+                addPostLayout.visible(false)
             } else {
-                addPostLayout.visibility = View.VISIBLE
+                addPostLayout.visible(true)
                 statusUpdate.requestFocus()
                 if (statusUpdate.hasFocus()) {
-                    val imm = mContext!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    val imm = mCtx.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
                 }
                 imageUploadBtn?.setOnClickListener {
@@ -117,6 +136,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                 }
             }
         }
+
         editProfileButton?.setOnClickListener {
             val asf: Fragment = AccountSettingsFragment()
             val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
@@ -124,6 +144,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
             fragmentTransaction.addToBackStack(null)
             fragmentTransaction.commit()
         }
+
         setProfileCoverButton?.setOnClickListener {
             val asf: Fragment = UploadCoverFragment()
             val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
@@ -131,6 +152,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
             fragmentTransaction.addToBackStack(null)
             fragmentTransaction.commit()
         }
+
         setProfilePhotoButton?.setOnClickListener {
             val asf: Fragment = UploadProfilePhotoFragment()
             val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
@@ -142,40 +164,26 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
         profileClansButtons.setOnClickListener { postsQueryButtonClicked(profileClansButtons) }
         publicsPostsButtons.setOnClickListener { postsQueryButtonClicked(publicsPostsButtons) }
         profilePostsButton.setOnClickListener { postsQueryButtonClicked(profilePostsButton) }
-
-        subscribeObservers()
-
-    }
-
-    private fun refreshProfile(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
-            (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
-        } else {
-            (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
-        }
-        profileRefreshLayout.isRefreshing = false
-        profileCover.requestFocus()
     }
 
     private fun subscribeObservers(){
         if (arguments != null) {
             if (requireArguments().getString("UserId") != null) {
                 userProfileID = requireArguments().getString("UserId")
-                viewModel.getProfileTop(deviceUserID!!, userProfileID!!.toInt(), deviceUsername.toString())
+                viewModel.getProfileTop(deviceUserID, userProfileID!!.toInt(), deviceUsername)
             } else if (requireArguments().getString("Username") != null && requireArguments().getString("UserId") == null) {
                 getUserID(requireArguments().getString("Username"))
             } else {
                 userProfileID = deviceUserID.toString()
-                viewModel.getProfileTop(deviceUserID!!, userProfileID!!.toInt(), deviceUsername.toString())
+                viewModel.getProfileTop(deviceUserID, userProfileID!!.toInt(), deviceUsername)
             }
         } else {
             userProfileID = deviceUserID.toString()
-            viewModel.getProfileTop(deviceUserID!!, userProfileID!!.toInt(), deviceUsername.toString())
+            viewModel.getProfileTop(deviceUserID, userProfileID!!.toInt(), deviceUsername)
         }
 
 
-        viewModel.profileTop.observe(viewLifecycleOwner, Observer{
+        viewModel.profileTop.observe(viewLifecycleOwner, {
             when(it){
                 is DataState.Success -> {
                     //profileLoadingScreen.visible(false)
@@ -184,6 +192,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                 }
                 is DataState.Loading -> {
                     profileLoadingScreen.visible(true)
+                    profileLayout.visible(false)
                 }
                 is DataState.Failure -> handleApiError(it) {
                     refreshProfile()
@@ -213,15 +222,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                         val postId = jsonObject.getString("postid")
                         postImageUpload(imageToUpload!!, postId, deviceUsername)
                     }
-                    statusUpdate?.setText("")
-                    profileCover?.requestFocus()
-                    // TODO: 11/11/20 CREATE METHOD FOR REFRESHING FEED, NOT WHOLE FRAGMENT
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
-                        (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
-                    } else {
-                        (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
-                    }
+                    refreshProfile()
                 } else {
                     profileLoadingScreen.visible(false)
                 }
@@ -230,20 +231,20 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
             }
         }, Response.ErrorListener {
             profileLoadingScreen.visible(false)
-            mContext?.toastShort("Error on Response, please try again later...")
+            mCtx.toastShort("Error on Response, please try again later...")
         }) {
             override fun getParams(): Map<String, String> {
                 val params: MutableMap<String, String> = HashMap()
                 params["body"] = body
                 params["added_by"] = added_by
                 params["user_to"] = user_to
-                params["user_id"] = deviceUserID!!.toString()
+                params["user_id"] = deviceUserID.toString()
                 params["type"] = type
                 params["form"] = form
                 return params
             }
         }
-        val requestQueue = Volley.newRequestQueue(mContext)
+        val requestQueue = Volley.newRequestQueue(mCtx)
         requestQueue.add(stringRequest)
     }
 
@@ -266,14 +267,14 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                     rQueue!!.cache.clear()
                     try {
                         if (jsonObject.getString("error") == "true") {
-                            mContext?.toastShort(jsonObject.getString("message"))
+                            mCtx.toastShort(jsonObject.getString("message"))
                         }
                     } catch (e: JSONException) {
                         e.printStackTrace()
-                        mContext?.toastShort("Failed to upload!")
+                        mCtx.toastShort("Failed to upload!")
                     }
                 }) { }
-        rQueue = Volley.newRequestQueue(mContext)
+        rQueue = Volley.newRequestQueue(mCtx)
         rQueue?.add(jsonObjectRequest)
     }
 
@@ -323,7 +324,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
             setProfileCoverButton.visible(true)
             setProfilePhotoButton.visible(true)
         }
-        if (blocked == "yes" || SharedPrefManager.getInstance(mContext!!)!!.isUserBlocked(username)) {
+        if (blocked == "yes" || SharedPrefManager.getInstance(mCtx)!!.isUserBlocked(username)) {
             profileErrorScreen.visible(true)
             profileLayout.visible(false)
             profileLoadingScreen.visible(false)
@@ -346,7 +347,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
             userTwitterDetails.visible(true)
             userTwitter.text = twitter
             userTwitterDetails.setOnClickListener {
-                if (mContext is FragmentContainer) {
+                if (mCtx is FragmentContainer) {
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/$twitter")))
                 }
             }
@@ -355,7 +356,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
             profileWebsiteContainer.visible(true)
             profileWebsite.text = website
             profileWebsiteContainer.setOnClickListener {
-                if (mContext is FragmentContainer) {
+                if (mCtx is FragmentContainer) {
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(website)))
                 }
             }
@@ -384,7 +385,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
             fragmentTransaction.addToBackStack(null)
             fragmentTransaction.commit()
         }
-        addMessageButton.setOnClickListener { startActivity(Intent(mContext, ChatActivity::class.java).putExtra("user_to", username)) }
+        addMessageButton.setOnClickListener { startActivity(Intent(mCtx, ChatActivity::class.java).putExtra("user_to", username)) }
         followersCount.text = followers.toString()
         followingCount.text = followings.toString()
         friendsCount.text = numFriends.toString()
@@ -392,78 +393,63 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
             userTwitch.text = twitch
             userTwitchDetails.visible(true)
             userTwitchDetails.setOnClickListener {
-                if (mContext is FragmentContainer) {
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.twitch.tv/$twitch")))
-                }
+
             }
         }
         if (mixer.isNotEmpty()) {
             userMixer.text = mixer
             userMixerDetails.visible(true)
             userMixerDetails.setOnClickListener {
-                if (mContext is FragmentContainer) {
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://mixer.com/$mixer")))
-                }
             }
         }
         if (psn.isNotEmpty()) {
             userPSN.text = psn
             userPSNDetails.visible(true)
             userPSNDetails.setOnClickListener {
-                if (mContext is FragmentContainer) {
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://psnprofiles.com/$psn")))
-                }
             }
         }
         if (xbox.isNotEmpty()) {
             userXbox.text = xbox
             userXboxDetails.visible(true)
             userXboxDetails.setOnClickListener {
-                if (mContext is FragmentContainer) {
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://account.xbox.com/en-us/profile?gamertag=$xbox")))
-                }
             }
         }
         if (discord.isNotEmpty()) {
             userDiscord.setText(R.string.discord_server_text)
             userDiscordDetails.visible(true)
             userDiscordDetails.setOnClickListener {
-                if (mContext is FragmentContainer) {
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.discord.gg/$discord")))
-                }
             }
         }
         if (steam.isNotEmpty()) {
             userSteam.text = steam
             userSteamDetails.visible(true)
             userSteamDetails.setOnClickListener {
-                if (mContext is FragmentContainer) {
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://steamcommunity.com/id/$steam")))
-                }
             }
         }
         if (youtube.isNotEmpty()) {
             userYoutubeDetails.visible(true)
             userYoutubeDetails.setOnClickListener {
-                if (mContext is FragmentContainer) {
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://youtube.com/channel/$youtube")))
-                }
             }
         }
         if (instagram.isNotEmpty()) {
             userInstagram.text = instagram
             userInstagramDetails.visible(true)
             userInstagramDetails.setOnClickListener {
-                if (mContext is FragmentContainer) {
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://instagram.com/$instagram")))
-                }
             }
         }
         val averageFloat = average.toFloat()
         profileRating.rating = averageFloat
         reviewCount.text = count.toString()
         val usernameTo: String
-        if (SharedPrefManager.getInstance(mContext!!)!!.username != username) {
+        if (deviceUsername != username) {
             usernameTo = username
             if (isFollowing == "yes") {
                 followProfileButton.visible(false)
@@ -482,25 +468,25 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
         } else {
             // profile is device user's
             usernameTo = "none"
-            if (SharedPrefManager.getInstance(mContext!!)!!.profilePic != profilePic) {
-                SharedPrefManager.getInstance(mContext!!)!!.profilePic = profilePic
+            if (SharedPrefManager.getInstance(mCtx)!!.profilePic != profilePic) {
+                SharedPrefManager.getInstance(mCtx)!!.profilePic = profilePic
             }
         }
-        submitStatusButton!!.setOnClickListener { view: View ->
-            val body = statusUpdate!!.text.toString()
-            val addedBy = SharedPrefManager.getInstance(mContext!!)!!.username
-            val spinnerText = postTypeSpinner!!.selectedItem.toString()
+        submitStatusButton?.setOnClickListener { view: View ->
+            val body = statusUpdate?.text.toString()
+            val addedBy = deviceUsername
+            val spinnerText = postTypeSpinner?.selectedItem.toString()
             val form = "user"
-            if (statusUpdate!!.text.toString().isNotEmpty() && spinnerText.isNotEmpty()) {
+            if (statusUpdate?.text.toString().isNotEmpty() && spinnerText.isNotEmpty()) {
                 profileLayout.visible(false)
                 profileLoadingScreen.visible(true)
-                submitStatus(body, addedBy!!, usernameTo, spinnerText, form)
-                hideKeyboardFrom(mContext, view)
+                submitStatus(body, addedBy, usernameTo, spinnerText, form)
+                hideKeyboardFrom(mCtx, view)
             } else {
-                mContext?.toastShort("You must enter text before submitting!")
+                mCtx.toastShort("You must enter text before submitting!")
             }
         }
-        profileRatingContainer!!.setOnClickListener {
+        profileRatingContainer?.setOnClickListener {
             val ldf = PlayerReviewFragment()
             val args = Bundle()
             args.putString("UserId", id.toString())
@@ -513,8 +499,8 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
             ldf.arguments = args
             requireActivity().supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).replace(R.id.fragment_container, ldf).addToBackStack(null).commit()
         }
-        moreButtonLayout!!.setOnClickListener { view: View? ->
-            val popup = PopupMenu(mContext, view)
+        moreButtonLayout?.setOnClickListener { view: View? ->
+            val popup = PopupMenu(mCtx, view)
             val inflater = popup.menuInflater
             inflater.inflate(R.menu.profile_more_menu, popup.menu)
             popup.setOnMenuItemClickListener { item: MenuItem ->
@@ -545,22 +531,17 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                         val dialogClickListener = DialogInterface.OnClickListener { _: DialogInterface?, which: Int ->
                             when (which) {
                                 DialogInterface.BUTTON_POSITIVE -> {
-                                    SharedPrefManager.getInstance(mContext!!)!!.blockUser(username)
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                        (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
-                                        (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
-                                    } else {
-                                        (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
-                                    }
+                                    SharedPrefManager.getInstance(mCtx)!!.blockUser(username)
+                                    refreshProfile()
                                 }
                                 DialogInterface.BUTTON_NEGATIVE -> { }
                             }
                         }
-                        val builder = AlertDialog.Builder(mContext, R.style.AlertDialogStyle)
+                        val builder = AlertDialog.Builder(mCtx, R.style.AlertDialogStyle)
                         builder.setMessage("Block user?").setPositiveButton("Yes", dialogClickListener)
                                 .setNegativeButton("No", dialogClickListener).show()
                     } else {
-                        mContext?.toastLong("Are you really trying to block yourself?")
+                        mCtx.toastLong("Are you really trying to block yourself?")
                     }
                 }
                 true
@@ -569,7 +550,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
         }
         followProfileButton.setOnClickListener { followUser(username, followers.toString(), "follow") }
         followedProfileButton.setOnClickListener {
-            LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
+            LovelyStandardDialog(mCtx, LovelyStandardDialog.ButtonLayout.VERTICAL)
                     .setTopColorRes(R.color.green)
                     .setButtonsColorRes(R.color.green)
                     .setIcon(R.drawable.ic_friend_add)
@@ -579,7 +560,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                     .show()
         }
         addFriendButton.setOnClickListener {
-            LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
+            LovelyStandardDialog(mCtx, LovelyStandardDialog.ButtonLayout.VERTICAL)
                     .setTopColorRes(R.color.green)
                     .setButtonsColorRes(R.color.green)
                     .setIcon(R.drawable.ic_friend_add)
@@ -595,15 +576,15 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                     .show()
         }
         requestedFriendButton.setOnClickListener {
-            LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
+            LovelyStandardDialog(mCtx, LovelyStandardDialog.ButtonLayout.VERTICAL)
                     .setTopColorRes(R.color.green)
                     .setButtonsColorRes(R.color.green)
                     .setIcon(R.drawable.ic_friend_add)
                     .setTitle("Connection")
                     .setMessage("Connecting is PERMANENT as this user will be able to review you at any time if accepted.\n\nConnect with @$username?")
                     .setPositiveButton(R.string.yes) {
-                        addFriendButton!!.visibility = View.GONE
-                        requestedFriendButton!!.visibility = View.VISIBLE
+                        addFriendButton.visible(false)
+                        requestedFriendButton.visible(true)
                         acceptConnection(username)
                         followUser(username, followers.toString(), "follow")
                     }
@@ -611,7 +592,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                     .show()
         }
         requestSentFriendButton.setOnClickListener {
-            LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
+            LovelyStandardDialog(mCtx, LovelyStandardDialog.ButtonLayout.VERTICAL)
                     .setTopColorRes(R.color.green)
                     .setButtonsColorRes(R.color.green)
                     .setIcon(R.drawable.ic_friend_add)
@@ -620,7 +601,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                     .show()
         }
         addedFriendButton.setOnClickListener {
-            LovelyStandardDialog(mContext, LovelyStandardDialog.ButtonLayout.VERTICAL)
+            LovelyStandardDialog(mCtx, LovelyStandardDialog.ButtonLayout.VERTICAL)
                     .setTopColorRes(R.color.green)
                     .setButtonsColorRes(R.color.green)
                     .setIcon(R.drawable.ic_friend_add)
@@ -630,23 +611,23 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
         }
         if (description != "") {
             textViewDescription.text = description
-            profileStatusContainer.visibility = View.VISIBLE
+            profileStatusContainer.visible(true)
         }
         if (verified == "yes") {
-            verifiedIcon.visibility = View.VISIBLE
+            verifiedIcon.visible(true)
         }
         if (lastOnline == "yes") {
-            profileOnlineIcon.visibility = View.VISIBLE
+            profileOnlineIcon.visible(true)
         }
         textViewUsername.text = String.format("@%s", username)
         tvPosts.text = numPosts.toString()
         textViewNickname.text = nickname
-        Glide.with(mContext!!)
+        Glide.with(mCtx)
                 .load(Constants.BASE_URL + profilePic)
                 .error(R.mipmap.ic_launcher)
                 .into(imageViewProfilePic)
         if (coverPic.isNotEmpty()) {
-            Glide.with(mContext!!)
+            Glide.with(mCtx)
                     .load(Constants.BASE_URL + coverPic)
                     .error(R.mipmap.ic_launcher)
                     .into(profileCover)
@@ -684,7 +665,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
             fragmentTransaction.addToBackStack(null)
             fragmentTransaction.commit()
         }
-        profileCover.requestFocus()
+        //profileCover.requestFocus()
     }
 
 
@@ -694,7 +675,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
             followedProfileButton.visible(true)
             var numFollowers = followers.toInt()
             numFollowers++
-            followersCount!!.text = numFollowers.toString()
+            followersCount.text = numFollowers.toString()
         } else if (method == "unfollow") {
             followedProfileButton.visible(false)
             followProfileButton.visible(true)
@@ -706,33 +687,33 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
             try {
                 val obj = JSONObject(response!!)
                 if (obj.getString("error") == "false") {
-                    Toast.makeText(mContext, obj.getString("message"), Toast.LENGTH_LONG).show()
+                    Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show()
                 }
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
-        }, Response.ErrorListener { Toast.makeText(mContext, "Could not follow/unfollow user, please try again later...", Toast.LENGTH_LONG).show() }) {
+        }, Response.ErrorListener { Toast.makeText(mCtx, "Could not follow/unfollow user, please try again later...", Toast.LENGTH_LONG).show() }) {
             override fun getParams(): Map<String, String> {
                 val params: MutableMap<String, String> = HashMap()
-                params["username"] = deviceUsername!!
-                params["user_id"] = deviceUserID!!.toString()
+                params["username"] = deviceUsername
+                params["user_id"] = deviceUserID.toString()
                 params["user_followed"] = username
                 params["method"] = method
                 return params
             }
         }
-        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
+        (mCtx as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
     private fun updateProfileNewsUI(data: List<ProfilenewsRecycler>){
         if (data.isEmpty()) {
             postsNoPosts.visible(true)
-            postsNoPosts.text = mContext!!.getString(R.string.no_posts_to_show)
+            postsNoPosts.text = mCtx.getString(R.string.no_posts_to_show)
         } else {
             postsNoPosts.visible(false)
         }
-        newsadapter = ProfilenewsAdapter(mContext!!)
-        newsadapter!!.addItems(data)
+        newsadapter = ProfilenewsAdapter(mCtx)
+        newsadapter.addItems(data)
         recyclerProfilenews.adapter = newsadapter
         recyclerProfilenews.scheduleLayoutAnimation()
         recyclerProfilenews.isNestedScrollingEnabled = false
@@ -744,69 +725,9 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
             args.putString("queryidextra", userProfileID.toString())
             args.putString("method", "posts")
             ldf.arguments = args
-            (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+            (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
         }
     }
-
-    /*private fun loadProfilenews() {
-        val stringRequest = StringRequest(Request.Method.GET, "$Profilenews_URL?userid=$deviceUserID&userprofileid=$userProfileID&thisusername=$deviceUsername", { response: String? ->
-            try {
-                val profilenews = JSONArray(response)
-                for (i in 0 until profilenews.length()) {
-                    val profilenewsObject = profilenews.getJSONObject(i)
-                    val id = profilenewsObject.getInt("id")
-                    val type = profilenewsObject.getString("type")
-                    val likes = profilenewsObject.getString("likes")
-                    val body = profilenewsObject.getString("body")
-                    val addedBy = profilenewsObject.getString("added_by")
-                    val userTo = profilenewsObject.getString("user_to")
-                    val dateAdded = profilenewsObject.getString("date_added")
-                    val userClosed = profilenewsObject.getString("user_closed")
-                    val deleted = profilenewsObject.getString("deleted")
-                    val image = profilenewsObject.getString("image")
-                    val userId = profilenewsObject.getString("user_id")
-                    val profilePic = profilenewsObject.getString("profile_pic")
-                    val verified = profilenewsObject.getString("verified")
-                    val online = profilenewsObject.getString("online")
-                    val nickname = profilenewsObject.getString("nickname")
-                    val username = profilenewsObject.getString("username")
-                    val commentcount = profilenewsObject.getString("commentcount")
-                    val likedbyuserYes = profilenewsObject.getString("likedbyuseryes")
-                    val form = profilenewsObject.getString("form")
-                    val edited = profilenewsObject.getString("edited")
-                    val profilenewsResult = ProfilenewsRecycler(id, type, likes, body, addedBy, userTo, dateAdded, userClosed, deleted, image, userId, profilePic, verified, online, nickname, username, commentcount, likedbyuserYes, form, edited)
-                    profilenewsRecyclerList!!.add(profilenewsResult)
-                }
-                try {
-                    if (profilenews.length() == 0) {
-                        postsNoPosts!!.visibility = View.VISIBLE
-                        postsNoPosts!!.text = mContext!!.getString(R.string.no_posts_to_show)
-                    } else {
-                        postsNoPosts!!.visibility = View.GONE
-                    }
-                } catch (ignored: Exception) {
-                }
-                newsadapter = ProfilenewsAdapter(mContext!!, profilenewsRecyclerList)
-                recyclerProfilenews.adapter = newsadapter
-                recyclerProfilenews.scheduleLayoutAnimation()
-                recyclerProfilenews.isNestedScrollingEnabled = false
-                profileLayout.visible(true)
-                profileLoadingScreen.visible(false)
-                profileNewsMoreBtn.setOnClickListener {
-                    val ldf = SeeAllFragment()
-                    val args = Bundle()
-                    args.putString("queryid", profileUsername)
-                    args.putString("queryidextra", userProfileID.toString())
-                    args.putString("method", "posts")
-                    ldf.arguments = args
-                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
-                }
-            } catch (e: JSONException) {
-                e.printStackTrace()
-            }
-        }) { }
-        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
-    }*/
 
     private fun loadProfilePublicsnews() {
         val stringRequest = StringRequest(Request.Method.GET, "$ProfilePublicsNews_URL?username=$profileUsername", { response: String? ->
@@ -815,7 +736,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                 for (i in 0 until profilepublicsnews.length()) {
                     val profilenewsObject = profilepublicsnews.getJSONObject(i)
                     val username = profilenewsObject.getString("username")
-                    if (SharedPrefManager.getInstance(mContext!!)!!.isUserBlocked(username)) continue
+                    if (SharedPrefManager.getInstance(mCtx)!!.isUserBlocked(username)) continue
                     val id = profilenewsObject.getString("id")
                     val numposts = profilenewsObject.getString("numposts")
                     val subject = profilenewsObject.getString("subject")
@@ -841,7 +762,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                     args.putString("queryid", profileUsername)
                     args.putString("method", "publics")
                     ldf.arguments = args
-                    (mContext as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
+                    (mCtx as FragmentActivity?)!!.supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out).add(R.id.fragment_container, ldf).addToBackStack(null).commit()
                 }
                 if (profilepublicsnews.length() == 0) {
                     postsNoPosts.visible(true)
@@ -849,15 +770,15 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                 } else {
                     postsNoPosts.visible(false)
                 }
-                publicsnewsadapter = PublicsTopicAdapter(mContext!!, profilepublicsnewsRecyclerList!!)
+                publicsnewsadapter = PublicsTopicAdapter(mCtx, profilepublicsnewsRecyclerList!!)
                 recyclerProfilenews.adapter = publicsnewsadapter
                 recyclerProfilenews.scheduleLayoutAnimation()
                 recyclerProfilenews.isNestedScrollingEnabled = false
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
-        }) { Toast.makeText(mContext, "Network error!", Toast.LENGTH_SHORT).show() }
-        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
+        }) { Toast.makeText(mCtx, "Network error!", Toast.LENGTH_SHORT).show() }
+        (mCtx as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
     private fun loadJoinedClans() {
@@ -884,8 +805,8 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                             postsNoPosts.text = getString(R.string.no_clans_text)
                         }
                         profileLoadingScreen.visible(false)
-                        clansAdapter = JoinedClansAdapter(mContext!!)
-                        clansAdapter?.addItems(clans)
+                        clansAdapter = JoinedClansAdapter(mCtx)
+                        clansAdapter.addItems(clans)
                         recyclerProfilenews.adapter = clansAdapter
                         recyclerProfilenews.scheduleLayoutAnimation()
                         recyclerProfilenews.isNestedScrollingEnabled = false
@@ -894,7 +815,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                     }
                 }
         ) { }
-        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
+        (mCtx as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
     private fun connectionRequest(thisUsername: String) {
@@ -915,20 +836,20 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                         addFriendProgress.visible(false)
                     }
                 } else {
-                    Toast.makeText(mContext, obj.getString("message"), Toast.LENGTH_LONG).show()
+                    Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show()
                 }
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
-        }, Response.ErrorListener { Toast.makeText(mContext, "Could not get requests, please try again later...", Toast.LENGTH_LONG).show() }) {
+        }, Response.ErrorListener { Toast.makeText(mCtx, "Could not get requests, please try again later...", Toast.LENGTH_LONG).show() }) {
             override fun getParams(): Map<String, String> {
                 val params: MutableMap<String, String> = HashMap()
-                params["username"] = deviceUsername!!
+                params["username"] = deviceUsername
                 params["thisusername"] = thisUsername
                 return params
             }
         }
-        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
+        (mCtx as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
     private fun addConnection(thisusername: String) {
@@ -937,23 +858,23 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                 val obj = JSONObject(response!!)
                 if (!obj.getBoolean("error")) {
                     if (obj.getString("request_sent") == "yes") {
-                        Toast.makeText(mContext, "Request Sent!", Toast.LENGTH_LONG).show()
+                        Toast.makeText(mCtx, "Request Sent!", Toast.LENGTH_LONG).show()
                     }
                 } else {
-                    Toast.makeText(mContext, obj.getString("message"), Toast.LENGTH_LONG).show()
+                    Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show()
                 }
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
-        }, Response.ErrorListener { Toast.makeText(mContext, "Could not send request, please try again later...", Toast.LENGTH_LONG).show() }) {
+        }, Response.ErrorListener { Toast.makeText(mCtx, "Could not send request, please try again later...", Toast.LENGTH_LONG).show() }) {
             override fun getParams(): Map<String, String> {
                 val params: MutableMap<String, String> = HashMap()
-                params["username"] = deviceUsername!!
+                params["username"] = deviceUsername
                 params["thisusername"] = thisusername
                 return params
             }
         }
-        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
+        (mCtx as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
     private fun acceptConnection(thisusername: String) {
@@ -966,20 +887,20 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                         requestedFriendButton.visible(false)
                     }
                 } else {
-                    Toast.makeText(mContext, obj.getString("message"), Toast.LENGTH_LONG).show()
+                    Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show()
                 }
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
-        }, Response.ErrorListener { Toast.makeText(mContext, "Could not send request, please try again later...", Toast.LENGTH_LONG).show() }) {
+        }, Response.ErrorListener { Toast.makeText(mCtx, "Could not send request, please try again later...", Toast.LENGTH_LONG).show() }) {
             override fun getParams(): Map<String, String> {
                 val params: MutableMap<String, String> = HashMap()
-                params["username"] = deviceUsername!!
+                params["username"] = deviceUsername
                 params["thisusername"] = thisusername
                 return params
             }
         }
-        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
+        (mCtx as FragmentContainer?)!!.addToRequestQueue(stringRequest)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -991,7 +912,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                 var bitmap1: Bitmap? = null
                 try {
                     if (Build.VERSION.SDK_INT >= 29) {
-                        val source: ImageDecoder.Source = ImageDecoder.createSource(mContext!!.contentResolver, resultUri)
+                        val source: ImageDecoder.Source = ImageDecoder.createSource(mCtx.contentResolver, resultUri)
                         try {
                             bitmap1 = ImageDecoder.decodeBitmap(source)
                         } catch (e: IOException) {
@@ -999,7 +920,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                         }
                     } else {
                         try {
-                            bitmap1 = MediaStore.Images.Media.getBitmap(mContext!!.contentResolver, resultUri)
+                            bitmap1 = MediaStore.Images.Media.getBitmap(mCtx.contentResolver, resultUri)
                         } catch (e: IOException) {
                             e.printStackTrace()
                         }
@@ -1009,13 +930,13 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                         imageUploadBtn!!.setImageBitmap(bitmap1)
                     }else{
                         imageUploadBtn?.setImageResource(R.drawable.icons8_question_mark_64)
-                        activity?.toastLong("Cannot display image cropped! (Android 10+ temporary issue, upload should work as usual.)")
+                        mCtx.toastLong("Cannot display image cropped! (Android 10+ temporary issue, upload should work as usual.)")
                     }
 
                     imageToUpload = bitmap1
                 } catch (e: IOException) {
                     e.printStackTrace()
-                    Toast.makeText(mContext, "Failed!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(mCtx, "Failed!", Toast.LENGTH_SHORT).show()
                 }
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 val error = result.error
@@ -1032,13 +953,13 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                 .withListener(object : MultiplePermissionsListener {
                     override fun onPermissionsChecked(report: MultiplePermissionsReport) {
                         if (report.isAnyPermissionPermanentlyDenied) {
-                            Toast.makeText(mContext!!.applicationContext, "No permissions are granted by user!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(mCtx.applicationContext, "No permissions are granted by user!", Toast.LENGTH_SHORT).show()
                         }
                     }
                     override fun onPermissionRationaleShouldBeShown(permissions: List<PermissionRequest>, token: PermissionToken) {
                         token.continuePermissionRequest()
                     }
-                }).withErrorListener { Toast.makeText(mContext!!.applicationContext, "Some Error! ", Toast.LENGTH_SHORT).show() }
+                }).withErrorListener { Toast.makeText(mCtx.applicationContext, "Some Error!", Toast.LENGTH_SHORT).show() }
                 .onSameThread()
                 .check()
     }
@@ -1046,35 +967,35 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
     private fun postsQueryButtonClicked(clicked: Button?) {
         when {
             clicked === profilePostsButton -> {
-                profilePostsButton.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.green))
-                profileClansButtons.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.grey_80))
-                publicsPostsButtons.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.grey_80))
+                profilePostsButton.setBackgroundColor(ContextCompat.getColor(mCtx, R.color.green))
+                profileClansButtons.setBackgroundColor(ContextCompat.getColor(mCtx, R.color.grey_80))
+                publicsPostsButtons.setBackgroundColor(ContextCompat.getColor(mCtx, R.color.grey_80))
                 //TODO add progressbar
                 profilenewsRecyclerList!!.clear()
-                viewModel.getProfileNews(deviceUserID!!.toInt(), userProfileID!!.toInt(), deviceUsername.toString())
+                viewModel.getProfileNews(deviceUserID, userProfileID!!.toInt(), deviceUsername)
                 tvPosts.visible(true)
-                profileItemsLabel.text = mContext!!.getString(R.string.profile_posts_text)
+                profileItemsLabel.text = mCtx.getString(R.string.profile_posts_text)
                 profileNewsMoreBtn.visible(true)
             }
             clicked === profileClansButtons -> {
-                profilePostsButton.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.grey_80))
-                publicsPostsButtons.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.grey_80))
-                profileClansButtons.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.green))
+                profilePostsButton.setBackgroundColor(ContextCompat.getColor(mCtx, R.color.grey_80))
+                publicsPostsButtons.setBackgroundColor(ContextCompat.getColor(mCtx, R.color.grey_80))
+                profileClansButtons.setBackgroundColor(ContextCompat.getColor(mCtx, R.color.green))
                 clans!!.clear()
                 loadJoinedClans()
                 tvPosts.visible(false)
-                profileItemsLabel.text = mContext!!.getString(R.string.clans_joined_text)
+                profileItemsLabel.text = mCtx.getString(R.string.clans_joined_text)
                 //TODO: Fix this with see all fragment --> clans
                 profileNewsMoreBtn.visible(true)
             }
             clicked === publicsPostsButtons -> {
-                profileClansButtons!!.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.grey_80))
-                profilePostsButton!!.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.grey_80))
-                publicsPostsButtons!!.setBackgroundColor(ContextCompat.getColor(mContext!!, R.color.green))
+                profileClansButtons!!.setBackgroundColor(ContextCompat.getColor(mCtx, R.color.grey_80))
+                profilePostsButton!!.setBackgroundColor(ContextCompat.getColor(mCtx, R.color.grey_80))
+                publicsPostsButtons!!.setBackgroundColor(ContextCompat.getColor(mCtx, R.color.green))
                 profilepublicsnewsRecyclerList!!.clear()
                 loadProfilePublicsnews()
                 tvPosts.visible(false)
-                profileItemsLabel.text = mContext!!.getString(R.string.publics_posts_text)
+                profileItemsLabel.text = mCtx.getString(R.string.publics_posts_text)
                 profileNewsMoreBtn.visible(true)
             }
         }
@@ -1087,7 +1008,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                     val obj = JSONObject(response!!)
                     if (obj.getString("error") == "false") {
                         userProfileID = obj.getString("userid")
-                        viewModel.getProfileTop(deviceUserID!!, userProfileID!!.toInt(), deviceUsername.toString())
+                        viewModel.getProfileTop(deviceUserID, userProfileID!!.toInt(), deviceUsername)
                     } else {
                         profileErrorScreen.visible(true)
                     }
@@ -1101,7 +1022,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                     return params
                 }
             }
-            (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
+            (mCtx as FragmentContainer?)!!.addToRequestQueue(stringRequest)
         } catch (e: Exception) {
             // stringrequest error
         }
@@ -1115,9 +1036,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
     companion object {
         private const val TAG = "ProfileFragment"
         private const val RG = ROOT_URL + "new_post.php"
-        private const val Profilenews_URL = ROOT_URL + "profilenews_api.php"
         private const val ProfilePublicsNews_URL = ROOT_URL + "profilepublicsnews_api.php"
-        private const val ProfileTop_URL = ROOT_URL + "profiletop_api.php"
         private const val GET_REQUESTS = ROOT_URL + "get_profile_requests.php"
         private const val ADD_CONNECTION = ROOT_URL + "add_connection.php"
         private const val FOLLOW_USER = ROOT_URL + "user_follow_api.php"
@@ -1133,5 +1052,5 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
 
     override fun getViewModel() = ProfileVM::class.java
     override fun getFragmentBinding(inflater: LayoutInflater, container: ViewGroup?) = FragmentProfileBinding.inflate(inflater, container, false)
-    override fun getFragmentRepository() = ProfileRepo(remoteDataSource.buildApi(ProfileApi::class.java, mContext?.fcmToken))
+    override fun getFragmentRepository() = ProfileRepo(remoteDataSource.buildApi(ProfileApi::class.java, mCtx.fcmToken))
 }
