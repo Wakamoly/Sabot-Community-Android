@@ -1,235 +1,146 @@
 package com.lucidsoftworksllc.sabotcommunity.fragments
 
-import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
 import com.lucidsoftworksllc.sabotcommunity.*
-import com.lucidsoftworksllc.sabotcommunity.activities.FragmentContainer
 import com.lucidsoftworksllc.sabotcommunity.adapters.NotificationsAdapter
-import com.lucidsoftworksllc.sabotcommunity.db.notifications.MainStateEvent
-import com.lucidsoftworksllc.sabotcommunity.db.notifications.NotificationDataModel
-import com.lucidsoftworksllc.sabotcommunity.db.notifications.NotificationViewModel
+import com.lucidsoftworksllc.sabotcommunity.databinding.FragmentNotificationsBinding
+import com.lucidsoftworksllc.sabotcommunity.db.SabotDatabase
+import com.lucidsoftworksllc.sabotcommunity.db.notifications.*
+import com.lucidsoftworksllc.sabotcommunity.fragments.repositories.NotificationsRepo
+import com.lucidsoftworksllc.sabotcommunity.fragments.viewmodels.NotificationsVM
+import com.lucidsoftworksllc.sabotcommunity.network.NotificationsApi
 import com.lucidsoftworksllc.sabotcommunity.others.*
+import com.lucidsoftworksllc.sabotcommunity.others.base.BaseFragment
 import com.lucidsoftworksllc.sabotcommunity.util.DataState
-import dagger.hilt.android.AndroidEntryPoint
-import org.json.JSONException
-import org.json.JSONObject
+import kotlinx.android.synthetic.main.fragment_notifications.*
+import kotlinx.android.synthetic.main.snippet_top_notificationsbar.*
 import java.util.*
-import kotlin.collections.ArrayList
 
-@AndroidEntryPoint
-class NotificationsFragment : Fragment() {
+class NotificationsFragment : BaseFragment<NotificationsVM, FragmentNotificationsBinding, NotificationsRepo>() {
     private var currentPage = PaginationOnScroll.PAGE_START
     private var isLastPage = false
     private val pageSize = PaginationOnScroll.PAGE_SIZE
     private var isLoading = false
-    private var recyclerView: RecyclerView? = null
-    private var layoutManager: LinearLayoutManager? = null
-    private var notifications: List<NotificationDataModel>? = null
-    private var adapter: NotificationsAdapter? = null
-    private var deviceUserID: String? = null
-    private var deviceUsername: String? = null
-    private var none: TextView? = null
-    private val badgenum: TextView? = null
-    private var notiMenu: ImageView? = null
-    private var notificationSwipe: SwipeRefreshLayout? = null
-    private var notiLayout: RelativeLayout? = null
-    private var progressBar: ProgressBar? = null
-    private var mContext: Context? = null
-    private val viewModel: NotificationViewModel by viewModels()
+    private var last_id: Int = 0
+    private lateinit var layoutManager: LinearLayoutManager
+    private lateinit var adapter: NotificationsAdapter
+    private lateinit var notificationDao: NotificationDao
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val notificationsRootView = inflater.inflate(R.layout.fragment_notifications, null)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mCtx = requireContext()
+        notificationDao = SabotDatabase(mCtx).getNotificationsDao()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
-        none = notificationsRootView.findViewById(R.id.noNotifications)
-        progressBar = notificationsRootView.findViewById(R.id.progressBar)
-        notificationSwipe = notificationsRootView.findViewById(R.id.notificationsSwipe)
-        recyclerView = notificationsRootView.findViewById(R.id.recyclerNotifications)
-        notiLayout = notificationsRootView.findViewById(R.id.notiLayout)
-        notiMenu = notificationsRootView.findViewById(R.id.notiMenu)
-        mContext = activity
-        deviceUsername = mContext?.deviceUsername
-        deviceUserID = mContext?.deviceUserID
-
         initRecycler()
         initNotiMenu()
         subscribeObservers()
-        viewModel.setStateEvent(MainStateEvent.GetNotiEvents, mContext!!)
-        return notificationsRootView
     }
 
     private fun subscribeObservers(){
-        viewModel.dataState.observe(viewLifecycleOwner, Observer { dataState ->
-            when(dataState){
-                is DataState.Success<List<NotificationDataModel>> -> {
-                    println("Success!")
-                    displayProgressbar(false)
-                    appendNotifications(dataState.data)
-                }
-                is DataState.Error -> {
-                    println("Error!")
-                    displayProgressbar(false)
-                    displayError(dataState.exception.message)
-                }
+        viewModel.currentNotifications.observe(viewLifecycleOwner, {
+            when(it){
                 is DataState.Loading -> {
-                    println("Loading!")
                     displayProgressbar(true)
                 }
-                is DataState.UpdateSuccess<List<NotificationDataModel>> -> {
-                    println("Update Success!")
+                is DataState.Success -> {
                     displayProgressbar(false)
-                    appendNotifications(dataState.data)
+                    appendNotifications(it.data, true)
+                }
+                is DataState.Error -> {
+                    displayError(it.exception.toString())
                 }
             }
         })
+        viewModel.newNotifications.observe(viewLifecycleOwner, {
+            when(it){
+                is DataState.Loading -> {
+                    view?.snackbarShort(getString(R.string.updating_notifications), "")
+                }
+                is DataState.Success -> {
+                    appendNotifications(it.data, false)
+                }
+            }
+        })
+
+        viewModel.getCurrentNotifications(deviceUsername, deviceUserID, currentPage, pageSize)
     }
 
     private fun displayError(message: String?){
-        none?.visibility = View.VISIBLE
+        noNotifications?.visible(true)
         if(message != null){
             println("Error message: $message")
-            //mContext?.toastLong("Error!: $message")
-        }else{
-            mContext?.toastShort("Error!")
+            mCtx.toastShort("Error!")
         }
-
+        mCtx.toastShort("Error!")
     }
 
     private fun displayProgressbar(isDisplayed: Boolean){
-        progressBar?.visibility = if(isDisplayed) View.VISIBLE else View.GONE
+        progressBar?.visible(isDisplayed)
     }
 
-    private fun appendNotifications(notis: List<NotificationDataModel>){
+    private fun scrollToTop() {
+        if (adapter.itemCount > 1) Objects.requireNonNull(recyclerNotifications?.layoutManager!!).smoothScrollToPosition(recyclerNotifications, null, 0)
+    }
+
+    private fun appendNotifications(notis: List<NotificationCacheEntity>, init: Boolean){
         println("Appending notifications")
-        (recyclerView?.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-        if (notis.isEmpty()) {
-            none?.visibility = View.VISIBLE
-            progressBar?.visibility = View.GONE
+        displayProgressbar(false)
+        if (notis.isEmpty() && adapter.size() == 0) {
+            noNotifications?.visible(true)
         }
-        notiLayout!!.visibility = View.VISIBLE
-        if (currentPage != PaginationOnScroll.PAGE_START) adapter?.removeLoading()
-        progressBar!!.visibility = View.GONE
-        adapter?.addItems(notis)
-        //recyclerView?.scheduleLayoutAnimation()
-        if (notis.size == pageSize) {
-            adapter!!.addLoading()
-        } else {
-            isLastPage = true
-            //adapter.removeLoading();
-        }
-        isLoading = false
-    }
-
-    /*private fun loadNotifications(page: Int) {
-        val items = ArrayList<NotificationsRecycler>()
-        val stringRequest: StringRequest = object : StringRequest(Method.POST, Notifications_URL,
-                Response.Listener { response: String? ->
-                    try {
-                        val notificationsArray = JSONArray(response)
-                        if (notificationsArray.length() == 0) {
-                            none!!.visibility = View.VISIBLE
-                            progressBar!!.visibility = View.GONE
-                        }
-                        for (i in 0 until notificationsArray.length()) {
-                            val notificationsObject = notificationsArray.getJSONObject(i)
-                            val id = notificationsObject.getString("id")
-                            val userTo = notificationsObject.getString("user_to")
-                            val userFrom = notificationsObject.getString("user_from")
-                            if (SharedPrefManager.getInstance(mContext!!)!!.isUserBlocked(userFrom)) continue
-                            val message = notificationsObject.getString("message")
-                            val type = notificationsObject.getString("type")
-                            val link = notificationsObject.getString("link")
-                            val datetime = notificationsObject.getString("datetime")
-                            val opened = notificationsObject.getString("opened")
-                            val viewed = notificationsObject.getString("viewed")
-                            val userId = notificationsObject.getString("user_id")
-                            val profilePic = notificationsObject.getString("profile_pic")
-                            val nickname = notificationsObject.getString("nickname")
-                            val verified = notificationsObject.getString("verified")
-                            val lastOnline = notificationsObject.getString("last_online")
-                            val notificationsResult = NotificationsRecycler(id, userTo, userFrom, message, type, link, datetime, opened, viewed, userId, profilePic, nickname, verified, lastOnline)
-                            items.add(notificationsResult)
-                        }
-                        notiLayout!!.visibility = View.VISIBLE
-                        if (currentPage != PaginationOnScroll.PAGE_START) adapter!!.removeLoading()
-                        progressBar!!.visibility = View.GONE
-                        adapter!!.addItems(items)
-                        if (notificationsArray.length() == pageSize) {
-                            adapter!!.addLoading()
-                        } else {
-                            isLastPage = true
-                            //adapter.removeLoading();
-                        }
-                        isLoading = false
-                    } catch (e: JSONException) {
-                        e.printStackTrace()
-                        //TODO FIX THIS
-                        notiLayout!!.visibility = View.VISIBLE
-                        progressBar!!.visibility = View.GONE
-                        none!!.visibility = View.VISIBLE
-                    }
-                },
-                Response.ErrorListener { }) {
-            override fun getParams(): Map<String, String> {
-                val params: MutableMap<String, String> = HashMap()
-                params["page"] = page.toString()
-                params["items"] = pageSize.toString()
-                params["userid"] = deviceUserID!!
-                params["username"] = deviceUsername!!
-                return params
+        if (init){
+            notiLayout?.visible(true)
+            if (currentPage != PaginationOnScroll.PAGE_START) adapter.removeLoading()
+            adapter.addItems(notis)
+            if (notis.size == pageSize) {
+                adapter.addLoading()
+            } else {
+                isLastPage = true
+                //adapter.removeLoading();
+            }
+            isLoading = false
+            last_id = notis.first().id
+            viewModel.getNewNotifications(deviceUsername, deviceUserID, currentPage, pageSize, last_id)
+        }else{
+            var atTop = false
+            val currentView = layoutManager.findFirstVisibleItemPosition()
+            if (currentView == 0){
+                atTop = true
+            }
+            if (currentPage != PaginationOnScroll.PAGE_START) adapter.removeLoading()
+            adapter.addItemsToTop(notis)
+            if (notis.size == pageSize) {
+                adapter.addLoading()
+            } else {
+                isLastPage = true
+            }
+            isLoading = false
+            if (atTop){
+                scrollToTop()
             }
         }
-        (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
-    }*/
+    }
 
     private fun initNotiMenu(){
         //TODO: Add opened to Room db
         notiMenu?.setOnClickListener { view: View? ->
-            val popup = PopupMenu(mContext, view)
+            val popup = PopupMenu(mCtx, view)
             val inflater1 = popup.menuInflater
             inflater1.inflate(R.menu.noti_menu, popup.menu)
             popup.setOnMenuItemClickListener { item: MenuItem ->
                 if (item.itemId == R.id.menuSetOpened) {
-                    val stringRequest: StringRequest = object : StringRequest(Method.POST, SET_ALL_READ, Response.Listener { response: String? ->
-                        try {
-                            val obj = JSONObject(response!!)
-                            if (!obj.getBoolean("error")) {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                    (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
-                                    (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
-                                } else {
-                                    (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
-                                }
-                                notificationSwipe?.isRefreshing = false
-                            } else {
-                                Toast.makeText(mContext, obj.getString("message"), Toast.LENGTH_LONG).show()
-                            }
-                        } catch (e: JSONException) {
-                            e.printStackTrace()
-                        }
-                    }, Response.ErrorListener { }) {
-                        override fun getParams(): MutableMap<String, String?> {
-                            val params: MutableMap<String, String?> = HashMap()
-                            params["username"] = deviceUsername
-                            return params
-                        }
-                    }
-                    (mContext as FragmentContainer?)!!.addToRequestQueue(stringRequest)
+                    viewModel.setAllOpened(deviceUsername)
+                    refreshFragment()
                 }
                 true
             }
@@ -238,14 +149,11 @@ class NotificationsFragment : Fragment() {
     }
 
     private fun initRecycler(){
-        recyclerView?.setHasFixedSize(true)
-        layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false)
-        recyclerView?.layoutManager = layoutManager
-
-
-        notifications = ArrayList()
-        adapter = NotificationsAdapter(notifications!! as MutableList<NotificationDataModel>, mContext!!)
-        recyclerView?.adapter = adapter
+        recyclerNotifications?.setHasFixedSize(true)
+        layoutManager = LinearLayoutManager(mCtx, LinearLayoutManager.VERTICAL, false)
+        recyclerNotifications?.layoutManager = layoutManager
+        adapter = NotificationsAdapter(mCtx)
+        recyclerNotifications?.adapter = adapter
 
 
         /*loadNotifications(currentPage)
@@ -260,20 +168,30 @@ class NotificationsFragment : Fragment() {
         })*/
 
 
-        notificationSwipe?.setOnRefreshListener {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
-                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
-            } else {
-                (mContext as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
-            }
-            notificationSwipe?.isRefreshing = false
+        notificationsSwipe?.setOnRefreshListener {
+            refreshFragment()
         }
+    }
+
+    private fun refreshFragment(){
+        noNotifications?.visible(false)
+        adapter.clear()
+        viewModel.getCurrentNotifications(deviceUsername, deviceUserID, currentPage, pageSize)
+        notificationsSwipe?.isRefreshing = false
     }
 
     companion object {
         private const val TAG = "NotificationsFragment"
-        private const val Notifications_URL = Constants.ROOT_URL + "getNotifications.php"
-        private const val SET_ALL_READ = Constants.ROOT_URL + "set_all_noti_read.php"
+    }
+
+    override fun getViewModel(): Class<NotificationsVM> = NotificationsVM::class.java
+
+    override fun getFragmentBinding(inflater: LayoutInflater, container: ViewGroup?) =
+            FragmentNotificationsBinding
+                    .inflate(inflater, container, false)
+
+    override fun getFragmentRepository(): NotificationsRepo {
+        val api = remoteDataSource.buildApi(NotificationsApi::class.java, mCtx.fcmToken)
+        return NotificationsRepo(api, notificationDao)
     }
 }

@@ -93,7 +93,7 @@
                     android:layout_height="match_parent"
                     android:orientation="horizontal">
 
-                    <TextView
+                    <com.lucidsoftworksllc.sabotcommunity.others.active_label.SocialTextView
                         android:id="@+id/notificationsBody"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -101,6 +101,11 @@
                         android:ellipsize="end"
                         android:maxLines="7"
                         android:textColor="@color/white"
+                        app:socialFlags="hashtag|mention|hyperlink"
+                        app:hashtagColor="@color/hashtag"
+                        app:mentionColor="@color/usermention"
+                        app:hyperlinkColor="@color/hyperlink"
+                        app:doubleMentionColor="@color/gamemention"
                         tools:text="Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text Some text " />
 
                 </LinearLayout>

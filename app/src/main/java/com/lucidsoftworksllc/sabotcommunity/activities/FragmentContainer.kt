@@ -8,6 +8,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -29,6 +30,7 @@ import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.FirebaseApp
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
 import com.google.firebase.installations.FirebaseInstallations
@@ -87,6 +89,7 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
             startActivity(Intent(this, LoginActivity::class.java))
         }
 
+        FirebaseApp.initializeApp(this)
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val fbToken = task.result!!
@@ -338,12 +341,12 @@ class FragmentContainer : AppCompatActivity(), BottomNavigationView.OnNavigation
     }
 
     fun unreadNotificationsHandler(delay: Int) {
-        val chatHandler = Handler()
+        val chatHandler = Handler(Looper.getMainLooper())
         val runnableCode = Runnable {
             if(!::unreadNotiJob.isInitialized){
                 unreadNotiJob = Job()
             }
-            CoroutineScope(Dispatchers.IO + unreadNotiJob).launch {
+            CoroutineScope(IO + unreadNotiJob).launch {
                 unreadNotifications()
             }
         }

@@ -11,7 +11,14 @@ sealed class DataState<out R> {
     data class Failure(
             val isNetworkError: Boolean,
             val errorCode: Int?,
-            val errorBody: ResponseBody?
+            val errorBody: ResponseBody?,
+            val extraText: String? = null
+    ) : DataState<Nothing>()
+    data class Failure2(
+            val isNetworkError: Boolean,
+            val errorCode: Int?,
+            val errorBody: ResponseBody?,
+            val extraText: String?
     ) : DataState<Nothing>()
     object Loading: DataState<Nothing>()
 }

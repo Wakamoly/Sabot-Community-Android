@@ -80,8 +80,6 @@ class MessageFragment : BaseFragment<UserMessageVM, ContentChatBinding, UserMess
     private lateinit var messageUserInfoDao: MessageUserInfoDao
     private lateinit var userMessagesDao: UserMessagesDao
     private lateinit var typedMessageDao: TypedMessageDao
-    private var rQueue: RequestQueue? = null
-    private var jsonObject: JSONObject? = null
     private var canUpdate: Boolean = false
     private var recyclerInit: Boolean = false
 
@@ -176,6 +174,7 @@ class MessageFragment : BaseFragment<UserMessageVM, ContentChatBinding, UserMess
                     updateSentMessageUI(it.data)
                 }
                 // TODO: 10/30/20 ADD RETRY FOR SENDING MESSAGES
+                // TODO: 11/19/20 Could not send message! // Add errorRetry() properly with image saving
                 is DataState.Failure -> handleApiError(it) { errorRetry() }
             }
         })

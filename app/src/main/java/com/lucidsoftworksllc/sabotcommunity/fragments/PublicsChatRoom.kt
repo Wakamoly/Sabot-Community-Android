@@ -7,6 +7,7 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -331,11 +332,11 @@ class PublicsChatRoom : Fragment() {
 
     fun newChats() {
         if (!shouldGetNotification(mCtx)) {
-            val chatHandler = Handler()
+            val chatHandler = Handler(Looper.getMainLooper())
             val runnableCode = Runnable { messagesFromID }
             chatHandler.postDelayed(runnableCode, 5000)
         } else {
-            val chatHandler = Handler()
+            val chatHandler = Handler(Looper.getMainLooper())
             val runnableCode = Runnable { newChats() }
             chatHandler.postDelayed(runnableCode, 10000)
         }

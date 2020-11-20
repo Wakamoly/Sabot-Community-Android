@@ -4,6 +4,7 @@ import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.*
 import android.widget.Button
 import android.widget.ProgressBar
@@ -155,20 +156,17 @@ class MessageGroupInviteFragment : Fragment(), NewGroupMessageUserAdapter.Adapte
                 } else {
                     recyclerSearch?.visibility = View.GONE
                 }
-                return false
+                return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                val handler = Handler()
-                handler.postDelayed({
-                    fetchUser("users_only", newText)
-                    if (newText.isNotEmpty()) {
-                        recyclerSearch?.visibility = View.VISIBLE
-                    } else {
-                        recyclerSearch?.visibility = View.GONE
-                    }
-                }, 100)
-                return false
+                fetchUser("users_only", newText)
+                if (newText.isNotEmpty()) {
+                    recyclerSearch?.visibility = View.VISIBLE
+                } else {
+                    recyclerSearch?.visibility = View.GONE
+                }
+                return true
             }
         })
         players
@@ -273,7 +271,7 @@ class MessageGroupInviteFragment : Fragment(), NewGroupMessageUserAdapter.Adapte
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                val handler = Handler()
+                val handler = Handler(Looper.getMainLooper())
                 handler.postDelayed({
                     fetchUser("users_only", newText)
                     if (newText.isNotEmpty()) {

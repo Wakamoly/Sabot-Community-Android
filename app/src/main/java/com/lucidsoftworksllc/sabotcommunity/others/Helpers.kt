@@ -189,8 +189,13 @@ fun Fragment.handleApiError(
             (this as BaseFragment<*, *, *>).logout()
         }
         else -> {
-            val error = failure.errorBody?.string().toString()
-            requireView().retrySnackbar(error)
+            if (failure.extraText != null){
+                val error = failure.extraText
+                requireView().retrySnackbar(error)
+            }else{
+                val error = failure.errorBody?.string().toString()
+                requireView().retrySnackbar(error)
+            }
         }
     }
 }

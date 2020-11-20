@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
@@ -118,7 +119,7 @@ class PostCommentsAdapter(private val mCtx: Context) : RecyclerView.Adapter<Prof
                     }
                 }).start()
 
-                val handler = Handler()
+                val handler = Handler(Looper.getMainLooper())
                 handler.postDelayed({
                     Glide.with(mCtx)
                             .load(imageUrl[0])
@@ -187,13 +188,13 @@ class PostCommentsAdapter(private val mCtx: Context) : RecyclerView.Adapter<Prof
                         holder.likeProgress.visibility = View.GONE
                         holder.likedView.visibility = View.VISIBLE
                         holder.likedView.isEnabled = false
-                        Handler().postDelayed({ holder.likedView.isEnabled = true }, 3500)
+                        Handler(Looper.getMainLooper()).postDelayed({ holder.likedView.isEnabled = true }, 3500)
                     } else {
                         Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show()
                         holder.likeProgress.visibility = View.GONE
                         holder.likeView.visibility = View.VISIBLE
                         holder.likeView.isEnabled = false
-                        Handler().postDelayed({ holder.likeView.isEnabled = true }, 3000)
+                        Handler(Looper.getMainLooper()).postDelayed({ holder.likeView.isEnabled = true }, 3000)
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
@@ -203,7 +204,7 @@ class PostCommentsAdapter(private val mCtx: Context) : RecyclerView.Adapter<Prof
                 holder.likeProgress.visibility = View.GONE
                 holder.likeView.visibility = View.VISIBLE
                 holder.likeView.isEnabled = false
-                Handler().postDelayed({ holder.likeView.isEnabled = true }, 3000)
+                Handler(Looper.getMainLooper()).postDelayed({ holder.likeView.isEnabled = true }, 3000)
             }) {
                 override fun getParams(): Map<String, String> {
                     val params: MutableMap<String, String> = HashMap()
@@ -232,13 +233,13 @@ class PostCommentsAdapter(private val mCtx: Context) : RecyclerView.Adapter<Prof
                         holder.likeProgress.visibility = View.GONE
                         holder.likeView.visibility = View.VISIBLE
                         holder.likeView.isEnabled = false
-                        Handler().postDelayed({ holder.likeView.isEnabled = true }, 3500)
+                        Handler(Looper.getMainLooper()).postDelayed({ holder.likeView.isEnabled = true }, 3500)
                     } else {
                         Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show()
                         holder.likeProgress.visibility = View.GONE
                         holder.likedView.visibility = View.VISIBLE
                         holder.likedView.isEnabled = false
-                        Handler().postDelayed({ holder.likedView.isEnabled = true }, 3000)
+                        Handler(Looper.getMainLooper()).postDelayed({ holder.likedView.isEnabled = true }, 3000)
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
@@ -248,7 +249,7 @@ class PostCommentsAdapter(private val mCtx: Context) : RecyclerView.Adapter<Prof
                 holder.likeProgress.visibility = View.GONE
                 holder.likedView.visibility = View.VISIBLE
                 holder.likedView.isEnabled = false
-                Handler().postDelayed({ holder.likeView.isEnabled = true }, 3000)
+                Handler(Looper.getMainLooper()).postDelayed({ holder.likeView.isEnabled = true }, 3000)
             }) {
                 override fun getParams(): Map<String, String> {
                     val params: MutableMap<String, String> = HashMap()

@@ -3,6 +3,7 @@ package com.lucidsoftworksllc.sabotcommunity.adapters
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -119,7 +120,7 @@ class ProfilenewsAdapter(private val mCtx: Context,
     }
 
     override fun getItemCount(): Int {
-        return profilenewsList.size ?: 0
+        return profilenewsList.size
     }
 
     fun clear() {
@@ -129,7 +130,7 @@ class ProfilenewsAdapter(private val mCtx: Context,
 
     fun addItems(items: List<ProfilenewsRecycler>) {
         profilenewsList.addAll(items)
-        notifyDataSetChanged()
+        notifyItemRangeInserted(profilenewsList.size - 1, items.size)
     }
 
     fun addLoading() {
@@ -166,7 +167,6 @@ class ProfilenewsAdapter(private val mCtx: Context,
         private var postContext: RelativeLayout = itemView.findViewById(R.id.postContext)
         private var likeProgress: ProgressBar = itemView.findViewById(R.id.likeProgress)
         private var imageInflater: View? = null
-        //private var imageProfilenewsView: ImageView = itemView.findViewById(R.id.profileNewsImage)
         private var imageViewProfilenewsPic: ImageView = itemView.findViewById(R.id.imageViewProfilenewsPic)
         private var notiType: ImageView = itemView.findViewById(R.id.platformType)
         private var likeView: ImageView = itemView.findViewById(R.id.like)
@@ -370,7 +370,6 @@ class ProfilenewsAdapter(private val mCtx: Context,
             likeView.setOnClickListener {
                 likeView.isEnabled = false
                 likeView.visible(false)
-                //val unlikeAnim:Animation = AnimationUtils.loadAnimation(mCtx, R.anim.fade_out)
                 val likeAppear:Animation = AnimationUtils.loadAnimation(mCtx, R.anim.expand_in)
 
                 val newValue = (textViewLikes.text.toString().toInt() + 1).toString()
@@ -379,18 +378,16 @@ class ProfilenewsAdapter(private val mCtx: Context,
                 likedView.visible(true)
                 likedView.startAnimation(likeAppear)
                 likedView.isEnabled = false
-                Handler().postDelayed({ likedView.isEnabled = true }, 3500)
-                //likeProgress.visibility = View.VISIBLE
+                Handler(Looper.getMainLooper()).postDelayed({ likedView.isEnabled = true }, 3500)
                 val stringRequest: StringRequest = object : StringRequest(Method.POST, LIKE_URL, Response.Listener { response: String? ->
                     val obj: JSONObject
                     try {
                         obj = JSONObject(response!!)
                         if (obj.getBoolean("error")) {
                             Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show()
-                            //likeProgress.visibility = View.GONE
                             likeView.visible(true)
                             likeView.isEnabled = false
-                            Handler().postDelayed({ likeView.isEnabled = true }, 3000)
+                            Handler(Looper.getMainLooper()).postDelayed({ likeView.isEnabled = true }, 3000)
                         }
                     } catch (e: JSONException) {
                         e.printStackTrace()
@@ -400,7 +397,7 @@ class ProfilenewsAdapter(private val mCtx: Context,
                     likeProgress.visible(false)
                     likeView.visible(true)
                     likeView.isEnabled = false
-                    Handler().postDelayed({ likeView.isEnabled = true }, 3000)
+                    Handler(Looper.getMainLooper()).postDelayed({ likeView.isEnabled = true }, 3000)
                 }) {
                     override fun getParams(): Map<String, String> {
                         val params: MutableMap<String, String> = HashMap()
@@ -425,17 +422,17 @@ class ProfilenewsAdapter(private val mCtx: Context,
                 likeView.visible(true)
                 likeView.startAnimation(likedAppear)
                 likeView.isEnabled = false
-                Handler().postDelayed({ likeView.isEnabled = true }, 3500)
+                Handler(Looper.getMainLooper()).postDelayed({ likeView.isEnabled = true }, 3500)
                 val stringRequest: StringRequest = object : StringRequest(Method.POST, LIKE_URL, Response.Listener { response: String? ->
                     val obj: JSONObject
                     try {
                         obj = JSONObject(response!!)
                         if (!obj.getBoolean("error")) {
-                            Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show()
+//                            Toast.makeText(mCtx, obj.getString("message"), Toast.LENGTH_LONG).show()
                             likeProgress.visible(false)
                             likedView.visible(true)
                             likedView.isEnabled = false
-                            Handler().postDelayed({ likedView.isEnabled = true }, 3000)
+                            Handler(Looper.getMainLooper()).postDelayed({ likedView.isEnabled = true }, 3000)
                         }
                     } catch (e: JSONException) {
                         e.printStackTrace()
@@ -445,7 +442,7 @@ class ProfilenewsAdapter(private val mCtx: Context,
                     likeProgress.visible(false)
                     likedView.visible(true)
                     likedView.isEnabled = false
-                    Handler().postDelayed({ likeView.isEnabled = true }, 3000)
+                    Handler(Looper.getMainLooper()).postDelayed({ likeView.isEnabled = true }, 3000)
                 }) {
                     override fun getParams(): Map<String, String> {
                         val params: MutableMap<String, String> = HashMap()

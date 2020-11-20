@@ -3,6 +3,7 @@ package com.lucidsoftworksllc.sabotcommunity.adapters
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -92,7 +93,7 @@ class PublicsRoomAdapter(private val mCtx: Context, private val games: MutableLi
                 publicsActionBtnFollowed.visibility = View.VISIBLE
                 publicsActionBtnFollowed.startAnimation(buttonAppear)
                 publics.followed = "yes"
-                Handler().postDelayed({ publicsActionBtnFollowed.isEnabled = true }, 3500)
+                Handler(Looper.getMainLooper()).postDelayed({ publicsActionBtnFollowed.isEnabled = true }, 3500)
                 CoroutineScope(IO).launch{
                     SabotDatabase(mCtx).getPublicsDao().followGame(publics.id)
                 }
@@ -141,7 +142,7 @@ class PublicsRoomAdapter(private val mCtx: Context, private val games: MutableLi
                             publicsActionBtn.visibility = View.VISIBLE
                             publicsActionBtn.startAnimation(buttonAppear)
                             publics.followed = "no"
-                            Handler().postDelayed({ publicsActionBtn.isEnabled = true }, 3500)
+                            Handler(Looper.getMainLooper()).postDelayed({ publicsActionBtn.isEnabled = true }, 3500)
                             CoroutineScope(IO).launch{
                                 SabotDatabase(mCtx).getPublicsDao().unfollowGame(publics.id)
                             }

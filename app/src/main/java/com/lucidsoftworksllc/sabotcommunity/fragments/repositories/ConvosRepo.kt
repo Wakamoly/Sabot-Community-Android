@@ -1,31 +1,13 @@
 package com.lucidsoftworksllc.sabotcommunity.fragments.repositories
 
-import android.graphics.Bitmap
-import android.util.Base64
-import android.util.Log
 import com.lucidsoftworksllc.sabotcommunity.db.messages.general.MessagesCacheEntity
 import com.lucidsoftworksllc.sabotcommunity.db.messages.general.MessagesDao
-import com.lucidsoftworksllc.sabotcommunity.db.messages.general.MessagesDataModel
 import com.lucidsoftworksllc.sabotcommunity.db.messages.general.MessagesRetrofit
-import com.lucidsoftworksllc.sabotcommunity.db.messages.typed.TypedMessageDao
-import com.lucidsoftworksllc.sabotcommunity.db.messages.typed.TypedMessageEntity
-import com.lucidsoftworksllc.sabotcommunity.db.messages.user_info.MessageUserInfoDao
-import com.lucidsoftworksllc.sabotcommunity.db.messages.user_info.MessageUserInfoEntity
-import com.lucidsoftworksllc.sabotcommunity.db.messages.user_messages.UserMessagesDao
-import com.lucidsoftworksllc.sabotcommunity.db.messages.user_messages.UserMessagesEntity
-import com.lucidsoftworksllc.sabotcommunity.models.network_autogen.UserMessageData
-import com.lucidsoftworksllc.sabotcommunity.models.network_autogen.UserMessagesFromID
-import com.lucidsoftworksllc.sabotcommunity.network.UserMessageApi
 import com.lucidsoftworksllc.sabotcommunity.others.base.BaseRepository
 import com.lucidsoftworksllc.sabotcommunity.util.DataState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import org.json.JSONException
-import org.json.JSONObject
-import java.io.ByteArrayOutputStream
 import java.lang.Exception
-import java.util.*
-import kotlin.collections.ArrayList
 
 class ConvosRepo (
         private val api: MessagesRetrofit,
@@ -40,15 +22,14 @@ class ConvosRepo (
                 for (message in networkMessages){
                     generalMessagesDao.insert(message)
                 }
-                generalMessagesDao.setAllLoaded()
-                val newCachedMessages = generalMessagesDao.get()
                 try {
-                    emit(DataState.UpdateSuccess(newCachedMessages))
+                    emit(DataState.Success(networkMessages))
                 }catch (throwable: Throwable){
                     emit(DataState.Failure(false, null, null))
                 }
+                generalMessagesDao.setAllLoaded()
             }else{
-                emit(DataState.UpdateSuccess(cachedMessages))
+                emit(DataState.Success(cachedMessages))
                 val networkMessages = api.getMessages(dUsername, dUserID)
                 for (message in networkMessages){
                     if (message.type != "group"){
@@ -70,11 +51,10 @@ class ConvosRepo (
                     }
 
                 }
-                val newCachedMessages = generalMessagesDao.get()
-                generalMessagesDao.setAllLoaded()
-                if (newCachedMessages.isNotEmpty()){
-                    emit(DataState.UpdateSuccess(newCachedMessages))
+                if (networkMessages.isNotEmpty()){
+                    emit(DataState.UpdateSuccess(networkMessages))
                 }
+                generalMessagesDao.setAllLoaded()
 
             }
         }catch (e: Exception){

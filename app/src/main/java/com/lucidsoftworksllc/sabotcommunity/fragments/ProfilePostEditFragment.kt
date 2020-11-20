@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
@@ -247,8 +248,7 @@ class ProfilePostEditFragment : Fragment() {
                                 e.printStackTrace()
                             }
                         }).start()
-                        //Fucking code wouldn't work any other way than I'm currently capable. Fuck it, have a delay
-                        val handler = Handler()
+                        val handler = Handler(Looper.getMainLooper())
                         handler.postDelayed({
                             Glide.with(mContext!!)
                                     .load(imageUrl[0])

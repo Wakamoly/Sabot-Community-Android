@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -19,13 +21,14 @@ import com.lucidsoftworksllc.sabotcommunity.db.messages.general.MessagesDataMode
 import com.lucidsoftworksllc.sabotcommunity.db.messages.user_messages.UserMessagesEntity
 import com.lucidsoftworksllc.sabotcommunity.fragments.PhotoViewFragment
 import com.lucidsoftworksllc.sabotcommunity.others.active_label.SocialTextView
+import com.lucidsoftworksllc.sabotcommunity.others.base.BaseViewHolder
 import com.lucidsoftworksllc.sabotcommunity.others.getTimeAgo
 import com.lucidsoftworksllc.sabotcommunity.others.setClicks
 import com.lucidsoftworksllc.sabotcommunity.others.visible
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MessagesThreadAdapter(private val context: Context, private val username: String) : RecyclerView.Adapter<MessagesThreadAdapter.ViewHolder>() {
+class MessagesThreadAdapter(private val context: Context, private val username: String) : RecyclerView.Adapter<BaseViewHolder>() {
     private val SELF = 786
     private val messages: MutableList<UserMessagesEntity> = ArrayList()
     override fun getItemViewType(position: Int): Int {
@@ -46,36 +49,9 @@ class MessagesThreadAdapter(private val context: Context, private val username: 
         return ViewHolder(itemView)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val message = messages[position]
-        holder.textViewMessage.text = message.body
-        holder.textViewMessage.setClicks(context)
-        holder.textViewTime.text = getTimeAgo(message.date, context)
-        if (message.image != "") {
-            holder.imgMsg.visible(true)
-            Glide.with((context as ChatActivity))
-                    .load(Constants.BASE_URL + message.image)
-                    .error(R.mipmap.ic_launcher)
-                    .into(holder.imgMsg)
-            holder.imgMsg.setOnClickListener {
-                val asf: Fragment = PhotoViewFragment()
-                val args = Bundle()
-                args.putString("image", message.image)
-                asf.arguments = args
-                val fragmentTransaction = (context as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                fragmentTransaction.addToBackStack(null)
-                fragmentTransaction.replace(R.id.chat_fragment_container, asf)
-                fragmentTransaction.commit()
-            }
-        } else {
-            holder.imgMsg.visible(false)
-            holder.imgMsg.setImageDrawable(null)
-        }
-    }
-
     fun add(item: UserMessagesEntity){
         messages.add(0,item)
-        notifyDataSetChanged()
+        notifyItemInserted(0)
     }
 
     fun addItems(items: List<UserMessagesEntity>) {
@@ -92,20 +68,62 @@ class MessagesThreadAdapter(private val context: Context, private val username: 
                     }
                 }
                 if (addNew){
-                    messages.add(0, items[item])
+                    add(items[item])
                 }
             }
         }
         notifyDataSetChanged()
     }
 
+    private fun setAnimation(viewToAnimate: View, position: Int) {
+        if (position >= 0) {
+            val animation: Animation = AnimationUtils.loadAnimation(context, R.anim.slide_in)
+            viewToAnimate.startAnimation(animation)
+        }
+    }
+
     override fun getItemCount(): Int {
         return messages.size
     }
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var textViewMessage: SocialTextView = itemView.findViewById(R.id.tv_message_content)
-        var textViewTime: TextView = itemView.findViewById<View>(R.id.tv_time) as TextView
-        var imgMsg: ImageView = itemView.findViewById(R.id.img_msg)
+    inner class ViewHolder(itemView: View) : BaseViewHolder(itemView) {
+        private var textViewMessage: SocialTextView = itemView.findViewById(R.id.tv_message_content)
+        private var textViewTime: TextView = itemView.findViewById<View>(R.id.tv_time) as TextView
+        private var imgMsg: ImageView = itemView.findViewById(R.id.img_msg)
+        override fun clear() { }
+        override fun onBind(position: Int){
+            super.onBind(position)
+            val message = messages[position]
+            textViewMessage.text = message.body
+            textViewMessage.setClicks(context)
+            textViewTime.text = getTimeAgo(message.date, context)
+            if (message.image != "") {
+                imgMsg.visible(true)
+                Glide.with((context as ChatActivity))
+                        .load(Constants.BASE_URL + message.image)
+                        .error(R.mipmap.ic_launcher)
+                        .into(imgMsg)
+                imgMsg.setOnClickListener {
+                    val asf: Fragment = PhotoViewFragment()
+                    val args = Bundle()
+                    args.putString("image", message.image)
+                    asf.arguments = args
+                    val fragmentTransaction = (context as FragmentActivity).supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
+                    fragmentTransaction.addToBackStack(null)
+                    fragmentTransaction.replace(R.id.chat_fragment_container, asf)
+                    fragmentTransaction.commit()
+                }
+            } else {
+                imgMsg.visible(false)
+                imgMsg.setImageDrawable(null)
+            }
+            //setAnimation(itemView, position)
+
+        }
     }
+
+    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
+        holder.onBind(position)
+    }
+
 }
