@@ -130,7 +130,7 @@ class ProfilenewsAdapter(private val mCtx: Context,
 
     fun addItems(items: List<ProfilenewsRecycler>) {
         profilenewsList.addAll(items)
-        notifyDataSetChanged()
+        notifyItemRangeInserted(profilenewsList.size - 1, items.size)
     }
 
     fun addLoading() {

@@ -138,13 +138,13 @@ class NotificationsAdapter(private val context: Context) : RecyclerView.Adapter<
     }
 
     inner class ViewHolder(itemView: View) : BaseViewHolder(itemView) {
-        var nickname: TextView = itemView.findViewById(R.id.notificationsNickname)
-        var body: SocialTextView = itemView.findViewById(R.id.notificationsBody)
+        private var nickname: TextView = itemView.findViewById(R.id.notificationsNickname)
+        private var body: SocialTextView = itemView.findViewById(R.id.notificationsBody)
         private var datetime: TextView = itemView.findViewById(R.id.notificationsDateTime)
         private var profilePicView: ImageView = itemView.findViewById(R.id.notificationsImageView)
-        var online: CircleImageView = itemView.findViewById(R.id.online)
+        private var online: CircleImageView = itemView.findViewById(R.id.online)
         private var notiType: CircleImageView = itemView.findViewById(R.id.notiType)
-        var verified: CircleImageView = itemView.findViewById(R.id.verified)
+        private var verified: CircleImageView = itemView.findViewById(R.id.verified)
         private var notiLayout: MaterialRippleLayout = itemView.findViewById(R.id.notiLayout)
         override fun clear() {}
         override fun onBind(position: Int) {

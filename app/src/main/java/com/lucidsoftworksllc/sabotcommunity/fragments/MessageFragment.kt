@@ -174,6 +174,7 @@ class MessageFragment : BaseFragment<UserMessageVM, ContentChatBinding, UserMess
                     updateSentMessageUI(it.data)
                 }
                 // TODO: 10/30/20 ADD RETRY FOR SENDING MESSAGES
+                // TODO: 11/19/20 Could not send message! // Add errorRetry() properly with image saving
                 is DataState.Failure -> handleApiError(it) { errorRetry() }
             }
         })

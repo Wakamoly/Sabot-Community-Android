@@ -148,20 +148,24 @@ class UserMessageRepo (
 
         val sentMessageData = safeApiCall { api.sendMessage(userTo, dUsername, dUserID, message, jsonObject) }
         if (sentMessageData is DataState.Success){
-            val data = sentMessageData.data
-            val messageEntity = UserMessagesEntity(data.messageid, userTo, dUsername, message, currentDateSendMessage(), data.imagepath)
+            if (!sentMessageData.data.error){
+                val data = sentMessageData.data
+                val messageEntity = UserMessagesEntity(data.messageid, userTo, dUsername, message, currentDateSendMessage(), data.imagepath)
+                return try {
+                    val messageData = UserMessageData(false, listOf(messageEntity))
+                    if (messagesDao.isRowExist(messageEntity.message_id)) {
+                        messagesDao.updateMessage(messageEntity)
+                    } else {
+                        messagesDao.addMessage(messageEntity)
+                    }
+                    DataState.Success(messageData)
+                }catch (throwable: Throwable){
+                    DataState.Failure(false, null, null, "Network response error!")
+                }
+            }else{
+                return DataState.Failure(false, null, null, "Network response error!")
+            }
 
-            val messageData = UserMessageData(false, listOf(messageEntity))
-            if (messagesDao.isRowExist(messageEntity.message_id)) {
-                messagesDao.updateMessage(messageEntity)
-            } else {
-                messagesDao.addMessage(messageEntity)
-            }
-            return try {
-                DataState.Success(messageData)
-            }catch (throwable: Throwable){
-                DataState.Failure(false, null, null)
-            }
         }else{
             return DataState.Failure(false, null, null)
         }
