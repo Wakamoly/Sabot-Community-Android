@@ -3,8 +3,10 @@ package com.lucidsoftworksllc.sabotcommunity.db
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.room.TypeConverter
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.time.Instant
-import java.util.*
+
 
 class DbConverters {
     companion object {
@@ -20,6 +22,16 @@ class DbConverters {
         @JvmStatic
         fun toInstant(value: Long): Instant {
             return Instant.ofEpochMilli(value)
+        }
+
+        @TypeConverter
+        fun restoreList(listOfString: String?): List<String?>? {
+            return Gson().fromJson(listOfString, object : TypeToken<List<String?>?>() {}.type)
+        }
+
+        @TypeConverter
+        fun saveList(listOfString: List<String?>?): String? {
+            return Gson().toJson(listOfString)
         }
 
         /*@TypeConverter

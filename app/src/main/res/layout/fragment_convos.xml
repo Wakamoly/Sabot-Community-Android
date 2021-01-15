@@ -17,7 +17,7 @@
         android:orientation="vertical">
 
         <ProgressBar
-                        android:indeterminateDrawable="@drawable/sabot_progress"
+            android:indeterminateDrawable="@drawable/sabot_progress"
             android:id="@+id/progressBar"
             android:layout_centerInParent="true"
             android:layout_width="wrap_content"

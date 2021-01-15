@@ -23,19 +23,14 @@ import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.balysv.materialripple.MaterialRippleLayout
 import com.bumptech.glide.Glide
-import com.iarcuschin.simpleratingbar.SimpleRatingBar
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -61,7 +56,6 @@ import com.lucidsoftworksllc.sabotcommunity.others.base.BaseFragment
 import com.lucidsoftworksllc.sabotcommunity.util.DataState
 import com.theartofdev.edmodo.cropper.CropImage
 import com.yarolegovich.lovelydialog.LovelyStandardDialog
-import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.fragment_profile.*
 import kotlinx.android.synthetic.main.snippet_top_profilebar.*
 import org.json.JSONArray
@@ -104,17 +98,16 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
     }
 
     private fun refreshProfile(){
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).commitNowAllowingStateLoss()
-            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().attach(this).commitAllowingStateLoss()
-        } else {
-            (mCtx as FragmentActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
-        }*/
-
         viewModel.getProfileTop(deviceUserID, userProfileID!!.toInt(), deviceUsername)
         statusUpdate?.setText("")
         profileRefreshLayout.isRefreshing = false
         profileCover.requestFocus()
+    }
+
+    private fun refreshRecycler(){
+        addPostLayout.visible(false)
+        viewModel.getProfileNews(deviceUserID, userProfileID!!.toInt(), deviceUsername)
+        statusUpdate?.setText("")
     }
 
     private fun setOnClickListeners(){
@@ -482,6 +475,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                 profileLoadingScreen.visible(true)
                 submitStatus(body, addedBy, usernameTo, spinnerText, form)
                 hideKeyboardFrom(mCtx, view)
+                refreshRecycler()
             } else {
                 mCtx.toastShort("You must enter text before submitting!")
             }
@@ -927,7 +921,7 @@ class FragmentProfile : BaseFragment<ProfileVM, FragmentProfileBinding, ProfileR
                     }
 
                     if (Build.VERSION.SDK_INT < 29){
-                        imageUploadBtn!!.setImageBitmap(bitmap1)
+                        imageUploadBtn?.setImageBitmap(bitmap1)
                     }else{
                         imageUploadBtn?.setImageResource(R.drawable.icons8_question_mark_64)
                         mCtx.toastLong("Cannot display image cropped! (Android 10+ temporary issue, upload should work as usual.)")
